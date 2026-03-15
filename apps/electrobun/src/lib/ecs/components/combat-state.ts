@@ -1,4 +1,4 @@
-import { component, field } from '@lastolivegames/becsy';
+import { component, field } from "@lastolivegames/becsy";
 
 /**
  * Combat phase constants.
@@ -10,7 +10,7 @@ export const CombatPhase = {
   ENDING: 3,
 } as const;
 
-export type CombatPhaseValue = typeof CombatPhase[keyof typeof CombatPhase];
+export type CombatPhaseValue = (typeof CombatPhase)[keyof typeof CombatPhase];
 
 /**
  * Turn state constants for player actions.
@@ -22,7 +22,7 @@ export const TurnState = {
   ANIMATING: 3,
 } as const;
 
-export type TurnStateValue = typeof TurnState[keyof typeof TurnState];
+export type TurnStateValue = (typeof TurnState)[keyof typeof TurnState];
 
 /**
  * Combat fight type constants.
@@ -35,13 +35,14 @@ export const FightType = {
   MONSTER: 4,
 } as const;
 
-export type FightTypeValue = typeof FightType[keyof typeof FightType];
+export type FightTypeValue = (typeof FightType)[keyof typeof FightType];
 
 /**
  * Global combat context.
  * Singleton entity tracking the current fight state.
  */
-@component export class CombatContext {
+@component
+export class CombatContext {
   @field.uint32 declare fightId: number;
   @field.uint8 declare fightType: number;
   @field.uint8 declare phase: number;
@@ -57,7 +58,8 @@ export type FightTypeValue = typeof FightType[keyof typeof FightType];
  * Player-specific turn state.
  * Tracks the local player's combat status.
  */
-@component export class PlayerTurnState {
+@component
+export class PlayerTurnState {
   @field.uint8 declare state: number;
   @field.boolean declare ready: boolean;
   @field.uint16 declare startCellId: number;
@@ -67,7 +69,8 @@ export type FightTypeValue = typeof FightType[keyof typeof FightType];
  * Team placement cells.
  * Available cells for team placement during preparation phase.
  */
-@component export class TeamPlacement {
+@component
+export class TeamPlacement {
   @field.uint8 declare team: number;
   @field.object declare cells: number[];
 }

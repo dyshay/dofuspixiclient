@@ -7,11 +7,13 @@ set shell := ["bash", "-cu"]
 root := justfile_directory()
 assets_exporter := root + "/tools/assets-exporter"
 svg_spritesheet := root + "/tools/svg-spritesheet"
+tile_classifier := root + "/tools/tile-classifier"
 sources := root + "/assets/sources"
 tiles_output := root + "/assets/rasters/tiles"
 sprites_output := root + "/assets/rasters/sprites"
 tiles_spritesheets := root + "/assets/spritesheets/tiles"
 sprites_spritesheets := root + "/assets/spritesheets/sprites"
+tile_classifications := root + "/assets/tile-classifications.json"
 
 # Rasterized images output (for cross-animation deduplication)
 tiles_rasters := root + "/assets/spritesheets/rasters/tiles"
@@ -48,7 +50,9 @@ spritesheet-ground:
     cd "{{svg_spritesheet}}" && bun run src/cli.ts \
         "{{tiles_output}}/svg/ground" \
         "{{tiles_spritesheets}}/ground" \
-        --parallel {{parallel}}
+        --parallel {{parallel}} \
+        --tile-classifications "{{tile_classifications}}" \
+        --tile-type ground
 
 # Generate objects tiles spritesheet only
 spritesheet-objects:
@@ -57,7 +61,20 @@ spritesheet-objects:
     cd "{{svg_spritesheet}}" && bun run src/cli.ts \
         "{{tiles_output}}/svg/objects" \
         "{{tiles_spritesheets}}/objects" \
-        --parallel {{parallel}}
+        --parallel {{parallel}} \
+        --tile-classifications "{{tile_classifications}}" \
+        --tile-type objects
+
+# Open visual gallery to review and classify tiles (auto-saves on each change)
+review-tiles:
+    @echo "Starting tile classifier gallery..."
+    cd "{{tile_classifier}}" && bun run src/cli.ts review \
+        "{{tiles_output}}/svg" \
+        --classifications "{{tile_classifications}}"
+
+# Show tile classification stats
+classify-stats:
+    cd "{{tile_classifier}}" && bun run src/cli.ts stats "{{tile_classifications}}"
 
 # Clean all generated output
 clean:

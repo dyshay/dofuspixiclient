@@ -1,20 +1,22 @@
-import { system, System } from '@lastolivegames/becsy';
+import { System, system } from "@lastolivegames/becsy";
+
 import {
+  ActiveEffect,
   CombatContext,
   CombatPhase,
-  PlayerTurnState,
-  TurnState,
   Fighter,
   FighterStats,
-  ActiveEffect,
+  PlayerTurnState,
   SpellCooldown,
-} from '@/ecs/components';
+  TurnState,
+} from "@/ecs/components";
 
 /**
  * Turn management system.
  * Handles turn timing, AP/MP reset, and end-of-turn processing.
  */
-@system export class TurnSystem extends System {
+@system
+export class TurnSystem extends System {
   private combatContext = this.query(
     (q) => q.current.with(CombatContext).write
   );
@@ -27,13 +29,9 @@ import {
     (q) => q.current.with(Fighter, FighterStats).write
   );
 
-  private effects = this.query(
-    (q) => q.current.with(ActiveEffect).write
-  );
+  private effects = this.query((q) => q.current.with(ActiveEffect).write);
 
-  private cooldowns = this.query(
-    (q) => q.current.with(SpellCooldown).write
-  );
+  private cooldowns = this.query((q) => q.current.with(SpellCooldown).write);
 
   execute(): void {
     // Turn system runs passively
@@ -97,7 +95,7 @@ import {
   /**
    * Set player turn state to active.
    */
-  private updatePlayerTurnState(fighterId: number): void {
+  private updatePlayerTurnState(_fighterId: number): void {
     // This would check if fighterId matches the local player
     // For now, we update the state assuming it's the player's turn
     for (const entity of this.playerTurnState.current) {
@@ -109,7 +107,7 @@ import {
   /**
    * Reset spell uses for the new turn.
    */
-  private resetSpellUsesThisTurn(fighterId: number): void {
+  private resetSpellUsesThisTurn(_fighterId: number): void {
     for (const entity of this.cooldowns.current) {
       const cooldown = entity.write(SpellCooldown);
       cooldown.usesThisTurn = 0;
@@ -119,7 +117,7 @@ import {
   /**
    * Process effects that trigger at end of turn.
    */
-  private processEndOfTurnEffects(fighterId: number): void {
+  private processEndOfTurnEffects(_fighterId: number): void {
     for (const entity of this.effects.current) {
       const effect = entity.write(ActiveEffect);
 
@@ -138,7 +136,7 @@ import {
   /**
    * Decrement spell cooldowns at end of turn.
    */
-  private decrementCooldowns(fighterId: number): void {
+  private decrementCooldowns(_fighterId: number): void {
     for (const entity of this.cooldowns.current) {
       const cooldown = entity.write(SpellCooldown);
 

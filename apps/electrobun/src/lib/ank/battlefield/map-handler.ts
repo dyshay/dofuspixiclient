@@ -33,15 +33,6 @@ export interface Viewport {
 }
 
 /**
- * Cache entry for pre-sorted cells
- */
-interface SortedCellsCache {
-  mapId: number;
-  mapWidth: number;
-  sortedCells: CellData[];
-}
-
-/**
  * Tracks a rendered sprite for in-place texture swapping on zoom changes
  */
 interface SpriteRef {
@@ -56,7 +47,6 @@ export class MapHandler {
   // Opt #2: Cache Texture directly instead of Sprite wrapper
   private textureCache = new Map<string, Texture>();
   private animatedSprites: AnimatedSprite[] = [];
-  private sortedCellsCache: SortedCellsCache | null = null;
   private onSpriteCreated?: (
     sprite: Sprite,
     tileId: number,
@@ -69,12 +59,10 @@ export class MapHandler {
   private groundLayer = new Container();
   private objectLayer1 = new Container();
   private objectLayer2 = new Container();
-  private animatedLayer = new Container();
   private layersInitialized = false;
 
   // Opt #7: Track sprite→tileKey mappings for texture-swap on zoom
   private spriteRefs: SpriteRef[] = [];
-  private lastMapScale: MapScale | null = null;
 
   constructor(config: MapHandlerConfig) {
     this.atlasLoader = config.atlasLoader;
@@ -84,40 +72,6 @@ export class MapHandler {
     this.groundLayer.sortableChildren = true;
     this.objectLayer1.sortableChildren = true;
     this.objectLayer2.sortableChildren = true;
-    this.animatedLayer.sortableChildren = true;
-  }
-
-  /**
-   * Get pre-sorted cells for a map, using cache when possible
-   * Sorting is done once per map and cached for subsequent renders
-   */
-  private getSortedCells(mapData: MapData): CellData[] {
-    const { id: mapId, width: mapWidth, cells } = mapData;
-
-    // Return cached sorted cells if same map
-    if (
-      this.sortedCellsCache &&
-      this.sortedCellsCache.mapId === mapId &&
-      this.sortedCellsCache.mapWidth === mapWidth
-    ) {
-      return this.sortedCellsCache.sortedCells;
-    }
-
-    // Sort cells by isometric depth (y + x determines draw order)
-    const sortedCells = [...cells].sort((a, b) => {
-      const posA = getCellPosition(a.id, mapWidth, a.groundLevel);
-      const posB = getCellPosition(b.id, mapWidth, b.groundLevel);
-      return posA.y + posA.x - (posB.y + posB.x);
-    });
-
-    // Cache the sorted result
-    this.sortedCellsCache = {
-      mapId,
-      mapWidth,
-      sortedCells,
-    };
-
-    return sortedCells;
   }
 
   /**
@@ -158,7 +112,6 @@ export class MapHandler {
     this.groundLayer.removeChildren();
     this.objectLayer1.removeChildren();
     this.objectLayer2.removeChildren();
-    this.animatedLayer.removeChildren();
     this.clearAnimatedSprites();
 
     // Opt #7: Reset sprite refs for this render pass
@@ -170,8 +123,6 @@ export class MapHandler {
       backgroundNum,
     } = mapData;
     const mapScale = computeMapScale(mapWidth, mapHeight);
-    this.lastMapScale = mapScale;
-
     mapContainer.scale.set(zoom);
 
     // Opt #5: Add layers to parent only once
@@ -180,7 +131,6 @@ export class MapHandler {
       mapContainer.addChild(this.groundLayer);
       mapContainer.addChild(this.objectLayer1);
       mapContainer.addChild(this.objectLayer2);
-      mapContainer.addChild(this.animatedLayer);
       this.layersInitialized = true;
     } else if (this.backgroundLayer.parent !== mapContainer) {
       // Re-parent if mapContainer changed
@@ -189,11 +139,10 @@ export class MapHandler {
       mapContainer.addChild(this.groundLayer);
       mapContainer.addChild(this.objectLayer1);
       mapContainer.addChild(this.objectLayer2);
-      mapContainer.addChild(this.animatedLayer);
     }
 
-    // Use pre-sorted cells (cached per map to avoid re-sorting on each render)
-    const sortedCells = this.getSortedCells(mapData);
+    // Use cells in sequential order (CellId sequential order IS the correct isometric front-to-back order)
+    const { cells } = mapData;
 
     // Collect all unique tile keys including background for parallel prefetch
     const uniqueTileKeys = new Set<string>();
@@ -202,7 +151,7 @@ export class MapHandler {
       uniqueTileKeys.add(`ground_${backgroundNum}`);
     }
 
-    for (const cell of sortedCells) {
+    for (const cell of cells) {
       if (cell.ground > 0) {
         uniqueTileKeys.add(`ground_${cell.ground}`);
       }
@@ -229,7 +178,7 @@ export class MapHandler {
     let renderedCount = 0;
     let culledCount = 0;
 
-    for (const cell of sortedCells) {
+    for (const cell of cells) {
       const cellPosition = getCellPosition(cell.id, mapWidth, cell.groundLevel);
 
       if (!this.isCellInViewport(cellPosition, viewport, mapScale)) {
@@ -244,8 +193,7 @@ export class MapHandler {
         mapScale,
         this.groundLayer,
         this.objectLayer1,
-        this.objectLayer2,
-        this.animatedLayer
+        this.objectLayer2
       );
     }
 
@@ -272,8 +220,10 @@ export class MapHandler {
       return;
     }
 
-    const bgBaseX = bgTile?.offsetX ?? 0;
-    const bgBaseY = bgTile?.offsetY ?? 0;
+    // Account for frame trim offset (same as positionSpriteWithManifest)
+    const bgFrame = bgTile?.frames[0];
+    const bgBaseX = (bgTile?.offsetX ?? 0) + (bgFrame?.ox ?? 0);
+    const bgBaseY = (bgTile?.offsetY ?? 0) + (bgFrame?.oy ?? 0);
 
     const bgScale = mapScale.scale;
     bgSprite.scale.set(bgScale, bgScale);
@@ -307,8 +257,7 @@ export class MapHandler {
     mapScale: MapScale,
     groundLayer: Container,
     objectLayer1: Container,
-    objectLayer2: Container,
-    animatedLayer: Container
+    objectLayer2: Container
   ): void {
     const basePosition = getCellPosition(cell.id, mapWidth, cell.groundLevel);
     const groundSlope = cell.groundSlope ?? 1;
@@ -319,10 +268,11 @@ export class MapHandler {
       const tile = this.atlasLoader.getTileManifestSync(tileKey);
 
       const targetFrame = this.getFrameIndexFromManifest(tile, cell.id, groundSlope);
-      const isSlope = tile?.behavior === "slope" && (tile?.frameCount ?? 0) > 1;
 
+      // Original AS: rotation is ONLY applied when groundSlope == 1 (flat cells).
+      // Slope cells (groundSlope != 1) get their slope frame but NO rotation/scale.
       let groundRot = cell.layerGroundRot;
-      if (isSlope && groundSlope !== 1) {
+      if (groundSlope !== 1) {
         groundRot = 0;
       }
 
@@ -336,7 +286,9 @@ export class MapHandler {
           groundRot,
           cell.layerGroundFlip,
           cell.id,
-          mapScale
+          mapScale,
+          0,
+          targetFrame
         );
         groundLayer.addChild(sprite);
         this.onSpriteCreated?.(sprite, cell.ground, cell.id, 0);
@@ -372,7 +324,9 @@ export class MapHandler {
           objRot,
           cell.layerObject1Flip,
           cell.id,
-          mapScale
+          mapScale,
+          1,
+          targetFrame
         );
         objectLayer1.addChild(sprite);
         this.onSpriteCreated?.(sprite, cell.layer1, cell.id, 1);
@@ -407,9 +361,11 @@ export class MapHandler {
             0,
             cell.layerObject2Flip,
             cell.id,
-            mapScale
+            mapScale,
+            2,
+            0
           );
-          animatedLayer.addChild(animSprite);
+          objectLayer2.addChild(animSprite);
           this.animatedSprites.push(animSprite);
           this.onSpriteCreated?.(animSprite, cell.layer2, cell.id, 2);
 
@@ -433,7 +389,9 @@ export class MapHandler {
             0,
             cell.layerObject2Flip,
             cell.id,
-            mapScale
+            mapScale,
+            2,
+            targetFrame
           );
           objectLayer2.addChild(sprite);
           this.onSpriteCreated?.(sprite, cell.layer2, cell.id, 2);
@@ -456,7 +414,7 @@ export class MapHandler {
    * Opt #4: Accepts pre-resolved tileKey and manifest to avoid redundant lookups.
    */
   private createTileSpriteWithManifest(
-    tileId: number,
+    _tileId: number,
     tileKey: string,
     _tile: TileManifest | null,
     frameIndex: number
@@ -522,7 +480,9 @@ export class MapHandler {
     rotation: number,
     flip: boolean,
     cellId: number,
-    mapScale: MapScale
+    mapScale: MapScale,
+    layer: number,
+    frameIndex = 0
   ): void {
     if (!tile) {
       return;
@@ -533,12 +493,20 @@ export class MapHandler {
     const baseWidth = tile.width;
     const baseHeight = tile.height;
 
+    // The atlas-level offset is the registration point relative to SVG origin (0,0).
+    // The frame trim offset (frame.ox, frame.oy) is where the frame content starts
+    // in SVG space. We must adjust the atlas offset by the trim to get the correct
+    // registration point within the frame texture.
+    const frame = tile.frames[frameIndex];
+    const trimX = frame?.ox ?? 0;
+    const trimY = frame?.oy ?? 0;
+
     const { offsetX, offsetY } = computePhpLikeOffsets(
       {
         width: baseWidth,
         height: baseHeight,
-        offsetX: tile.offsetX,
-        offsetY: tile.offsetY,
+        offsetX: tile.offsetX + trimX,
+        offsetY: tile.offsetY + trimY,
       },
       r,
       flip
@@ -580,9 +548,10 @@ export class MapHandler {
     const topLeftScaledX = topLeftBaseX * globalScale + mapScale.offsetX;
     const topLeftScaledY = topLeftBaseY * globalScale + mapScale.offsetY;
 
-    sprite.x = Math.round(topLeftScaledX - minX);
-    sprite.y = Math.round(topLeftScaledY - minY);
-    sprite.zIndex = cellId;
+    sprite.x = topLeftScaledX - minX;
+    sprite.y = topLeftScaledY - minY;
+    sprite.zIndex = layer === 2 ? cellId * 100 : cellId;
+
   }
 
   /**
@@ -731,7 +700,6 @@ export class MapHandler {
     // Just clear references - don't destroy textures as they're managed by atlas loader
     this.textureCache.clear();
     this.clearAnimatedSprites();
-    this.sortedCellsCache = null;
     this.spriteRefs = [];
   }
 

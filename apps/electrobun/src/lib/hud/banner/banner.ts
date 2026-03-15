@@ -100,6 +100,7 @@ export class Banner {
   private minimapMaskTexture!: Texture;
   private minimapHitArea: Graphics;
   private minimapRenderer: MinimapRenderer | null = null;
+  private onMinimapTeleport?: (mapId: number) => void;
 
   constructor(app: Application, displayHeight: number) {
     this.app = app;
@@ -127,6 +128,17 @@ export class Banner {
 
     this.minimapHitArea.on('pointerout', () => {
       this.collapseMinimap();
+    });
+
+    let lastClickTime = 0;
+    this.minimapHitArea.on('pointerdown', (event) => {
+      const now = performance.now();
+      if (now - lastClickTime < 400) {
+        this.handleMinimapDoubleClick(event.global.x, event.global.y);
+        lastClickTime = 0;
+      } else {
+        lastClickTime = now;
+      }
     });
 
     this.loadAssets();
@@ -276,7 +288,6 @@ export class Banner {
     const resolution = this.getTargetIconResolution();
     this.currentIconResolution = resolution;
 
-    const prevAliases = new Set(this.iconAssetAliases);
     this.iconAssetAliases.clear();
 
     const assets = this.allIconSvgPaths.map((path) => {
@@ -611,6 +622,20 @@ export class Banner {
       this.heartDefaultFiller.y = currentHeartY;
       this.heartFiller.y = currentHeartY;
     });
+  }
+
+  public setOnMinimapTeleport(callback: (mapId: number) => void): void {
+    this.onMinimapTeleport = callback;
+  }
+
+  private handleMinimapDoubleClick(globalX: number, globalY: number): void {
+    if (!this.minimapRenderer) return;
+
+    const mapId = this.minimapRenderer.getMapIdAtPoint(globalX, globalY);
+    if (mapId !== null) {
+      console.log('[Banner] Minimap double-click teleport to map', mapId);
+      this.onMinimapTeleport?.(mapId);
+    }
   }
 
   public getGraphics(): Container {

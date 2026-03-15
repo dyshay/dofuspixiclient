@@ -24,7 +24,8 @@
     ],
     "catalog": {
       "typescript": "^5.9.3",
-      "@types/node": "^24.10.0"
+      "@types/node": "^24.10.0",
+      "ts-pattern": "^5.9.0"
     }
   },
   "dependencies": {

@@ -1,4 +1,5 @@
 import { type Entity, System, system } from "@lastolivegames/becsy";
+import { match } from "ts-pattern";
 
 import {
   CellPosition,
@@ -275,34 +276,16 @@ export class SpellCastSystem extends System {
     shape: number,
     size: number
   ): number[] {
-    switch (shape) {
-      case ZoneShape.SINGLE:
-        return [centerCell];
-
-      case ZoneShape.CROSS:
-        return this.getCrossCells(centerCell, size);
-
-      case ZoneShape.CIRCLE:
-        return this.getCircleCells(centerCell, size);
-
-      case ZoneShape.LINE:
-        return this.getLineCells(centerCell, size);
-
-      case ZoneShape.RING:
-        return this.getRingCells(centerCell, size);
-
-      case ZoneShape.SQUARE:
-        return this.getSquareCells(centerCell, size);
-
-      case ZoneShape.DIAGONAL:
-        return this.getDiagonalCells(centerCell, size);
-
-      case ZoneShape.CONE:
-        return this.getConeCells(centerCell, size);
-
-      default:
-        return [centerCell];
-    }
+    return match(shape)
+      .with(ZoneShape.SINGLE, () => [centerCell])
+      .with(ZoneShape.CROSS, () => this.getCrossCells(centerCell, size))
+      .with(ZoneShape.CIRCLE, () => this.getCircleCells(centerCell, size))
+      .with(ZoneShape.LINE, () => this.getLineCells(centerCell, size))
+      .with(ZoneShape.RING, () => this.getRingCells(centerCell, size))
+      .with(ZoneShape.SQUARE, () => this.getSquareCells(centerCell, size))
+      .with(ZoneShape.DIAGONAL, () => this.getDiagonalCells(centerCell, size))
+      .with(ZoneShape.CONE, () => this.getConeCells(centerCell, size))
+      .otherwise(() => [centerCell]);
   }
 
   /**

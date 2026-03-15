@@ -7,7 +7,7 @@ import {
   DEFAULT_MAP_WIDTH,
 } from "@/constants/battlefield";
 
-import { getCellPosition } from "./datacenter/cell";
+import { getCellPosition, type CellData } from "./datacenter/cell";
 
 /**
  * Highlight type for combat cells.
@@ -60,6 +60,7 @@ const HIGHLIGHT_ALPHA: Record<HighlightTypeValue, number> = {
 export interface CellHighlightConfig {
   mapWidth?: number;
   groundLevel?: number;
+  cellDataMap?: Map<number, CellData>;
 }
 
 /**
@@ -72,10 +73,12 @@ export class CellHighlighter {
   private highlighted: Map<number, HighlightTypeValue> = new Map();
   private mapWidth: number;
   private groundLevel: number;
+  private cellDataMap: Map<number, CellData>;
 
   constructor(parentContainer: Container, config: CellHighlightConfig = {}) {
     this.mapWidth = config.mapWidth ?? DEFAULT_MAP_WIDTH;
     this.groundLevel = config.groundLevel ?? DEFAULT_GROUND_LEVEL;
+    this.cellDataMap = config.cellDataMap ?? new Map();
 
     this.container = new Container();
     this.container.label = "cell-highlighter";
@@ -146,6 +149,15 @@ export class CellHighlighter {
    */
   getHighlightType(cellId: number): HighlightTypeValue | undefined {
     return this.highlighted.get(cellId);
+  }
+
+  /**
+   * Get cell position considering per-cell ground data.
+   */
+  private getCellPos(cellId: number): { x: number; y: number } {
+    const cell = this.cellDataMap.get(cellId);
+    const level = cell?.groundLevel ?? this.groundLevel;
+    return getCellPosition(cellId, this.mapWidth, level);
   }
 
   /**
@@ -232,7 +244,7 @@ export class CellHighlighter {
     color: number,
     alpha: number
   ): void {
-    const pos = getCellPosition(cellId, this.mapWidth, this.groundLevel);
+    const pos = this.getCellPos(cellId);
 
     // Diamond shape centered at pos (matching original AS CELL_COORD for groundSlope=1)
     const points = [

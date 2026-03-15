@@ -1,6 +1,6 @@
 import { Assets, Rectangle, type Renderer, Texture } from "pixi.js";
 
-import type { FrameInfo, TileManifest } from "@/types";
+import type { FrameInfo, TileBehavior, TileManifest } from "@/types";
 
 import { registerSvgStrokeLoader } from "./svg-stroke-loader";
 
@@ -13,6 +13,14 @@ registerSvgStrokeLoader();
 interface SpritesheetManifest {
   version: number;
   spriteId: string;
+  /** Tile behavior from tile-classifications.json (embedded by spritesheet compiler) */
+  behavior?: TileBehavior;
+  /** Animation fps hint from classification */
+  fps_hint?: number;
+  /** Whether to autoplay animations */
+  autoplay?: boolean;
+  /** Whether animations loop */
+  loop?: boolean;
   animations: Record<
     string,
     AtlasManifest & {
@@ -353,7 +361,13 @@ export class AtlasLoader {
   }
 
   /**
-   * Convert spritesheet format to TileManifest format
+   * Convert spritesheet format to TileManifest format.
+   *
+   * Behavior is read from the manifest (embedded by the spritesheet compiler
+   * from tile-classifications.json). Falls back to a safe heuristic if missing:
+   * - 1 frame → static
+   * - ground + multi-frame → slope
+   * - objects + multi-frame → random (safe default, avoids flicker)
    */
   private convertToTileManifest(
     data: CachedTileData,
@@ -361,9 +375,14 @@ export class AtlasLoader {
   ): TileManifest {
     const { manifest, atlas } = data;
 
-    let behavior: string | null = null;
-    if (atlas.frames.length > 1) {
-      behavior = "animated";
+    // Use classified behavior from manifest if available
+    let behavior: TileBehavior = "static";
+
+    if (manifest.behavior) {
+      behavior = manifest.behavior;
+    } else if (atlas.frames.length > 1) {
+      // Fallback heuristic: default objects to "random" (safe — no flicker)
+      behavior = type === "ground" ? "slope" : "random";
     }
 
     const firstFrame = atlas.frames[0];
@@ -384,9 +403,9 @@ export class AtlasLoader {
       id: parseInt(manifest.spriteId, 10),
       type,
       behavior,
-      fps: atlas.fps ?? null,
-      autoplay: true,
-      loop: true,
+      fps: manifest.fps_hint ?? atlas.fps ?? null,
+      autoplay: manifest.autoplay ?? true,
+      loop: manifest.loop ?? true,
       frameCount: atlas.frames.length,
       width: spriteWidth,
       height: spriteHeight,

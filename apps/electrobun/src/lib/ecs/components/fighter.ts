@@ -1,10 +1,11 @@
-import { component, field } from '@lastolivegames/becsy';
+import { component, field } from "@lastolivegames/becsy";
 
 /**
  * Core fighter identity and team assignment.
  * Attached to all entities participating in combat.
  */
-@component export class Fighter {
+@component
+export class Fighter {
   @field.uint32 declare id: number;
   @field.uint8 declare team: number;
   @field.boolean declare isPlayer: boolean;
@@ -15,7 +16,8 @@ import { component, field } from '@lastolivegames/becsy';
  * Fighter combat statistics.
  * HP, AP, MP, and initiative for turn order.
  */
-@component export class FighterStats {
+@component
+export class FighterStats {
   @field.int32 declare hp: number;
   @field.int32 declare maxHp: number;
   @field.int32 declare ap: number;
@@ -30,7 +32,8 @@ import { component, field } from '@lastolivegames/becsy';
  * Fighter position on the combat grid.
  * Uses cell ID for isometric map positioning.
  */
-@component export class CellPosition {
+@component
+export class CellPosition {
   @field.uint16 declare cellId: number;
   @field.uint8 declare groundLevel: number;
 }
@@ -38,7 +41,8 @@ import { component, field } from '@lastolivegames/becsy';
 /**
  * Fighter visual appearance and display name.
  */
-@component export class FighterLook {
+@component
+export class FighterLook {
   @field.object declare look: string;
   @field.object declare name: string;
   @field.uint8 declare entityType: number;
@@ -52,7 +56,7 @@ export const FighterTeam = {
   BLUE: 1,
 } as const;
 
-export type FighterTeamValue = typeof FighterTeam[keyof typeof FighterTeam];
+export type FighterTeamValue = (typeof FighterTeam)[keyof typeof FighterTeam];
 
 /**
  * Fighter entity type constants.
@@ -63,7 +67,8 @@ export const FighterEntityType = {
   SUMMON: 2,
 } as const;
 
-export type FighterEntityTypeValue = typeof FighterEntityType[keyof typeof FighterEntityType];
+export type FighterEntityTypeValue =
+  (typeof FighterEntityType)[keyof typeof FighterEntityType];
 
 /**
  * Direction constants (8 directions).
@@ -79,4 +84,4 @@ export const Direction = {
   NORTH_EAST: 7,
 } as const;
 
-export type DirectionValue = typeof Direction[keyof typeof Direction];
+export type DirectionValue = (typeof Direction)[keyof typeof Direction];

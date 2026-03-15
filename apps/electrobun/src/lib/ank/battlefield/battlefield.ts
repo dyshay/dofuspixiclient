@@ -5,11 +5,13 @@ import {
   extensions,
   type Sprite,
   TextureSource,
+  Ticker,
 } from "pixi.js";
 
 import type { InteractiveObjectData, PickResult, RenderStats } from "@/types";
 import { ZaapContextMenu } from "@/ank/gapi/controls";
 import { DISPLAY_HEIGHT } from "@/constants/battlefield";
+import { type GameWorld, getGameWorld } from "@/ecs/world";
 import { Banner } from "@/hud/banner";
 import { AtlasLoader } from "@/render/atlas-loader";
 import { Engine } from "@/render/engine";
@@ -25,15 +27,15 @@ import {
   DamageRenderer,
   DamageType,
 } from "./damage-renderer";
-import { findCellAtPosition } from "./datacenter/cell";
+import { type CellData, findCellAtPosition } from "./datacenter/cell";
 import { computeMapScale, loadMapData, type MapData } from "./datacenter/map";
 import { DebugOverlay } from "./debug-overlay";
-import { GridOverlay } from "./grid-overlay";
 import {
   type FighterAnimationValue,
   FighterRenderer,
   type FighterSpriteData,
 } from "./fighter-renderer";
+import { GridOverlay } from "./grid-overlay";
 import { InteractionHandler } from "./interaction-handler";
 import { MapHandler } from "./map-handler";
 import { type SpellAnimationConfig, SpellRenderer } from "./spell-renderer";
@@ -73,7 +75,6 @@ export interface BattlefieldConfig {
 }
 
 export class Battlefield {
-  private container: HTMLElement;
   private engine: Engine;
   private app: Application | null = null;
   private mapContainer: Container | null = null;
@@ -84,6 +85,7 @@ export class Battlefield {
   private banner: Banner | null = null;
 
   private currentMapData: MapData | null = null;
+  private cellDataMap: Map<number, CellData> = new Map();
 
   private interactiveGfxIds = new Set<number>();
   private interactiveObjectsData = new Map<number, InteractiveObjectData>();
@@ -108,7 +110,12 @@ export class Battlefield {
   private gridOverlay: GridOverlay | null = null;
 
   // Ground click callback
+  // ECS
+  private gameWorld: GameWorld;
+  private ecsTickerCallback: (() => void) | null = null;
+
   private onCellClickCallback?: (cellId: number) => void;
+  private onMinimapTeleportCallback?: (mapId: number) => void;
 
   private onResizeStartCallback?: () => void;
   private onResizeEndCallback?: () => void;
@@ -119,9 +126,10 @@ export class Battlefield {
   private zoomDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(config: BattlefieldConfig) {
-    this.container = config.container;
     this.onResizeStartCallback = config.onResizeStart;
     this.onResizeEndCallback = config.onResizeEnd;
+
+    this.gameWorld = getGameWorld();
 
     this.engine = new Engine({
       container: config.container,
@@ -246,6 +254,9 @@ export class Battlefield {
     const baseZoom = this.engine.getBaseZoom();
     this.banner = new Banner(this.app, DISPLAY_HEIGHT);
     this.banner.init(this.app.screen.width, baseZoom);
+    this.banner.setOnMinimapTeleport((mapId) => {
+      this.onMinimapTeleportCallback?.(mapId);
+    });
     this.app.stage.addChild(this.banner.getGraphics());
 
     this.app.stage.eventMode = "static";
@@ -286,6 +297,20 @@ export class Battlefield {
 
     // Initialize grid overlay (inside mapContainer so it pans/zooms with map)
     this.gridOverlay = new GridOverlay(this.mapContainer);
+
+    // Initialize ECS world and wire to PixiJS Ticker
+    await this.gameWorld.init();
+    this.ecsTickerCallback = () => {
+      this.gameWorld.execute();
+    };
+    Ticker.shared.add(this.ecsTickerCallback);
+  }
+
+  /**
+   * Get the ECS GameWorld for pushing commands.
+   */
+  getGameWorld(): GameWorld {
+    return this.gameWorld;
   }
 
   async loadManifest(): Promise<void> {
@@ -324,6 +349,11 @@ export class Battlefield {
     const mapData = await loadMapData(mapId);
     this.currentMapData = mapData;
 
+    this.cellDataMap.clear();
+    for (const cell of mapData.cells) {
+      this.cellDataMap.set(cell.id, cell);
+    }
+
     this.mapContainer.x = 0;
     this.mapContainer.y = 0;
 
@@ -354,6 +384,11 @@ export class Battlefield {
     }
 
     this.currentMapData = mapData;
+
+    this.cellDataMap.clear();
+    for (const cell of mapData.cells) {
+      this.cellDataMap.set(cell.id, cell);
+    }
 
     this.mapContainer.x = 0;
     this.mapContainer.y = 0;
@@ -411,6 +446,7 @@ export class Battlefield {
     this.worldActorRenderer = new FighterRenderer(this.worldActorContainer, {
       mapWidth,
       groundLevel: 7,
+      cellDataMap: this.cellDataMap,
     });
   }
 
@@ -635,7 +671,7 @@ export class Battlefield {
     }
   }
 
-  private handleObjectHover(result: PickResult | null): void {
+  private handleObjectHover(_result: PickResult | null): void {
     // Can be extended for hover effects
   }
 
@@ -661,6 +697,10 @@ export class Battlefield {
 
   setOnCellClick(callback: (cellId: number) => void): void {
     this.onCellClickCallback = callback;
+  }
+
+  setOnMinimapTeleport(callback: (mapId: number) => void): void {
+    this.onMinimapTeleportCallback = callback;
   }
 
   private isZaap(pickableId: number): boolean {
@@ -690,7 +730,7 @@ export class Battlefield {
     }
   }
 
-  handleWheel(e: WheelEvent): void {
+  handleWheel(_e: WheelEvent): void {
     // Handled by interaction handler via canvas event
   }
 
@@ -706,6 +746,27 @@ export class Battlefield {
     return this.currentMapData;
   }
 
+  /**
+   * Get per-cell ground data for positioning actors correctly.
+   */
+  getCellGroundData(cellId: number): {
+    groundLevel: number;
+    groundSlope: number;
+  } {
+    const cell = this.cellDataMap.get(cellId);
+    return {
+      groundLevel: cell?.groundLevel ?? 7,
+      groundSlope: cell?.groundSlope ?? 1,
+    };
+  }
+
+  /**
+   * Get the full cell data map for renderers.
+   */
+  getCellDataMap(): Map<number, CellData> {
+    return this.cellDataMap;
+  }
+
   destroy(): void {
     // Clear zoom debounce timer
     if (this.zoomDebounceTimer) {
@@ -717,6 +778,12 @@ export class Battlefield {
     if (this.currentContextMenu) {
       this.currentContextMenu.destroy();
       this.currentContextMenu = null;
+    }
+
+    // Clean up ECS ticker
+    if (this.ecsTickerCallback) {
+      Ticker.shared.remove(this.ecsTickerCallback);
+      this.ecsTickerCallback = null;
     }
 
     this.exitCombatMode();
@@ -791,26 +858,30 @@ export class Battlefield {
 
     // Initialize combat renderers
     const mapWidth = this.currentMapData?.width ?? 15;
-    const groundLevel = this.currentMapData?.groundLevel ?? 7;
+    const groundLevel = 7;
 
     this.cellHighlighter = new CellHighlighter(this.combatContainer, {
       mapWidth,
       groundLevel,
+      cellDataMap: this.cellDataMap,
     });
 
     this.fighterRenderer = new FighterRenderer(this.combatContainer, {
       mapWidth,
       groundLevel,
+      cellDataMap: this.cellDataMap,
     });
 
     this.damageRenderer = new DamageRenderer(this.combatContainer, {
       mapWidth,
       groundLevel,
+      cellDataMap: this.cellDataMap,
     });
 
     this.spellRenderer = new SpellRenderer(this.combatContainer, {
       mapWidth,
       groundLevel,
+      cellDataMap: this.cellDataMap,
     });
   }
 

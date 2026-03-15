@@ -1,4 +1,6 @@
+import { match } from "ts-pattern";
 import type { Battlefield } from "@/ank/battlefield";
+import type { GameWorld } from "@/ecs/world";
 import {
   loadMapDataFromServer,
   type ServerMapDataPayload,
@@ -45,6 +47,7 @@ export class GameClient {
   private pathfinding: DofusPathfinding | null = null;
   private isMoving = false;
   private mapLoadPromise: Promise<void> = Promise.resolve();
+  private gameWorld: GameWorld | null = null;
 
   private onCharacterList?: (characters: CharacterInfo[]) => void;
   private onLoginFailed?: (reason: string) => void;
@@ -58,19 +61,19 @@ export class GameClient {
     this.messageHandler = createMessageHandler();
 
     this.connection.addEventListener((event: ConnectionEvent) => {
-      switch (event.type) {
-        case "connected":
+      match(event)
+        .with({ type: "connected" }, () => {
           console.log("[GameClient] Connected to server");
           this.onConnected?.();
-          break;
-        case "disconnected":
-          console.log("[GameClient] Disconnected:", event.reason);
+        })
+        .with({ type: "disconnected" }, (e) => {
+          console.log("[GameClient] Disconnected:", e.reason);
           this.onDisconnected?.();
-          break;
-        case "message":
-          this.messageHandler.handle(event.message);
-          break;
-      }
+        })
+        .with({ type: "message" }, (e) => {
+          this.messageHandler.handle(e.message);
+        })
+        .otherwise(() => {});
     });
 
     this.registerHandlers();
@@ -207,6 +210,13 @@ export class GameClient {
       const actor = payload as ActorAddPayload;
       console.log("[GameClient] ACTOR_ADD:", actor.name ?? actor.id);
 
+      // Push to ECS command queue for NetworkIngestSystem
+      this.gameWorld?.pushCommand({
+        type: ServerMessageType.ACTOR_ADD,
+        payload: actor,
+        timestamp: Date.now(),
+      });
+
       this.battlefield?.addWorldActor({
         id: actor.id,
         name: actor.name ?? `Player ${actor.id}`,
@@ -219,16 +229,31 @@ export class GameClient {
 
     // ACTOR_REMOVE — actor left the map
     this.messageHandler.on(ServerMessageType.ACTOR_REMOVE, (payload: any) => {
-      const { id } = payload as ActorRemovePayload;
-      console.log("[GameClient] ACTOR_REMOVE:", id);
-      this.battlefield?.removeWorldActor(id);
+      const data = payload as ActorRemovePayload;
+      console.log("[GameClient] ACTOR_REMOVE:", data.id);
+
+      this.gameWorld?.pushCommand({
+        type: ServerMessageType.ACTOR_REMOVE,
+        payload: data,
+        timestamp: Date.now(),
+      });
+
+      this.battlefield?.removeWorldActor(data.id);
     });
 
     // ACTOR_MOVE — actor moved on the map
     this.messageHandler.on(
       ServerMessageType.ACTOR_MOVE,
       async (payload: any) => {
-        const { id, path } = payload as ActorMovePayload;
+        const moveData = payload as ActorMovePayload;
+        const { id, path } = moveData;
+
+        this.gameWorld?.pushCommand({
+          type: ServerMessageType.ACTOR_MOVE,
+          payload: moveData,
+          timestamp: Date.now(),
+        });
+
         if (id === this.currentCharacter?.id && path.length > 0) {
           this.isMoving = true;
         }
@@ -236,6 +261,10 @@ export class GameClient {
         if (id === this.currentCharacter?.id && path.length > 0) {
           this.currentCellId = path[path.length - 1];
           this.isMoving = false;
+          // Signal server that walk animation is complete
+          this.connection.send(
+            encodeMessage(ClientMessageType.CHARACTER_MOVE_END, {}),
+          );
         }
       }
     );
@@ -243,7 +272,15 @@ export class GameClient {
 
   setBattlefield(battlefield: Battlefield): void {
     this.battlefield = battlefield;
+    this.gameWorld = battlefield.getGameWorld();
     this.battlefield.setOnCellClick((cellId) => this.handleCellClick(cellId));
+    this.battlefield.setOnMinimapTeleport((mapId) => this.handleMinimapTeleport(mapId));
+  }
+
+  private handleMinimapTeleport(mapId: number): void {
+    if (this.currentMapId === mapId) return;
+    console.log(`[GameClient] Minimap teleport to map ${mapId}`);
+    this.changeMap(mapId);
   }
 
   private handleCellClick(targetCellId: number): void {

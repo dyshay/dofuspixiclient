@@ -12,17 +12,19 @@
 		"start": "electrobun run"
 	},
 	"dependencies": {
-		"electrobun": "latest",
+		"@dofus/grid": "workspace:*",
+		"@dofus/protocol": "workspace:*",
 		"@lastolivegames/becsy": "^0.15.5",
 		"@msgpack/msgpack": "^3.1.3",
 		"@pixi/compressed-textures": "^7.4.3",
 		"@pixi/layout": "latest",
 		"@pixi/ui": "latest",
-		"bitecs": "^0.3.40",
+		"electrobun": "latest",
 		"fflate": "^0.8.2",
 		"fzstd": "^0.1.1",
 		"pixi-filters": "^6.1.5",
 		"pixi.js": "latest",
+		"ts-pattern": "catalog:",
 		"ws": "^8.19.0"
 	},
 	"devDependencies": {
@@ -30,6 +32,7 @@
 		"@types/bun": "latest",
 		"@types/compression": "^1.8.1",
 		"@types/node": "^24.10.9",
+		"@types/three": "^0.183.1",
 		"autoprefixer": "^10.4.20",
 		"compression": "^1.8.1",
 		"concurrently": "^9.1.0",

@@ -69,42 +69,26 @@ export class GridOverlay {
     for (const cell of this.cells) {
       const pos = getCellPosition(cell.id, this.mapWidth, cell.groundLevel);
 
-      // pos is the center of the diamond (matching original AS code)
       const cx = pos.x * scale + offsetX;
       const cy = pos.y * scale + offsetY;
 
       const isTrigger = this.triggerCellIds.has(cell.id);
       const isWalkable = cell.walkable === true;
 
+      // Draw diamond
+      const points = [cx, cy - hh, cx + hw, cy, cx, cy + hh, cx - hw, cy];
       if (isTrigger) {
-        // Red filled diamond for triggers
-        this.graphics.poly([
-          cx, cy - hh,
-          cx + hw, cy,
-          cx, cy + hh,
-          cx - hw, cy,
-        ]);
+        this.graphics.poly(points);
         this.graphics.fill({ color: 0xff0000, alpha: 0.35 });
         this.graphics.stroke({ width: 1.5, color: 0xff0000, alpha: 0.9 });
       } else if (isWalkable) {
-        // Green outline for walkable
-        this.graphics.poly([
-          cx, cy - hh,
-          cx + hw, cy,
-          cx, cy + hh,
-          cx - hw, cy,
-        ]);
+        this.graphics.poly(points);
         this.graphics.stroke({ width: 0.5, color: 0x00ff00, alpha: 0.25 });
       } else {
-        // Dark outline for non-walkable
-        this.graphics.poly([
-          cx, cy - hh,
-          cx + hw, cy,
-          cx, cy + hh,
-          cx - hw, cy,
-        ]);
+        this.graphics.poly(points);
         this.graphics.stroke({ width: 0.5, color: 0x666666, alpha: 0.15 });
       }
+
     }
   }
 

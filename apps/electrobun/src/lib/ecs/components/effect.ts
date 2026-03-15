@@ -1,4 +1,4 @@
-import { component, field } from '@lastolivegames/becsy';
+import { component, field } from "@lastolivegames/becsy";
 
 /**
  * Effect type constants matching Dofus protocol.
@@ -54,7 +54,7 @@ export const EffectType = {
   REFLECT_DAMAGE: 107,
 } as const;
 
-export type EffectTypeValue = typeof EffectType[keyof typeof EffectType];
+export type EffectTypeValue = (typeof EffectType)[keyof typeof EffectType];
 
 /**
  * Element type constants.
@@ -67,13 +67,14 @@ export const Element = {
   AIR: 4,
 } as const;
 
-export type ElementValue = typeof Element[keyof typeof Element];
+export type ElementValue = (typeof Element)[keyof typeof Element];
 
 /**
  * Active effect on a fighter.
  * Tracks buffs, debuffs, and ongoing effects.
  */
-@component export class ActiveEffect {
+@component
+export class ActiveEffect {
   @field.uint16 declare type: number;
   @field.int32 declare value: number;
   @field.int32 declare param1: number;
@@ -88,7 +89,8 @@ export type ElementValue = typeof Element[keyof typeof Element];
  * Effect indicator for UI display.
  * Shows buff/debuff icons on fighter portraits.
  */
-@component export class EffectIndicator {
+@component
+export class EffectIndicator {
   @field.uint16 declare iconId: number;
   @field.boolean declare isBuff: boolean;
   @field.uint8 declare element: number;
@@ -98,7 +100,8 @@ export type ElementValue = typeof Element[keyof typeof Element];
  * Pending damage for grouped display.
  * Accumulates damage during action resolution.
  */
-@component export class PendingDamage {
+@component
+export class PendingDamage {
   @field.int32 declare amount: number;
   @field.uint8 declare element: number;
   @field.boolean declare isCritical: boolean;

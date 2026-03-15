@@ -1,12 +1,19 @@
-import { Container, Graphics, Text, Sprite, type FederatedPointerEvent } from 'pixi.js';
-import type { ExtendedTexture } from '@/types';
+import {
+  Container,
+  type FederatedPointerEvent,
+  Graphics,
+  type Sprite,
+  Text,
+} from "pixi.js";
+
+import type { ExtendedTexture } from "@/types";
 
 export interface SpriteDebugInfo {
   sprite: Sprite;
   tileId: number;
   cellId: number;
   layer: number; // 0=ground, 1=object1, 2=object2
-  type: 'ground' | 'objects';
+  type: "ground" | "objects";
 }
 
 export class DebugOverlay {
@@ -16,13 +23,12 @@ export class DebugOverlay {
   private tooltipText: Text;
   private sprites: SpriteDebugInfo[] = [];
   private enabled = false;
-  private mapContainer: Container | null = null;
   private screenWidth = 1484;
   private screenHeight = 1114;
 
   constructor(parentContainer: Container) {
     this.container = new Container();
-    this.container.label = 'debug-overlay';
+    this.container.label = "debug-overlay";
     this.container.zIndex = 10000;
     parentContainer.addChild(this.container);
 
@@ -34,9 +40,9 @@ export class DebugOverlay {
     this.tooltip.addChild(this.tooltipBg);
 
     this.tooltipText = new Text({
-      text: '',
+      text: "",
       style: {
-        fontFamily: 'monospace',
+        fontFamily: "monospace",
         fontSize: 12,
         fill: 0xffffff,
         wordWrap: false,
@@ -49,20 +55,24 @@ export class DebugOverlay {
     this.container.addChild(this.tooltip);
   }
 
-  setMapContainer(mapContainer: Container): void {
-    this.mapContainer = mapContainer;
+  setMapContainer(_mapContainer: Container): void {
+    // Reserved for future use
   }
 
   registerSprite(info: SpriteDebugInfo): void {
     this.sprites.push(info);
 
     // Make sprite interactive for hover detection
-    info.sprite.eventMode = 'static';
-    info.sprite.cursor = 'pointer';
+    info.sprite.eventMode = "static";
+    info.sprite.cursor = "pointer";
 
-    info.sprite.on('pointerenter', (e: FederatedPointerEvent) => this.showTooltip(info, e));
-    info.sprite.on('pointermove', (e: FederatedPointerEvent) => this.updateTooltipPosition(e));
-    info.sprite.on('pointerleave', () => this.hideTooltip());
+    info.sprite.on("pointerenter", (e: FederatedPointerEvent) =>
+      this.showTooltip(info, e)
+    );
+    info.sprite.on("pointermove", (e: FederatedPointerEvent) =>
+      this.updateTooltipPosition(e)
+    );
+    info.sprite.on("pointerleave", () => this.hideTooltip());
   }
 
   clear(): void {
@@ -98,11 +108,11 @@ export class DebugOverlay {
     if (!this.enabled) return;
 
     const tex = info.sprite.texture as ExtendedTexture;
-    const scale = tex._scale ?? 'unknown';
+    const scale = tex._scale ?? "unknown";
     const isFallback = tex._isFallback ?? false;
     const requestedScale = tex._requestedScale;
 
-    const layerNames = ['ground', 'object1', 'object2'];
+    const layerNames = ["ground", "object1", "object2"];
     const layerName = layerNames[info.layer] ?? `layer${info.layer}`;
 
     let text = `Tile: ${info.type}_${info.tileId}\n`;
@@ -123,8 +133,14 @@ export class DebugOverlay {
 
     this.tooltipBg.clear();
     this.tooltipBg.roundRect(0, 0, width, height, 4);
-    this.tooltipBg.fill({ color: isFallback ? 0x990000 : 0x000000, alpha: 0.9 });
-    this.tooltipBg.stroke({ color: isFallback ? 0xff0000 : 0x666666, width: 1 });
+    this.tooltipBg.fill({
+      color: isFallback ? 0x990000 : 0x000000,
+      alpha: 0.9,
+    });
+    this.tooltipBg.stroke({
+      color: isFallback ? 0xff0000 : 0x666666,
+      width: 1,
+    });
 
     // Position tooltip at mouse cursor
     this.positionTooltipAtMouse(e.global.x, e.global.y, width, height);
@@ -140,7 +156,12 @@ export class DebugOverlay {
     this.positionTooltipAtMouse(e.global.x, e.global.y, width, height);
   }
 
-  private positionTooltipAtMouse(mouseX: number, mouseY: number, width: number, height: number): void {
+  private positionTooltipAtMouse(
+    mouseX: number,
+    mouseY: number,
+    width: number,
+    height: number
+  ): void {
     const margin = 15;
 
     // Try to position to the right and above the cursor

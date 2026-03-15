@@ -1,7 +1,8 @@
-import { Container, Graphics, Sprite, Texture } from 'pixi.js';
+import { Container, Graphics, Sprite, type Texture } from "pixi.js";
+
 // import { Input } from '@pixi/ui'; // TODO: Re-enable when @pixi/ui is compatible with latest pixi.js
-import type { ChatButton, ChatFilter } from '@/types/banner';
-import { CHAT_FILTER_CONFIGS } from '@/types/banner';
+import type { ChatButton, ChatFilter } from "@/types/banner";
+import { CHAT_FILTER_CONFIGS } from "@/types/banner";
 
 export function createChatButton(
   iconTexture: Texture,
@@ -20,8 +21,8 @@ export function createChatButton(
     container.addChild(hoverIcon);
   }
 
-  container.eventMode = 'static';
-  container.cursor = 'pointer';
+  container.eventMode = "static";
+  container.cursor = "pointer";
 
   const chatButton: ChatButton = {
     container,
@@ -30,7 +31,7 @@ export function createChatButton(
     isPressed: false,
   };
 
-  container.on('pointerover', () => {
+  container.on("pointerover", () => {
     if (!hoverIcon) {
       return;
     }
@@ -39,7 +40,7 @@ export function createChatButton(
     hoverIcon.visible = true;
   });
 
-  container.on('pointerout', () => {
+  container.on("pointerout", () => {
     if (!hoverIcon) {
       return;
     }
@@ -48,7 +49,7 @@ export function createChatButton(
     hoverIcon.visible = false;
   });
 
-  container.on('pointerdown', () => {
+  container.on("pointerdown", () => {
     chatButton.isPressed = !chatButton.isPressed;
   });
 
@@ -72,8 +73,8 @@ export function createChatFilter(color: number): ChatFilter {
   checkmark.stroke({ color: 0xffffff, width: 2 });
   container.addChild(checkmark);
 
-  container.eventMode = 'static';
-  container.cursor = 'pointer';
+  container.eventMode = "static";
+  container.cursor = "pointer";
 
   const filter: ChatFilter = {
     container,
@@ -82,7 +83,7 @@ export function createChatFilter(color: number): ChatFilter {
     isActive: true,
   };
 
-  container.on('pointerdown', () => {
+  container.on("pointerdown", () => {
     filter.isActive = !filter.isActive;
     checkmark.visible = filter.isActive;
   });
@@ -140,7 +141,10 @@ export function createChatUI(
   const expandButton = createChatButton(iconTextures.expand);
   container.addChild(expandButton.container);
 
-  const emotesButton = createChatButton(iconTextures.emotes, iconTextures.emotesHover);
+  const emotesButton = createChatButton(
+    iconTextures.emotes,
+    iconTextures.emotesHover
+  );
   container.addChild(emotesButton.container);
 
   const sitButton = createChatButton(iconTextures.sit, iconTextures.sitHover);
@@ -174,7 +178,7 @@ export function updateChatPositions(
   textureScale: number,
   iconTextureScale: number,
   emotesPopup: Sprite,
-  onExpandToggle: () => void
+  _onExpandToggle: () => void
 ): void {
   const chatButtonScale = iconTextureScale;
 

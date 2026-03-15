@@ -1,5 +1,9 @@
-import type { Sprite } from 'pixi.js';
-import type { TileData } from '@/types/tile';
+export interface TileData {
+  width: number;
+  height: number;
+  offsetX: number;
+  offsetY: number;
+}
 
 export interface SpriteTransform {
   rotation: number;

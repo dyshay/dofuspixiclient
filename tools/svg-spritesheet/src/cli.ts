@@ -11,6 +11,7 @@ import type {
   CombinedManifest,
   CompileResult,
   OptimizationOptions,
+  TileBehavior,
 } from "./types.ts";
 import { deduplicateDefinitions, processFrames } from "./lib/deduplicator.ts";
 import {
@@ -148,13 +149,62 @@ async function compileAnimation(
   return { manifest: result.manifest, outputSize: finalSize, inputSize };
 }
 
+/** Tile classification entry from tile-classifications.json */
+interface TileClassificationEntry {
+  behavior: TileBehavior;
+  fps?: number;
+  autoplay?: boolean;
+  loop?: boolean;
+}
+
+/** Tile classifications file format */
+interface TileClassifications {
+  version: number;
+  ground: Record<string, TileClassificationEntry>;
+  objects: Record<string, TileClassificationEntry>;
+}
+
+/**
+ * Load tile classifications from JSON file.
+ */
+function loadTileClassifications(
+  filePath: string
+): TileClassifications | null {
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  } catch (e) {
+    logger.warn(`Failed to load tile classifications from ${filePath}: ${e}`);
+    return null;
+  }
+}
+
+/**
+ * Look up a tile's classification by its spriteId and the parent directory type.
+ */
+function lookupTileClassification(
+  classifications: TileClassifications | null,
+  spriteId: string,
+  tileType: "ground" | "objects" | null
+): TileClassificationEntry | null {
+  if (!classifications || !tileType) {
+    return null;
+  }
+
+  return classifications[tileType]?.[spriteId] ?? null;
+}
+
 async function generateCombinedManifest(
   spriteId: string,
   outputDir: string,
   manifests: Map<string, { manifest: AtlasManifest; inputSize: number }>,
   totalInputSize: number,
   totalOutputSize: number,
-  singleAnimation: boolean = false
+  singleAnimation: boolean = false,
+  tileClassification: TileClassificationEntry | null = null
 ): Promise<CombinedManifest> {
   const animations: CombinedManifest["animations"] = {};
 
@@ -178,6 +228,21 @@ async function generateCombinedManifest(
     animations,
   };
 
+  // Embed tile classification if available
+  if (tileClassification) {
+    combined.behavior = tileClassification.behavior;
+
+    if (tileClassification.fps !== undefined) {
+      combined.fps_hint = tileClassification.fps;
+    }
+    if (tileClassification.autoplay !== undefined) {
+      combined.autoplay = tileClassification.autoplay;
+    }
+    if (tileClassification.loop !== undefined) {
+      combined.loop = tileClassification.loop;
+    }
+  }
+
   const manifestPath = path.join(outputDir, "manifest.json");
   await Bun.write(manifestPath, JSON.stringify(combined));
 
@@ -190,7 +255,8 @@ async function compileSprite(
   spriteId: string,
   svgoConfigPath: string,
   parallel: number,
-  imageRegistry?: ImageRegistry
+  imageRegistry?: ImageRegistry,
+  tileClassification?: TileClassificationEntry | null
 ): Promise<CompileResult> {
   try {
     const svgFiles = fs
@@ -255,7 +321,8 @@ async function compileSprite(
       manifests,
       totalInputSize,
       totalOutputSize,
-      singleAnimation
+      singleAnimation,
+      tileClassification ?? null
     );
 
     return {
@@ -300,10 +367,12 @@ interface CompileOptions {
   parallel: number;
   exportImages?: string;
   webBasePath?: string;
+  tileClassifications?: string;
+  tileType?: "ground" | "objects";
 }
 
 async function compileAll(options: CompileOptions): Promise<void> {
-  const { inputBase, outputBase, svgoConfig, parallel, exportImages, webBasePath } = options;
+  const { inputBase, outputBase, svgoConfig, parallel, exportImages, webBasePath, tileClassifications: tileClassPath, tileType } = options;
 
   logger.info("=== SVG Sprite Compiler ===");
   logger.info(`Input: ${inputBase}`);
@@ -337,6 +406,23 @@ async function compileAll(options: CompileOptions): Promise<void> {
     );
   }
 
+  // Load tile classifications if provided
+  let classifications: TileClassifications | null = null;
+
+  if (tileClassPath) {
+    classifications = loadTileClassifications(path.resolve(tileClassPath));
+
+    if (classifications) {
+      const groundCount = Object.keys(classifications.ground).length;
+      const objectsCount = Object.keys(classifications.objects).length;
+      logger.info(
+        `Loaded tile classifications: ${groundCount} ground, ${objectsCount} objects`
+      );
+    } else {
+      logger.warn(`Could not load tile classifications from: ${tileClassPath}`);
+    }
+  }
+
   const svgoConfigPath =
     svgoConfig ?? path.join(import.meta.dir, "..", "svgo.config.mjs");
 
@@ -360,13 +446,21 @@ async function compileAll(options: CompileOptions): Promise<void> {
       continue;
     }
 
+    // Look up tile classification for this sprite
+    const tileClass = lookupTileClassification(
+      classifications,
+      spriteId,
+      tileType ?? null
+    );
+
     const result = await compileSprite(
       spriteDir,
       outputDir,
       spriteId,
       svgoConfigPath,
       parallel,
-      imageRegistry
+      imageRegistry,
+      tileClass
     );
 
     if (result.success) {
@@ -443,11 +537,19 @@ program
     "-w, --web-base-path <path>",
     "Web URL base path for image references (e.g., /assets/images). If set, absolute URLs are used instead of relative paths"
   )
+  .option(
+    "--tile-classifications <path>",
+    "Path to tile-classifications.json (generated by tile-classifier tool)"
+  )
+  .option(
+    "--tile-type <type>",
+    "Tile type for classification lookup: ground or objects"
+  )
   .action(
     async (
       input: string,
       output: string,
-      opts: { parallel: string; config?: string; exportImages?: string; webBasePath?: string }
+      opts: { parallel: string; config?: string; exportImages?: string; webBasePath?: string; tileClassifications?: string; tileType?: string }
     ) => {
       try {
         await compileAll({
@@ -457,6 +559,8 @@ program
           svgoConfig: opts.config ? path.resolve(opts.config) : undefined,
           exportImages: opts.exportImages,
           webBasePath: opts.webBasePath,
+          tileClassifications: opts.tileClassifications,
+          tileType: opts.tileType as "ground" | "objects" | undefined,
         });
       } catch (error) {
         logger.error(`Compilation failed: ${error}`);

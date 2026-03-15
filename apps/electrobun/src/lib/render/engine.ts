@@ -8,7 +8,6 @@ import {
 
 import type { CanvasSize, RenderStats } from "@/types";
 import {
-  DISPLAY_HEIGHT,
   DISPLAY_WIDTH,
   FULL_HEIGHT,
   GAME_HEIGHT,
@@ -93,23 +92,20 @@ export class Engine {
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
       antialias: true,
-      roundPixels: true,
+      roundPixels: false,
       preferWebGLVersion: 1,
       preference: this.config.preferWebGPU ? "webgpu" : "webgl",
       layout: {
-        autoUpdate: true,
         enableDebug: false,
         throttle: 0,
-      },
+      } as never,
     });
 
     if (this.app.canvas && this.container) {
       this.container.appendChild(this.app.canvas);
     }
 
-    this.hookRenderPerformance();
-
-    (this.app.stage as Record<string, unknown>).layout = {
+    this.app.stage.layout = {
       width: this.app.screen.width,
       height: this.app.screen.height,
     };
@@ -131,47 +127,6 @@ export class Engine {
       height: Math.round(FULL_HEIGHT * zoom),
       zoom,
     };
-  }
-
-  private hookRenderPerformance(): void {
-    if (!this.app) {
-      return;
-    }
-
-    const appAny = this.app as Record<string, unknown>;
-    const originalRender = (appAny.render as Function)?.bind(appAny);
-
-    if (typeof originalRender === "function") {
-      appAny.render = (...args: unknown[]) => {
-        this.lastDrawCalls = 0;
-        const start = performance.now();
-        originalRender(...args);
-        this.lastFrameTimeMs = performance.now() - start;
-      };
-    }
-
-    const rendererAny = appAny.renderer as Record<string, unknown>;
-    const batchPipe = (rendererAny?.renderPipes as Record<string, unknown>)
-      ?.batch as Record<string, unknown>;
-
-    if (batchPipe && typeof batchPipe.execute === "function") {
-      const originalExecute = (batchPipe.execute as Function).bind(batchPipe);
-
-      batchPipe.execute = (
-        batch: Record<string, unknown>,
-        ...rest: unknown[]
-      ) => {
-        if (
-          batch &&
-          batch.renderPipeId === "batch" &&
-          (batch.size as number) > 0
-        ) {
-          this.lastDrawCalls++;
-        }
-
-        return originalExecute(batch, ...rest);
-      };
-    }
   }
 
   private setupResizeHandling(): void {
@@ -202,7 +157,10 @@ export class Engine {
     this.currentZoom = this.baseZoom * ZOOM_LEVELS[this.currentZoomIndex];
 
     this.app.renderer.resize(width, height);
-    (this.app.stage as Record<string, unknown>).layout = { width, height };
+    this.app.stage.layout = {
+      width,
+      height,
+    };
 
     // Notify resize start (only once per resize sequence)
     if (!this.isResizing) {

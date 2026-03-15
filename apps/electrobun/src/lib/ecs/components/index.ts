@@ -1,64 +1,81 @@
-export { Position, Scale, Rotation, ZIndex } from './transform';
-export { NetworkId } from './network-id';
-export { TileId, TileType, TILE_LAYER, type TileLayer } from './tile';
-export { Renderable, Animated, Interactive, type DisplayObject } from './renderable';
-
-// Combat - Fighter
+// Actor components
 export {
-  Fighter,
-  FighterStats,
-  CellPosition,
-  FighterLook,
-  FighterTeam,
-  FighterEntityType,
-  Direction,
-  type FighterTeamValue,
-  type FighterEntityTypeValue,
-  type DirectionValue,
-} from './fighter';
-
+  ActorTag,
+  DamageDisplay,
+  MovementAnimation,
+  SpriteState,
+} from "./actor";
 // Combat - State
 export {
   CombatContext,
+  CombatPhase,
+  type CombatPhaseValue,
+  FightType,
+  type FightTypeValue,
   PlayerTurnState,
   TeamPlacement,
-  CombatPhase,
   TurnState,
-  FightType,
-  type CombatPhaseValue,
   type TurnStateValue,
-  type FightTypeValue,
-} from './combat-state';
-
-// Combat - Spells
-export {
-  Spell,
-  SpellCost,
-  SpellCooldown,
-  SpellZone,
-  SpellCritical,
-  SpellStateRequirements,
-  ZoneShape,
-  type ZoneShapeValue,
-} from './spell';
-
+} from "./combat-state";
 // Combat - Effects
 export {
   ActiveEffect,
   EffectIndicator,
-  PendingDamage,
   EffectType,
-  Element,
   type EffectTypeValue,
+  Element,
   type ElementValue,
-} from './effect';
-
+  PendingDamage,
+} from "./effect";
+// Combat - Fighter
+export {
+  CellPosition,
+  Direction,
+  type DirectionValue,
+  Fighter,
+  FighterEntityType,
+  type FighterEntityTypeValue,
+  FighterLook,
+  FighterStats,
+  FighterTeam,
+  type FighterTeamValue,
+} from "./fighter";
 // Combat - Movement
 export {
-  MovementPath,
-  MovementRestriction,
   ForcedMovement,
-  TeleportTarget,
   MoveAnimation,
   type MoveAnimationValue,
-} from './movement';
+  MovementPath,
+  MovementRestriction,
+  TeleportTarget,
+} from "./movement";
+export { NetworkId } from "./network-id";
+export {
+  Animated,
+  type DisplayObject,
+  Interactive,
+  Renderable,
+} from "./renderable";
+// Singletons
+export {
+  FrameTime,
+  type FrameTimeData,
+  MapContext,
+  type NetworkCommand,
+  NetworkCommandQueue,
+  PlayerContext,
+  RenderContext,
+} from "./singletons";
+// Combat - Spells
+export {
+  Spell,
+  SpellCooldown,
+  SpellCost,
+  SpellCritical,
+  SpellStateRequirements,
+  SpellZone,
+  ZoneShape,
+  type ZoneShapeValue,
+} from "./spell";
+export { TILE_LAYER, TileId, type TileLayer, TileType } from "./tile";
+export { Position, Rotation, Scale, ZIndex } from "./transform";

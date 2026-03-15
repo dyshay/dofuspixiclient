@@ -181,10 +181,19 @@ export interface CompileResult {
   animationCount?: number;
 }
 
+/** Tile behavior classification */
+export type TileBehavior = "static" | "slope" | "animated" | "random" | "resource";
+
 /** Combined manifest for all animations in a sprite */
 export interface CombinedManifest {
   version: number;
   spriteId: string;
+  /** Tile behavior classification (when compiled with --tile-classifications) */
+  behavior?: TileBehavior;
+  /** Animation properties (only for animated/resource behaviors) */
+  fps_hint?: number;
+  autoplay?: boolean;
+  loop?: boolean;
   animations: Record<string, AnimationManifestEntry>;
 }
 

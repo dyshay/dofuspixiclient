@@ -12,8 +12,8 @@ import {
   getDirectionSuffix,
   isDirectionFlipped,
 } from "./character-sprite";
-import { getCellPosition } from "./datacenter/cell";
-import { DofusPathfinding } from "./dofus-pathfinding";
+import { getCellPosition, getSlopeYOffset, type CellData } from "./datacenter/cell";
+import { getDirection } from "./dofus-pathfinding";
 
 /**
  * Fighter animation state.
@@ -105,6 +105,7 @@ interface ActiveFighter {
 export interface FighterRendererConfig {
   mapWidth?: number;
   groundLevel?: number;
+  cellDataMap?: Map<number, CellData>;
 }
 
 /**
@@ -135,11 +136,13 @@ export class FighterRenderer {
   private fighters: Map<number, ActiveFighter> = new Map();
   private mapWidth: number;
   private groundLevel: number;
+  private cellDataMap: Map<number, CellData>;
   private tickerCallback: () => void;
 
   constructor(parentContainer: Container, config: FighterRendererConfig = {}) {
     this.mapWidth = config.mapWidth ?? DEFAULT_MAP_WIDTH;
     this.groundLevel = config.groundLevel ?? DEFAULT_GROUND_LEVEL;
+    this.cellDataMap = config.cellDataMap ?? new Map();
 
     this.container = new Container();
     this.container.label = "fighter-renderer";
@@ -149,6 +152,17 @@ export class FighterRenderer {
 
     this.tickerCallback = () => this.update();
     Ticker.shared.add(this.tickerCallback);
+  }
+
+  /**
+   * Get cell position using per-cell ground data when available.
+   */
+  private getCellPos(cellId: number): { x: number; y: number } {
+    const cell = this.cellDataMap.get(cellId);
+    const level = cell?.groundLevel ?? this.groundLevel;
+    const slope = cell?.groundSlope ?? 1;
+    const pos = getCellPosition(cellId, this.mapWidth, level);
+    return { x: pos.x, y: pos.y + getSlopeYOffset(slope) };
   }
 
   /**
@@ -190,7 +204,7 @@ export class FighterRenderer {
     fighterContainer.addChild(hpBar);
 
     // Position at cell
-    const pos = getCellPosition(data.cellId, this.mapWidth, this.groundLevel);
+    const pos = this.getCellPos(data.cellId);
     fighterContainer.x = pos.x;
     fighterContainer.y = pos.y;
     fighterContainer.zIndex = this.calculateZIndex(data.cellId);
@@ -456,12 +470,12 @@ export class FighterRenderer {
     const toCell = fighter.path[fighter.pathIndex + 1];
 
     // Compute direction
-    const dir = DofusPathfinding.getDirection(fromCell, toCell, this.mapWidth);
+    const dir = getDirection(fromCell, toCell, this.mapWidth);
     fighter.direction = dir;
 
     // Get pixel positions
-    const fromPos = getCellPosition(fromCell, this.mapWidth, this.groundLevel);
-    const toPos = getCellPosition(toCell, this.mapWidth, this.groundLevel);
+    const fromPos = this.getCellPos(fromCell);
+    const toPos = this.getCellPos(toCell);
 
     // Pixel distance (matches original: Math.sqrt(dx^2 + dy^2))
     const dx = toPos.x - fromPos.x;
@@ -494,7 +508,7 @@ export class FighterRenderer {
     }
 
     fighter.cellId = cellId;
-    const pos = getCellPosition(cellId, this.mapWidth, this.groundLevel);
+    const pos = this.getCellPos(cellId);
     fighter.container.x = pos.x;
     fighter.container.y = pos.y;
     fighter.container.zIndex = this.calculateZIndex(cellId);
@@ -574,7 +588,7 @@ export class FighterRenderer {
       if (fighter.moveDistance <= deltaPx) {
         // Segment complete — snap to destination cell and advance
         const toCell = fighter.path[fighter.pathIndex + 1];
-        const toPos = getCellPosition(toCell, this.mapWidth, this.groundLevel);
+        const toPos = this.getCellPos(toCell);
         fighter.container.x = toPos.x;
         fighter.container.y = toPos.y;
         fighter.cellId = toCell;
@@ -633,8 +647,7 @@ export class FighterRenderer {
    * Calculate z-index from cell position.
    */
   private calculateZIndex(cellId: number): number {
-    const pos = getCellPosition(cellId, this.mapWidth, this.groundLevel);
-    return Math.floor(pos.y * 100 + pos.x);
+    return cellId * 100 + 30;
   }
 
   /**

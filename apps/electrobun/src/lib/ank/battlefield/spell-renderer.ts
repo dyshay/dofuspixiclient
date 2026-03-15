@@ -1,11 +1,12 @@
 import { Container, Graphics, Ticker } from "pixi.js";
+import { match } from "ts-pattern";
 
 import {
   DEFAULT_GROUND_LEVEL,
   DEFAULT_MAP_WIDTH,
 } from "@/constants/battlefield";
 
-import { getCellPosition } from "./datacenter/cell";
+import { getCellPosition, getSlopeYOffset, type CellData } from "./datacenter/cell";
 
 /**
  * Spell animation type.
@@ -57,6 +58,7 @@ interface ActiveAnimation {
 export interface SpellRendererConfig {
   mapWidth?: number;
   groundLevel?: number;
+  cellDataMap?: Map<number, CellData>;
 }
 
 /**
@@ -70,10 +72,12 @@ export class SpellRenderer {
   private mapWidth: number;
   private groundLevel: number;
   private tickerCallback: () => void;
+  private cellDataMap: Map<number, CellData>;
 
   constructor(parentContainer: Container, config: SpellRendererConfig = {}) {
     this.mapWidth = config.mapWidth ?? DEFAULT_MAP_WIDTH;
     this.groundLevel = config.groundLevel ?? DEFAULT_GROUND_LEVEL;
+    this.cellDataMap = config.cellDataMap ?? new Map();
 
     this.container = new Container();
     this.container.label = "spell-renderer";
@@ -83,6 +87,17 @@ export class SpellRenderer {
 
     this.tickerCallback = () => this.update();
     Ticker.shared.add(this.tickerCallback);
+  }
+
+  /**
+   * Get cell position with per-cell ground data fallback.
+   */
+  private getCellPos(cellId: number): { x: number; y: number } {
+    const cell = this.cellDataMap.get(cellId);
+    const level = cell?.groundLevel ?? this.groundLevel;
+    const slope = cell?.groundSlope ?? 1;
+    const pos = getCellPosition(cellId, this.mapWidth, level);
+    return { x: pos.x, y: pos.y + getSlopeYOffset(slope) };
   }
 
   /**
@@ -114,7 +129,7 @@ export class SpellRenderer {
    */
   playCastAnimation(cellId: number, _element?: number): Promise<void> {
     return new Promise((resolve) => {
-      const pos = getCellPosition(cellId, this.mapWidth, this.groundLevel);
+      const pos = this.getCellPos(cellId);
       const x = pos.x;
       const y = pos.y;
 
@@ -155,12 +170,8 @@ export class SpellRenderer {
     element?: number
   ): Promise<void> {
     return new Promise((resolve) => {
-      const fromPos = getCellPosition(
-        fromCellId,
-        this.mapWidth,
-        this.groundLevel
-      );
-      const toPos = getCellPosition(toCellId, this.mapWidth, this.groundLevel);
+      const fromPos = this.getCellPos(fromCellId);
+      const toPos = this.getCellPos(toCellId);
 
       const startX = fromPos.x;
       const startY = fromPos.y;
@@ -211,7 +222,7 @@ export class SpellRenderer {
     critical?: boolean
   ): Promise<void> {
     return new Promise((resolve) => {
-      const pos = getCellPosition(cellId, this.mapWidth, this.groundLevel);
+      const pos = this.getCellPos(cellId);
       const x = pos.x;
       const y = pos.y;
 
@@ -251,7 +262,7 @@ export class SpellRenderer {
    */
   playGlyphAnimation(cellId: number, element?: number): Promise<void> {
     return new Promise((resolve) => {
-      const pos = getCellPosition(cellId, this.mapWidth, this.groundLevel);
+      const pos = this.getCellPos(cellId);
       const x = pos.x;
       const y = pos.y;
 
@@ -297,23 +308,12 @@ export class SpellRenderer {
 
       const progress = Math.min(1, anim.elapsed / anim.duration);
 
-      switch (anim.type) {
-        case SpellAnimationType.CAST:
-          this.updateCastAnimation(anim, progress);
-          break;
-
-        case SpellAnimationType.PROJECTILE:
-          this.updateProjectileAnimation(anim, progress);
-          break;
-
-        case SpellAnimationType.IMPACT:
-          this.updateImpactAnimation(anim, progress);
-          break;
-
-        case SpellAnimationType.GLYPH:
-          this.updateGlyphAnimation(anim, progress);
-          break;
-      }
+      match(anim.type)
+        .with(SpellAnimationType.CAST, () => this.updateCastAnimation(anim, progress))
+        .with(SpellAnimationType.PROJECTILE, () => this.updateProjectileAnimation(anim, progress))
+        .with(SpellAnimationType.IMPACT, () => this.updateImpactAnimation(anim, progress))
+        .with(SpellAnimationType.GLYPH, () => this.updateGlyphAnimation(anim, progress))
+        .otherwise(() => {});
 
       if (progress >= 1) {
         this.container.removeChild(anim.container);
@@ -414,18 +414,12 @@ export class SpellRenderer {
    * Get color for element.
    */
   private getElementColor(element?: number): number {
-    switch (element) {
-      case 1:
-        return 0x8b4513; // Earth
-      case 2:
-        return 0xff4500; // Fire
-      case 3:
-        return 0x1e90ff; // Water
-      case 4:
-        return 0x90ee90; // Air
-      default:
-        return 0xffffff; // Neutral
-    }
+    return match(element)
+      .with(1, () => 0x8b4513) // Earth
+      .with(2, () => 0xff4500) // Fire
+      .with(3, () => 0x1e90ff) // Water
+      .with(4, () => 0x90ee90) // Air
+      .otherwise(() => 0xffffff); // Neutral
   }
 
   /**

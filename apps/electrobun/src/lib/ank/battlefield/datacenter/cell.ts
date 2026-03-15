@@ -1,4 +1,6 @@
-import { CELL_WIDTH, CELL_HALF_WIDTH, CELL_HALF_HEIGHT, LEVEL_HEIGHT } from '@/constants/battlefield';
+import { CELL_HALF_HEIGHT, CELL_HALF_WIDTH, getCellPosition, getSlopeYOffset } from "@dofus/grid";
+
+export { getCellPosition, getSlopeYOffset };
 
 export interface CellData {
   id: number;
@@ -18,34 +20,6 @@ export interface CellData {
   layerObject2Flip: boolean;
 }
 
-export function getCellPosition(cellId: number, mapWidth: number, groundLevel: number): { x: number; y: number } {
-  let loc14 = mapWidth - 1;
-  let loc9 = -1;
-  let loc10 = 0;
-  let loc11 = 0;
-
-  for (let id = 0; id <= cellId; id++) {
-    if (loc9 === loc14) {
-      loc9 = 0;
-      loc10 += 1;
-      if (loc11 === 0) {
-        loc11 = CELL_HALF_WIDTH;
-        loc14 -= 1;
-      } else {
-        loc11 = 0;
-        loc14 += 1;
-      }
-    } else {
-      loc9 += 1;
-    }
-  }
-
-  const x = loc9 * CELL_WIDTH + loc11;
-  const y = loc10 * CELL_HALF_HEIGHT - LEVEL_HEIGHT * (groundLevel - 7);
-
-  return { x, y };
-}
-
 export function findCellAtPosition(
   mapX: number,
   mapY: number,
@@ -58,14 +32,12 @@ export function findCellAtPosition(
 
   for (const cell of cells) {
     const pos = getCellPosition(cell.id, mapWidth, cell.groundLevel);
-    // pos is the center of the diamond (matching original AS MapHandler.build)
     const cx = pos.x * mapScale.scale + mapScale.offsetX;
     const cy = pos.y * mapScale.scale + mapScale.offsetY;
 
     const dx = mapX - cx;
     const dy = mapY - cy;
 
-    // Diamond hit-test: |dx/hw| + |dy/hh| <= 1
     if (Math.abs(dx / hw) + Math.abs(dy / hh) <= 1) {
       return cell;
     }

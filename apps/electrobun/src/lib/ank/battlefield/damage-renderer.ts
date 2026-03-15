@@ -6,7 +6,7 @@ import {
 } from "@/constants/battlefield";
 import { Element } from "@/ecs/components";
 
-import { getCellPosition } from "./datacenter/cell";
+import { getCellPosition, getSlopeYOffset, type CellData } from "./datacenter/cell";
 
 /**
  * Damage display type.
@@ -73,6 +73,7 @@ export interface DamageRendererConfig {
   animationDuration?: number;
   floatDistance?: number;
   groupDelay?: number;
+  cellDataMap?: Map<number, CellData>;
 }
 
 /**
@@ -91,6 +92,7 @@ export class DamageRenderer {
   private pendingDamage: Map<number, DamageDisplayConfig[]> = new Map();
   private lastFlush: number = 0;
   private tickerCallback: () => void;
+  private cellDataMap: Map<number, CellData>;
 
   constructor(parentContainer: Container, config: DamageRendererConfig = {}) {
     this.mapWidth = config.mapWidth ?? DEFAULT_MAP_WIDTH;
@@ -98,6 +100,7 @@ export class DamageRenderer {
     this.animationDuration = config.animationDuration ?? 1500;
     this.floatDistance = config.floatDistance ?? 50;
     this.groupDelay = config.groupDelay ?? 50;
+    this.cellDataMap = config.cellDataMap ?? new Map();
 
     this.container = new Container();
     this.container.label = "damage-renderer";
@@ -180,6 +183,17 @@ export class DamageRenderer {
   }
 
   /**
+   * Get cell position with per-cell ground data support.
+   */
+  private getCellPos(cellId: number): { x: number; y: number } {
+    const cell = this.cellDataMap.get(cellId);
+    const level = cell?.groundLevel ?? this.groundLevel;
+    const slope = cell?.groundSlope ?? 1;
+    const pos = getCellPosition(cellId, this.mapWidth, level);
+    return { x: pos.x, y: pos.y + getSlopeYOffset(slope) };
+  }
+
+  /**
    * Display a single damage number.
    */
   private displayDamage(
@@ -187,7 +201,7 @@ export class DamageRenderer {
     yOffset: number = 0
   ): void {
     const text = this.acquireText();
-    const pos = getCellPosition(config.cellId, this.mapWidth, this.groundLevel);
+    const pos = this.getCellPos(config.cellId);
 
     // Position at cell center (pos is already the center)
     text.x = pos.x;

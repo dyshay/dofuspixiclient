@@ -1,5 +1,6 @@
-import { component, field } from '@lastolivegames/becsy';
+import { component, field } from "@lastolivegames/becsy";
 
-@component export class NetworkId {
+@component
+export class NetworkId {
   @field.uint32 declare value: number;
 }

@@ -1,1 +1,1 @@
-{"version":1,"spriteId":"3799","animations":{"tile":{"file":"atlas.svg","width":203,"height":276,"offsetX":-91.35,"offsetY":-226.2,"fps":60,"frames":[{"id":"tile_0","x":1,"y":1,"width":201,"height":274,"offsetX":9,"offsetY":11}],"frameOrder":["tile_0"],"duplicates":{}}}}
+{"version":1,"spriteId":"3799","animations":{"tile":{"file":"atlas.svg","width":203,"height":276,"offsetX":-91.35,"offsetY":-226.2,"fps":60,"frames":[{"id":"tile_0","x":1,"y":1,"width":201,"height":274,"offsetX":9,"offsetY":11}],"frameOrder":["tile_0"],"duplicates":{}}},"behavior":"static"}

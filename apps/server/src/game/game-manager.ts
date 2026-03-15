@@ -1,5 +1,5 @@
-import { MapInstance } from './map-instance.ts';
-import type { ClientSession } from '../ws/client-session.ts';
+import type { ClientSession } from "../ws/client-session.ts";
+import { MapInstance } from "./map-instance.ts";
 
 const mapInstances = new Map<number, MapInstance>();
 const onlineCharacters = new Map<number, ClientSession>();
@@ -24,7 +24,10 @@ export function cleanupEmptyMap(mapId: number): void {
   }
 }
 
-export function registerOnlineCharacter(characterId: number, session: ClientSession): void {
+export function registerOnlineCharacter(
+  characterId: number,
+  session: ClientSession
+): void {
   onlineCharacters.set(characterId, session);
 }
 
@@ -36,7 +39,9 @@ export function isCharacterOnline(characterId: number): boolean {
   return onlineCharacters.has(characterId);
 }
 
-export function getOnlineCharacterSession(characterId: number): ClientSession | undefined {
+export function getOnlineCharacterSession(
+  characterId: number
+): ClientSession | undefined {
   return onlineCharacters.get(characterId);
 }
 

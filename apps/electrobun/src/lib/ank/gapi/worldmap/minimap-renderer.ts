@@ -6,7 +6,7 @@ import type {
   HintsLayering,
   MapCoordinates,
 } from '@/types/worldmap';
-import { loadWorldMapData, mapCoordToPixel, filterHintsByArea } from './world-map-data';
+import { loadWorldMapData, mapCoordToPixel, pixelToMapCoord, findMapAtCoord, filterHintsByArea } from './world-map-data';
 
 interface MinimapRendererConfig {
   app: Application;
@@ -288,6 +288,20 @@ export class MinimapRenderer {
     this.positionMarker.fill({ color: 0xffffff, alpha: 0.9 });
     this.positionMarker.circle(pixelX, pixelY, 5);
     this.positionMarker.fill({ color: 0x44aaff, alpha: 1 });
+  }
+
+  /**
+   * Convert a global screen point to a map ID by tracing through the minimap's transforms.
+   */
+  getMapIdAtPoint(globalX: number, globalY: number): number | null {
+    if (!this.manifest || !this.mapCoordinates) {
+      return null;
+    }
+
+    const localPoint = this.worldContainer.toLocal({ x: globalX, y: globalY });
+    const { bounds } = this.manifest;
+    const gameCoord = pixelToMapCoord(localPoint.x, localPoint.y, bounds.xMin, bounds.yMin);
+    return findMapAtCoord(gameCoord.x, gameCoord.y, this.mapCoordinates);
   }
 
   show(): void {

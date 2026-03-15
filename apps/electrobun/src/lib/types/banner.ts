@@ -1,4 +1,4 @@
-import type { Container, Sprite, Graphics, Text, Texture } from 'pixi.js';
+import type { Container, Graphics, Sprite, Texture } from 'pixi.js';
 // import type { Input } from '@pixi/ui'; // TODO: Re-enable when compatible
 
 export interface AssetEntry {

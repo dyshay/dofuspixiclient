@@ -1,21 +1,25 @@
-import { db } from '../db/database.ts';
-import type { CharactersTable } from '../db/schema.ts';
+import type { CharactersTable } from "../db/schema.ts";
+import { db } from "../db/database.ts";
 
 export type Character = CharactersTable & { id: number };
 
-export async function getCharactersByAccountId(accountId: number): Promise<Character[]> {
+export async function getCharactersByAccountId(
+  accountId: number
+): Promise<Character[]> {
   return db
-    .selectFrom('characters')
+    .selectFrom("characters")
     .selectAll()
-    .where('account_id', '=', accountId)
+    .where("account_id", "=", accountId)
     .execute() as Promise<Character[]>;
 }
 
-export async function getCharacterById(id: number): Promise<Character | undefined> {
+export async function getCharacterById(
+  id: number
+): Promise<Character | undefined> {
   return db
-    .selectFrom('characters')
+    .selectFrom("characters")
     .selectAll()
-    .where('id', '=', id)
+    .where("id", "=", id)
     .executeTakeFirst() as Promise<Character | undefined>;
 }
 
@@ -26,8 +30,8 @@ export async function updateCharacterPosition(
   direction: number
 ): Promise<void> {
   await db
-    .updateTable('characters')
+    .updateTable("characters")
     .set({ map_id: mapId, cell_id: cellId, direction })
-    .where('id', '=', id)
+    .where("id", "=", id)
     .execute();
 }

@@ -1,26 +1,39 @@
+import {
+  CELL_HALF_HEIGHT,
+  CELL_HALF_WIDTH,
+  CELL_HEIGHT,
+  CELL_WIDTH,
+  DEPTH_PER_CELL,
+  FIRST_SPRITE_DEPTH_ON_CELL,
+  LEVEL_HEIGHT,
+  MAX_DEPTH_IN_MAP,
+  MAX_SPRITES_ON_CELL,
+} from "@dofus/grid";
+
+export {
+  CELL_HALF_HEIGHT,
+  CELL_HALF_WIDTH,
+  CELL_HEIGHT,
+  CELL_WIDTH,
+  DEFAULT_CELL_COUNT,
+  DEFAULT_MAP_HEIGHT,
+  DEFAULT_MAP_WIDTH,
+  DEPTH_PER_CELL,
+  FIRST_SPRITE_DEPTH_ON_CELL,
+  LEVEL_HEIGHT,
+  MAX_DEPTH_IN_MAP,
+  MAX_SPRITES_ON_CELL,
+} from "@dofus/grid";
+
 export const DISPLAY_WIDTH = 742;
 export const DISPLAY_HEIGHT = 432;
 export const BANNER_HEIGHT = 125;
-export const FULL_HEIGHT = DISPLAY_HEIGHT + BANNER_HEIGHT; // 557
+export const FULL_HEIGHT = DISPLAY_HEIGHT + BANNER_HEIGHT;
 export const GAME_WIDTH = 1049;
 export const GAME_HEIGHT = 786;
 
-export const CELL_WIDTH = 53;
-export const CELL_HEIGHT = 27;
-export const CELL_HALF_WIDTH = 26.5;
-export const CELL_HALF_HEIGHT = 13.5;
-export const LEVEL_HEIGHT = 20;
-
-export const DEFAULT_MAP_WIDTH = 15;
-export const DEFAULT_MAP_HEIGHT = 17;
-export const DEFAULT_WIDTH = DEFAULT_MAP_WIDTH;
-export const DEFAULT_HEIGHT = DEFAULT_MAP_HEIGHT;
-export const DEFAULT_CELL_COUNT = DEFAULT_MAP_WIDTH * DEFAULT_MAP_HEIGHT * 2 - DEFAULT_MAP_WIDTH;
-
-export const FIRST_SPRITE_DEPTH_ON_CELL = 30;
-export const MAX_SPRITES_ON_CELL = 100;
-export const DEPTH_PER_CELL = 100;
-export const MAX_DEPTH_IN_MAP = 100000;
+export const DEFAULT_WIDTH = 15;
+export const DEFAULT_HEIGHT = 17;
 
 export const ROT_SCALE_X = 51.85 / 100;
 export const ROT_SCALE_Y = 192.86 / 100;
@@ -41,7 +54,7 @@ export const DIRECTIONS = {
   NORTH_EAST: 7,
 } as const;
 
-export type Direction = typeof DIRECTIONS[keyof typeof DIRECTIONS];
+export type Direction = (typeof DIRECTIONS)[keyof typeof DIRECTIONS];
 
 export const MOVEMENT = {
   NONE: 0,
@@ -51,7 +64,7 @@ export const MOVEMENT = {
   OCCUPIED: 4,
 } as const;
 
-export type Movement = typeof MOVEMENT[keyof typeof MOVEMENT];
+export type Movement = (typeof MOVEMENT)[keyof typeof MOVEMENT];
 
 export const MIN_GROUND_LEVEL = 0;
 export const MAX_GROUND_LEVEL = 7;
@@ -64,8 +77,8 @@ export const MAP_CONSTANTS = {
   CELL_HEIGHT,
   CELL_HALF_WIDTH,
   CELL_HALF_HEIGHT,
-  DEFAULT_WIDTH: DEFAULT_MAP_WIDTH,
-  DEFAULT_HEIGHT: DEFAULT_MAP_HEIGHT,
+  DEFAULT_WIDTH,
+  DEFAULT_HEIGHT,
   LEVEL_HEIGHT,
   FIRST_SPRITE_DEPTH_ON_CELL,
   MAX_SPRITES_ON_CELL,

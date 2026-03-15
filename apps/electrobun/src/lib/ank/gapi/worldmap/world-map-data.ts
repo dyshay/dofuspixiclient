@@ -121,6 +121,49 @@ export function mapCoordToPixel(
   return [pixelX + mapCellWidth / 2, pixelY + mapCellHeight / 2];
 }
 
+/**
+ * Inverse of mapCoordToPixel — converts world map pixel coordinates back to game map coords.
+ */
+export function pixelToMapCoord(
+  pixelX: number,
+  pixelY: number,
+  chunkXMin: number,
+  chunkYMin: number,
+  scale = 1
+): { x: number; y: number } {
+  const { DISPLAY_WIDTH, DISPLAY_HEIGHT, CHUNK_SIZE } = WORLDMAP_CONSTANTS;
+
+  const mapCellWidth = DISPLAY_WIDTH / CHUNK_SIZE;
+  const mapCellHeight = DISPLAY_HEIGHT / CHUNK_SIZE;
+
+  const offsetX = (pixelX - mapCellWidth / 2) / (DISPLAY_WIDTH * scale);
+  const offsetY = (pixelY - mapCellHeight / 2) / (DISPLAY_HEIGHT * scale);
+
+  const chunkX = offsetX + chunkXMin;
+  const chunkY = offsetY + chunkYMin;
+
+  return {
+    x: Math.round(chunkX * CHUNK_SIZE),
+    y: Math.round(chunkY * CHUNK_SIZE),
+  };
+}
+
+/**
+ * Find the map ID at the given game coordinates.
+ */
+export function findMapAtCoord(
+  gameX: number,
+  gameY: number,
+  mapCoordinates: MapCoordinates
+): number | null {
+  for (const [mapId, coord] of Object.entries(mapCoordinates)) {
+    if (coord.x === gameX && coord.y === gameY) {
+      return Number(mapId);
+    }
+  }
+  return null;
+}
+
 export function filterHintsByArea(
   hintsLayering: HintsLayering,
   mapCoordinates: MapCoordinates,

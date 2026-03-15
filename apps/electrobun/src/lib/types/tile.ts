@@ -1,5 +1,16 @@
 export type TileType = "ground" | "objects";
 
+/**
+ * Tile behavior classification.
+ *
+ * - static:   single frame, no animation
+ * - slope:    ground tile with frames indexed by groundSlope
+ * - animated: auto-playing animation loop
+ * - random:   one frame picked per cell (cellId % frameCount)
+ * - resource: interactive/harvestable object
+ */
+export type TileBehavior = "static" | "slope" | "animated" | "random" | "resource";
+
 export interface FrameInfo {
   frame: number;
   x: number;
@@ -13,7 +24,7 @@ export interface FrameInfo {
 export interface TileManifest {
   id: number;
   type: TileType;
-  behavior: string | null;
+  behavior: TileBehavior;
   fps: number | null;
   autoplay: boolean | null;
   loop: boolean | null;

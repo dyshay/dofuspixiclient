@@ -5,9 +5,27 @@ export interface WsHandle {
   publish(topic: string, data: string | Uint8Array | ArrayBuffer): void;
 }
 
+export const SessionState = {
+  CONNECTED: "connected",
+  AUTHENTICATED: "authenticated",
+  IN_WORLD: "in_world",
+  IN_COMBAT: "in_combat",
+} as const;
+
+export type SessionStateValue =
+  (typeof SessionState)[keyof typeof SessionState];
+
+const VALID_TRANSITIONS: Record<SessionStateValue, SessionStateValue[]> = {
+  [SessionState.CONNECTED]: [SessionState.AUTHENTICATED],
+  [SessionState.AUTHENTICATED]: [SessionState.IN_WORLD, SessionState.CONNECTED],
+  [SessionState.IN_WORLD]: [SessionState.IN_COMBAT, SessionState.AUTHENTICATED],
+  [SessionState.IN_COMBAT]: [SessionState.IN_WORLD],
+};
+
 export interface ClientSession {
   ws: WsHandle;
   sessionId: string;
+  state: SessionStateValue;
   accountId: number | null;
   characterId: number | null;
   characterName: string | null;
@@ -22,6 +40,7 @@ export function createSession(ws: WsHandle, sessionId: string): ClientSession {
   const session: ClientSession = {
     ws,
     sessionId,
+    state: SessionState.CONNECTED,
     accountId: null,
     characterId: null,
     characterName: null,
@@ -33,6 +52,21 @@ export function createSession(ws: WsHandle, sessionId: string): ClientSession {
   return session;
 }
 
+export function transitionTo(
+  session: ClientSession,
+  targetState: SessionStateValue
+): boolean {
+  const allowed = VALID_TRANSITIONS[session.state];
+  if (!allowed?.includes(targetState)) {
+    console.warn(
+      `[Session] Invalid transition: ${session.state} → ${targetState} for ${session.sessionId}`
+    );
+    return false;
+  }
+  session.state = targetState;
+  return true;
+}
+
 export function getSession(sessionId: string): ClientSession | undefined {
   return sessions.get(sessionId);
 }
@@ -41,7 +75,9 @@ export function removeSession(sessionId: string): void {
   sessions.delete(sessionId);
 }
 
-export function getSessionByCharacterId(characterId: number): ClientSession | undefined {
+export function getSessionByCharacterId(
+  characterId: number
+): ClientSession | undefined {
   for (const session of sessions.values()) {
     if (session.characterId === characterId) return session;
   }
@@ -50,4 +86,8 @@ export function getSessionByCharacterId(characterId: number): ClientSession | un
 
 export function getAllSessions(): IterableIterator<ClientSession> {
   return sessions.values();
+}
+
+export function getSessionCount(): number {
+  return sessions.size;
 }

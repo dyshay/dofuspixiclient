@@ -1,6 +1,7 @@
 export interface InteractiveObjectData {
   id: number;
   name: string;
+  type?: number;
   gfxIds: number[];
   actions?: string[];
 }

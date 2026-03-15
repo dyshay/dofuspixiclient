@@ -1,4 +1,6 @@
-import { System, system, type Entity, type World } from '@lastolivegames/becsy';
+import { type Entity, System, system, type World } from "@lastolivegames/becsy";
+import { match } from "ts-pattern";
+
 import {
   CellPosition,
   CombatContext,
@@ -7,13 +9,14 @@ import {
   FighterStats,
   PlayerTurnState,
   TurnState,
-} from '@/ecs/components';
+} from "@/ecs/components";
 
 /**
  * Combat state machine system.
  * Manages combat phase transitions and coordinates other combat systems.
  */
-@system export class CombatManagerSystem extends System {
+@system
+export class CombatManagerSystem extends System {
   private combatContext = this.query(
     (q) => q.current.with(CombatContext).write
   );
@@ -22,30 +25,20 @@ import {
     (q) => q.current.with(PlayerTurnState).write
   );
 
-  private fighters = this.query(
-    (q) => q.current.with(Fighter, FighterStats, CellPosition)
+  private fighters = this.query((q) =>
+    q.current.with(Fighter, FighterStats, CellPosition)
   );
 
   execute(): void {
     for (const entity of this.combatContext.current) {
       const ctx = entity.read(CombatContext);
 
-      switch (ctx.phase) {
-        case CombatPhase.NONE:
-          break;
-
-        case CombatPhase.PLACEMENT:
-          this.handlePlacementPhase();
-          break;
-
-        case CombatPhase.FIGHTING:
-          this.handleFightingPhase(entity);
-          break;
-
-        case CombatPhase.ENDING:
-          this.handleEndingPhase();
-          break;
-      }
+      match(ctx.phase)
+        .with(CombatPhase.NONE, () => {})
+        .with(CombatPhase.PLACEMENT, () => this.handlePlacementPhase())
+        .with(CombatPhase.FIGHTING, () => this.handleFightingPhase(entity))
+        .with(CombatPhase.ENDING, () => this.handleEndingPhase())
+        .otherwise(() => {});
     }
   }
 
@@ -82,7 +75,8 @@ import {
     turnDuration: number
   ): void {
     world.createEntity(
-      CombatContext, {
+      CombatContext,
+      {
         fightId,
         fightType,
         phase: CombatPhase.PLACEMENT,
@@ -93,7 +87,8 @@ import {
         turnSequence: [],
         spectatorMode: false,
       },
-      PlayerTurnState, {
+      PlayerTurnState,
+      {
         state: TurnState.WAITING,
         ready: false,
         startCellId: 0,

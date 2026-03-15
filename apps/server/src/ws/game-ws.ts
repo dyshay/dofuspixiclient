@@ -1,14 +1,29 @@
-import { Elysia } from 'elysia';
-import { decodeClientMessage, encodeServerMessage } from '../protocol/codec.ts';
-import { ClientMessageType, ServerMessageType } from '../protocol/types.ts';
-import { createSession, getSession, removeSession, type WsHandle } from './client-session.ts';
-import { handleLogin, handleCharacterSelect, handleLogout } from '../handlers/auth.ts';
-import { handleMapChange } from '../handlers/map.ts';
-import { handleMovement } from '../handlers/movement.ts';
+import { Elysia } from "elysia";
+import { match } from "ts-pattern";
+
+import {
+  handleCharacterSelect,
+  handleLogin,
+  handleLogout,
+} from "../handlers/auth.ts";
+import { handleMapChange } from "../handlers/map.ts";
+import {
+  clearPendingTransition,
+  handleMoveEnd,
+  handleMovement,
+} from "../handlers/movement.ts";
+import { decodeClientMessage, encodeServerMessage } from "../protocol/codec.ts";
+import { ClientMessageType, ServerMessageType } from "../protocol/types.ts";
+import {
+  createSession,
+  getSession,
+  removeSession,
+  type WsHandle,
+} from "./client-session.ts";
 
 let sessionCounter = 0;
 
-export const gameWs = new Elysia().ws('/game', {
+export const gameWs = new Elysia().ws("/game", {
   open(ws) {
     const sessionId = `s${++sessionCounter}_${Date.now()}`;
     // Store sessionId on the ws data context
@@ -25,44 +40,30 @@ export const gameWs = new Elysia().ws('/game', {
 
     try {
       // data from Elysia WS can be string, Buffer, or undefined for binary
-      const raw = data instanceof ArrayBuffer
-        ? data
-        : data instanceof Uint8Array
-          ? data.buffer
-          : typeof data === 'object' && data !== null && 'buffer' in data
-            ? (data as { buffer: ArrayBuffer }).buffer
-            : data;
+      const raw =
+        data instanceof ArrayBuffer
+          ? data
+          : data instanceof Uint8Array
+            ? data.buffer
+            : typeof data === "object" && data !== null && "buffer" in data
+              ? (data as { buffer: ArrayBuffer }).buffer
+              : data;
 
       const msg = decodeClientMessage(raw as ArrayBuffer);
 
-      switch (msg.type) {
-        case ClientMessageType.AUTH_LOGIN:
-          await handleLogin(session, msg.payload as any);
-          break;
-
-        case ClientMessageType.AUTH_LOGOUT:
-          await handleLogout(session);
-          break;
-
-        case ClientMessageType.CHARACTER_SELECT:
-          await handleCharacterSelect(session, msg.payload as any);
-          break;
-
-        case ClientMessageType.CHARACTER_MOVE:
-          await handleMovement(session, msg.payload as any);
-          break;
-
-        case ClientMessageType.MAP_CHANGE:
-          await handleMapChange(session, msg.payload as any);
-          break;
-
-        case ClientMessageType.PING:
+      await match(msg.type)
+        .with(ClientMessageType.AUTH_LOGIN, () => handleLogin(session, msg.payload as any))
+        .with(ClientMessageType.AUTH_LOGOUT, () => handleLogout(session))
+        .with(ClientMessageType.CHARACTER_SELECT, () => handleCharacterSelect(session, msg.payload as any))
+        .with(ClientMessageType.CHARACTER_MOVE, () => handleMovement(session, msg.payload as any))
+        .with(ClientMessageType.CHARACTER_MOVE_END, () => handleMoveEnd(session))
+        .with(ClientMessageType.MAP_CHANGE, () => handleMapChange(session, msg.payload as any))
+        .with(ClientMessageType.PING, () => {
           ws.raw.send(encodeServerMessage(ServerMessageType.PONG, { time: Date.now() }));
-          break;
-
-        default:
-          console.log(`[WS] Unknown message type: 0x${msg.type.toString(16)}`);
-      }
+        })
+        .otherwise((type) => {
+          console.log(`[WS] Unknown message type: 0x${type.toString(16)}`);
+        });
     } catch (err) {
       console.error(`[WS] Message handling error:`, err);
     }
@@ -72,6 +73,7 @@ export const gameWs = new Elysia().ws('/game', {
     const sessionId = (ws.data as Record<string, unknown>).sessionId as string;
     const session = getSession(sessionId);
     if (session) {
+      clearPendingTransition(sessionId);
       await handleLogout(session);
       removeSession(sessionId);
     }

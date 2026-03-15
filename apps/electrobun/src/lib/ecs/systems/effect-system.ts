@@ -1,4 +1,5 @@
 import { type Entity, System, system } from "@lastolivegames/becsy";
+import { match, P } from "ts-pattern";
 
 import {
   ActiveEffect,
@@ -102,52 +103,23 @@ export class EffectSystem extends System {
     const cellPos = target.read(CellPosition);
     let value = effect.value;
 
-    switch (effect.effectType) {
-      case EffectType.DAMAGE_NEUTRAL:
-      case EffectType.DAMAGE_EARTH:
-      case EffectType.DAMAGE_FIRE:
-      case EffectType.DAMAGE_WATER:
-      case EffectType.DAMAGE_AIR:
-        value = this.applyDamage(stats, value, effect.critical);
-        break;
+    const handled = match(effect.effectType)
+      .with(
+        P.union(EffectType.DAMAGE_NEUTRAL, EffectType.DAMAGE_EARTH, EffectType.DAMAGE_FIRE, EffectType.DAMAGE_WATER, EffectType.DAMAGE_AIR),
+        () => { value = this.applyDamage(stats, value, effect.critical); return true; }
+      )
+      .with(
+        P.union(EffectType.STEAL_HP_NEUTRAL, EffectType.STEAL_HP_EARTH, EffectType.STEAL_HP_FIRE, EffectType.STEAL_HP_WATER, EffectType.STEAL_HP_AIR),
+        () => { value = this.applyStealHP(stats, effect.sourceId, value, effect.critical); return true; }
+      )
+      .with(EffectType.HEAL, () => { value = this.applyHeal(stats, value, effect.critical); return true; })
+      .with(EffectType.REMOVE_AP, () => { value = this.applyAPChange(stats, -value); return true; })
+      .with(EffectType.GIVE_AP, () => { value = this.applyAPChange(stats, value); return true; })
+      .with(EffectType.REMOVE_MP, () => { value = this.applyMPChange(stats, -value); return true; })
+      .with(EffectType.GIVE_MP, () => { value = this.applyMPChange(stats, value); return true; })
+      .otherwise(() => false);
 
-      case EffectType.STEAL_HP_NEUTRAL:
-      case EffectType.STEAL_HP_EARTH:
-      case EffectType.STEAL_HP_FIRE:
-      case EffectType.STEAL_HP_WATER:
-      case EffectType.STEAL_HP_AIR:
-        value = this.applyStealHP(
-          stats,
-          effect.sourceId,
-          value,
-          effect.critical
-        );
-        break;
-
-      case EffectType.HEAL:
-        value = this.applyHeal(stats, value, effect.critical);
-        break;
-
-      case EffectType.REMOVE_AP:
-        value = this.applyAPChange(stats, -value);
-        break;
-
-      case EffectType.GIVE_AP:
-        value = this.applyAPChange(stats, value);
-        break;
-
-      case EffectType.REMOVE_MP:
-        value = this.applyMPChange(stats, -value);
-        break;
-
-      case EffectType.GIVE_MP:
-        value = this.applyMPChange(stats, value);
-        break;
-
-      default:
-        // Unknown effect type
-        return;
-    }
+    if (!handled) return;
 
     // Record result for rendering
     this.effectResults.push({

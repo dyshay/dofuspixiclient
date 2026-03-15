@@ -290,11 +290,15 @@ export class CharacterSpriteLoader {
       if (textures.length === 0) return null;
 
       const firstFrame = atlas.frames[0];
+      // Account for frame trim offset: the atlas-level offset is relative to SVG origin,
+      // but the frame texture starts at (frame.offsetX, frame.offsetY) in SVG space.
+      const trimX = firstFrame?.offsetX ?? 0;
+      const trimY = firstFrame?.offsetY ?? 0;
       const animation: CharacterAnimation = {
         textures,
         fps: atlas.fps || 30,
-        offsetX: atlas.offsetX ?? 0,
-        offsetY: atlas.offsetY ?? 0,
+        offsetX: (atlas.offsetX ?? 0) + trimX,
+        offsetY: (atlas.offsetY ?? 0) + trimY,
         frameWidth: firstFrame?.width ?? 0,
         frameHeight: firstFrame?.height ?? 0,
       };

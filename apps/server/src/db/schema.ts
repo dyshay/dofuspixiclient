@@ -1,4 +1,4 @@
-import type { Generated, ColumnType } from 'kysely';
+import type { ColumnType, Generated } from "kysely";
 
 export interface Database {
   maps: MapsTable;

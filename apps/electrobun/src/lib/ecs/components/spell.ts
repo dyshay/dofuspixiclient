@@ -1,4 +1,4 @@
-import { component, field } from '@lastolivegames/becsy';
+import { component, field } from "@lastolivegames/becsy";
 
 /**
  * Zone shape constants for spell area of effect.
@@ -14,12 +14,13 @@ export const ZoneShape = {
   CONE: 7,
 } as const;
 
-export type ZoneShapeValue = typeof ZoneShape[keyof typeof ZoneShape];
+export type ZoneShapeValue = (typeof ZoneShape)[keyof typeof ZoneShape];
 
 /**
  * Spell definition attached to fighter entities.
  */
-@component export class Spell {
+@component
+export class Spell {
   @field.uint16 declare id: number;
   @field.uint8 declare level: number;
   @field.uint8 declare position: number;
@@ -29,7 +30,8 @@ export type ZoneShapeValue = typeof ZoneShape[keyof typeof ZoneShape];
 /**
  * Spell casting costs and range requirements.
  */
-@component export class SpellCost {
+@component
+export class SpellCost {
   @field.uint8 declare apCost: number;
   @field.uint8 declare minRange: number;
   @field.uint8 declare maxRange: number;
@@ -42,7 +44,8 @@ export type ZoneShapeValue = typeof ZoneShape[keyof typeof ZoneShape];
 /**
  * Spell cooldown and usage limits.
  */
-@component export class SpellCooldown {
+@component
+export class SpellCooldown {
   @field.uint16 declare spellId: number;
   @field.uint8 declare turnsRemaining: number;
   @field.uint8 declare usesThisTurn: number;
@@ -54,7 +57,8 @@ export type ZoneShapeValue = typeof ZoneShape[keyof typeof ZoneShape];
 /**
  * Spell area of effect zone.
  */
-@component export class SpellZone {
+@component
+export class SpellZone {
   @field.uint8 declare shape: number;
   @field.uint8 declare minSize: number;
   @field.uint8 declare maxSize: number;
@@ -63,7 +67,8 @@ export type ZoneShapeValue = typeof ZoneShape[keyof typeof ZoneShape];
 /**
  * Spell critical hit/failure chances.
  */
-@component export class SpellCritical {
+@component
+export class SpellCritical {
   @field.uint8 declare hitChance: number;
   @field.uint8 declare failureChance: number;
 }
@@ -72,7 +77,8 @@ export type ZoneShapeValue = typeof ZoneShape[keyof typeof ZoneShape];
  * Spell state requirements.
  * Required or forbidden states for casting.
  */
-@component export class SpellStateRequirements {
+@component
+export class SpellStateRequirements {
   @field.object declare requiredStates: number[];
   @field.object declare forbiddenStates: number[];
 }
