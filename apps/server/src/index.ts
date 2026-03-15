@@ -7,7 +7,7 @@ import { gameWs } from "./ws/game-ws.ts";
 
 const PORT = Number(process.env.PORT ?? 8080);
 
-const app = new Elysia()
+new Elysia()
   .get("/health", () => ({
     status: "ok",
     online: getOnlineCount(),
