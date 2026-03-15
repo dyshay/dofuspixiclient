@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "7_Cheveux",
+  "width": 23,
+  "height": 23,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "7_Cheveux_0",
+      "x": 1,
+      "y": 1,
+      "width": 21,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "7_Cheveux_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

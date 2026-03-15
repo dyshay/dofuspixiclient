@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "staticL",
+  "width": 43,
+  "height": 52,
+  "offsetX": -18.65,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "staticL_0",
+      "x": 1,
+      "y": 1,
+      "width": 41,
+      "height": 50,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "staticL_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

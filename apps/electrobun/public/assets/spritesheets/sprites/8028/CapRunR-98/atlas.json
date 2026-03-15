@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "animation": "CapRunR-98",
+  "width": 59,
+  "height": 22,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "CapRunR-98_0",
+      "x": 1,
+      "y": 1,
+      "width": 28,
+      "height": 20,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "CapRunR-98_3",
+      "x": 30,
+      "y": 1,
+      "width": 28,
+      "height": 20,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "CapRunR-98_0",
+    "CapRunR-98_1",
+    "CapRunR-98_2",
+    "CapRunR-98_3",
+    "CapRunR-98_4",
+    "CapRunR-98_5"
+  ],
+  "duplicates": {
+    "CapRunR-98_1": "CapRunR-98_0",
+    "CapRunR-98_2": "CapRunR-98_0",
+    "CapRunR-98_4": "CapRunR-98_3",
+    "CapRunR-98_5": "CapRunR-98_3"
+  },
+  "fps": 60
+}

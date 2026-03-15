@@ -1,0 +1,389 @@
+{
+  "version": 1,
+  "animation": "appearR",
+  "width": 1074,
+  "height": 23,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "appearR_0",
+      "x": 1,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_1",
+      "x": 30,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_2",
+      "x": 59,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_3",
+      "x": 88,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_4",
+      "x": 117,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_5",
+      "x": 146,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_6",
+      "x": 175,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_7",
+      "x": 204,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_8",
+      "x": 233,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_9",
+      "x": 262,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_10",
+      "x": 291,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_11",
+      "x": 320,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_12",
+      "x": 349,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_13",
+      "x": 378,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_14",
+      "x": 407,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_15",
+      "x": 436,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_16",
+      "x": 465,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_17",
+      "x": 494,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_18",
+      "x": 523,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_19",
+      "x": 552,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_20",
+      "x": 581,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_21",
+      "x": 610,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_22",
+      "x": 639,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_23",
+      "x": 668,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_24",
+      "x": 697,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_25",
+      "x": 726,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_26",
+      "x": 755,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_27",
+      "x": 784,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_28",
+      "x": 813,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_29",
+      "x": 842,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_30",
+      "x": 871,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_31",
+      "x": 900,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_32",
+      "x": 929,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_33",
+      "x": 958,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_34",
+      "x": 987,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_35",
+      "x": 1016,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearR_36",
+      "x": 1045,
+      "y": 1,
+      "width": 28,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "appearR_0",
+    "appearR_1",
+    "appearR_2",
+    "appearR_3",
+    "appearR_4",
+    "appearR_5",
+    "appearR_6",
+    "appearR_7",
+    "appearR_8",
+    "appearR_9",
+    "appearR_10",
+    "appearR_11",
+    "appearR_12",
+    "appearR_13",
+    "appearR_14",
+    "appearR_15",
+    "appearR_16",
+    "appearR_17",
+    "appearR_18",
+    "appearR_19",
+    "appearR_20",
+    "appearR_21",
+    "appearR_22",
+    "appearR_23",
+    "appearR_24",
+    "appearR_25",
+    "appearR_26",
+    "appearR_27",
+    "appearR_28",
+    "appearR_29",
+    "appearR_30",
+    "appearR_31",
+    "appearR_32",
+    "appearR_33",
+    "appearR_34",
+    "appearR_35",
+    "appearR_36",
+    "appearR_37",
+    "appearR_38"
+  ],
+  "duplicates": {
+    "appearR_37": "appearR_36",
+    "appearR_38": "appearR_36"
+  },
+  "fps": 60
+}

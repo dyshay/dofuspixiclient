@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "animation": "bonusL",
+  "width": 526,
+  "height": 73,
+  "offsetX": -58.95,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "bonusL_0",
+      "x": 1,
+      "y": 1,
+      "width": 74,
+      "height": 71,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_1",
+      "x": 76,
+      "y": 1,
+      "width": 74,
+      "height": 71,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_2",
+      "x": 151,
+      "y": 1,
+      "width": 74,
+      "height": 71,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_3",
+      "x": 226,
+      "y": 1,
+      "width": 74,
+      "height": 71,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_4",
+      "x": 301,
+      "y": 1,
+      "width": 74,
+      "height": 71,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_5",
+      "x": 376,
+      "y": 1,
+      "width": 74,
+      "height": 71,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_12",
+      "x": 451,
+      "y": 1,
+      "width": 74,
+      "height": 71,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "bonusL_0",
+    "bonusL_1",
+    "bonusL_2",
+    "bonusL_3",
+    "bonusL_4",
+    "bonusL_5",
+    "bonusL_6",
+    "bonusL_7",
+    "bonusL_8",
+    "bonusL_9",
+    "bonusL_10",
+    "bonusL_11",
+    "bonusL_12",
+    "bonusL_13",
+    "bonusL_14"
+  ],
+  "duplicates": {
+    "bonusL_6": "bonusL_5",
+    "bonusL_7": "bonusL_5",
+    "bonusL_8": "bonusL_5",
+    "bonusL_9": "bonusL_5",
+    "bonusL_10": "bonusL_5",
+    "bonusL_11": "bonusL_5",
+    "bonusL_13": "bonusL_12",
+    "bonusL_14": "bonusL_12"
+  },
+  "fps": 60
+}

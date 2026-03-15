@@ -1,0 +1,239 @@
+{
+  "version": 1,
+  "animation": "emote20R",
+  "width": 1013,
+  "height": 48,
+  "offsetX": -30.6,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "emote20R_0",
+      "x": 1,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_1",
+      "x": 47,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_2",
+      "x": 93,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_3",
+      "x": 139,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_4",
+      "x": 185,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_5",
+      "x": 231,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_6",
+      "x": 277,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_7",
+      "x": 323,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_8",
+      "x": 369,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_9",
+      "x": 415,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_10",
+      "x": 461,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_11",
+      "x": 507,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_12",
+      "x": 553,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_13",
+      "x": 599,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_14",
+      "x": 645,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_15",
+      "x": 691,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_16",
+      "x": 737,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_17",
+      "x": 783,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_18",
+      "x": 829,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_19",
+      "x": 875,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_20",
+      "x": 921,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote20R_21",
+      "x": 967,
+      "y": 1,
+      "width": 45,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "emote20R_0",
+    "emote20R_1",
+    "emote20R_2",
+    "emote20R_3",
+    "emote20R_4",
+    "emote20R_5",
+    "emote20R_6",
+    "emote20R_7",
+    "emote20R_8",
+    "emote20R_9",
+    "emote20R_10",
+    "emote20R_11",
+    "emote20R_12",
+    "emote20R_13",
+    "emote20R_14",
+    "emote20R_15",
+    "emote20R_16",
+    "emote20R_17",
+    "emote20R_18",
+    "emote20R_19",
+    "emote20R_20",
+    "emote20R_21",
+    "emote20R_22",
+    "emote20R_23"
+  ],
+  "duplicates": {
+    "emote20R_22": "emote20R_21",
+    "emote20R_23": "emote20R_21"
+  },
+  "fps": 60
+}

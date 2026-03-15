@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "spriteId": "1636",
+  "generatedAt": "2026-02-02T15:14:13.554Z",
+  "totalAnimations": 12,
+  "totalFrames": 614,
+  "uniqueFrames": 594,
+  "totalInputSize": 7531505,
+  "totalOutputSize": 884753,
+  "compressionPercent": 88.3,
+  "animations": {
+    "anim0L": {
+      "frameCount": 51,
+      "uniqueFrames": 49,
+      "atlasWidth": 2353,
+      "atlasHeight": 72,
+      "file": "anim0L/atlas.svg",
+      "manifestFile": "anim0L/atlas.json"
+    },
+    "anim0R": {
+      "frameCount": 51,
+      "uniqueFrames": 49,
+      "atlasWidth": 2451,
+      "atlasHeight": 75,
+      "file": "anim0R/atlas.svg",
+      "manifestFile": "anim0R/atlas.json"
+    },
+    "anim1L": {
+      "frameCount": 78,
+      "uniqueFrames": 76,
+      "atlasWidth": 3345,
+      "atlasHeight": 105,
+      "file": "anim1L/atlas.svg",
+      "manifestFile": "anim1L/atlas.json"
+    },
+    "anim1R": {
+      "frameCount": 78,
+      "uniqueFrames": 76,
+      "atlasWidth": 3269,
+      "atlasHeight": 105,
+      "file": "anim1R/atlas.svg",
+      "manifestFile": "anim1R/atlas.json"
+    },
+    "dieL": {
+      "frameCount": 93,
+      "uniqueFrames": 91,
+      "atlasWidth": 3997,
+      "atlasHeight": 358,
+      "file": "dieL/atlas.svg",
+      "manifestFile": "dieL/atlas.json"
+    },
+    "dieR": {
+      "frameCount": 93,
+      "uniqueFrames": 91,
+      "atlasWidth": 3997,
+      "atlasHeight": 358,
+      "file": "dieR/atlas.svg",
+      "manifestFile": "dieR/atlas.json"
+    },
+    "runL": {
+      "frameCount": 39,
+      "uniqueFrames": 37,
+      "atlasWidth": 1518,
+      "atlasHeight": 56,
+      "file": "runL/atlas.svg",
+      "manifestFile": "runL/atlas.json"
+    },
+    "runR": {
+      "frameCount": 39,
+      "uniqueFrames": 37,
+      "atlasWidth": 1555,
+      "atlasHeight": 61,
+      "file": "runR/atlas.svg",
+      "manifestFile": "runR/atlas.json"
+    },
+    "staticL": {
+      "frameCount": 1,
+      "uniqueFrames": 1,
+      "atlasWidth": 33,
+      "atlasHeight": 40,
+      "file": "staticL/atlas.svg",
+      "manifestFile": "staticL/atlas.json"
+    },
+    "staticR": {
+      "frameCount": 1,
+      "uniqueFrames": 1,
+      "atlasWidth": 32,
+      "atlasHeight": 41,
+      "file": "staticR/atlas.svg",
+      "manifestFile": "staticR/atlas.json"
+    },
+    "walkL": {
+      "frameCount": 45,
+      "uniqueFrames": 43,
+      "atlasWidth": 1377,
+      "atlasHeight": 46,
+      "file": "walkL/atlas.svg",
+      "manifestFile": "walkL/atlas.json"
+    },
+    "walkR": {
+      "frameCount": 45,
+      "uniqueFrames": 43,
+      "atlasWidth": 1420,
+      "atlasHeight": 45,
+      "file": "walkR/atlas.svg",
+      "manifestFile": "walkR/atlas.json"
+    }
+  }
+}

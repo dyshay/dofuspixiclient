@@ -25,8 +25,10 @@ import {
   DamageRenderer,
   DamageType,
 } from "./damage-renderer";
-import { loadMapData, type MapData } from "./datacenter/map";
+import { findCellAtPosition } from "./datacenter/cell";
+import { computeMapScale, loadMapData, type MapData } from "./datacenter/map";
 import { DebugOverlay } from "./debug-overlay";
+import { GridOverlay } from "./grid-overlay";
 import {
   type FighterAnimationValue,
   FighterRenderer,
@@ -51,6 +53,15 @@ export const CombatMode = {
 } as const;
 
 export type CombatModeValue = (typeof CombatMode)[keyof typeof CombatMode];
+
+export interface WorldActorData {
+  id: number;
+  name: string;
+  cellId: number;
+  direction: number;
+  look: string;
+  isCurrentPlayer: boolean;
+}
 
 export interface BattlefieldConfig {
   container: HTMLElement;
@@ -88,8 +99,16 @@ export class Battlefield {
   private damageRenderer: DamageRenderer | null = null;
   private spellRenderer: SpellRenderer | null = null;
 
+  // World actors (roleplay mode)
+  private worldActorContainer: Container | null = null;
+  private worldActorRenderer: FighterRenderer | null = null;
+
   // Debug overlay
   private debugOverlay: DebugOverlay | null = null;
+  private gridOverlay: GridOverlay | null = null;
+
+  // Ground click callback
+  private onCellClickCallback?: (cellId: number) => void;
 
   private onResizeStartCallback?: () => void;
   private onResizeEndCallback?: () => void;
@@ -239,6 +258,7 @@ export class Battlefield {
       onZoomChange: (zoom, index) => this.handleZoomChange(zoom, index),
       onObjectClick: (result) => this.handleObjectClick(result),
       onObjectHover: (result) => this.handleObjectHover(result),
+      onGroundClick: (mapX, mapY) => this.handleGroundClick(mapX, mapY),
     });
     this.interactionHandler.init();
     this.interactionHandler.setBaseZoom(this.engine.getBaseZoom());
@@ -263,6 +283,9 @@ export class Battlefield {
       this.app.screen.width,
       this.app.screen.height
     );
+
+    // Initialize grid overlay (inside mapContainer so it pans/zooms with map)
+    this.gridOverlay = new GridOverlay(this.mapContainer);
   }
 
   async loadManifest(): Promise<void> {
@@ -310,7 +333,127 @@ export class Battlefield {
     const zoom = this.interactionHandler?.getZoom() ?? this.engine.getZoom();
     // Set zoom on atlas loader for crisp SVG rasterization at current zoom level
     this.atlasLoader.setZoom(zoom);
-    await this.mapHandler.renderMap(mapData, this.mapContainer, zoom, this.getViewport());
+    await this.mapHandler.renderMap(
+      mapData,
+      this.mapContainer,
+      zoom,
+      this.getViewport()
+    );
+  }
+
+  /**
+   * Load a map from already-parsed MapData (e.g., from server MAP_DATA).
+   */
+  updateMinimapPosition(mapId: number): void {
+    this.banner?.updateMinimapPosition(mapId);
+  }
+
+  async loadMapFromData(mapData: MapData): Promise<void> {
+    if (!this.mapContainer || !this.mapHandler || !this.atlasLoader) {
+      return;
+    }
+
+    this.currentMapData = mapData;
+
+    this.mapContainer.x = 0;
+    this.mapContainer.y = 0;
+
+    this.clearPickableObjects();
+    this.clearWorldActors();
+    this.debugOverlay?.clear();
+    this.gridOverlay?.clear();
+
+    const zoom = this.interactionHandler?.getZoom() ?? this.engine.getZoom();
+    this.atlasLoader.setZoom(zoom);
+    await this.mapHandler.renderMap(
+      mapData,
+      this.mapContainer,
+      zoom,
+      this.getViewport()
+    );
+
+    // Update grid overlay with new map data
+    this.gridOverlay?.setMapData(
+      mapData.cells,
+      mapData.width,
+      mapData.height,
+      mapData.triggerCellIds ?? []
+    );
+
+    // Re-create world actor container on top of the map
+    this.initWorldActorContainer();
+  }
+
+  // ============================================================================
+  // World Actor Methods (Roleplay Mode)
+  // ============================================================================
+
+  private initWorldActorContainer(): void {
+    if (!this.mapContainer) return;
+
+    // Destroy previous
+    if (this.worldActorRenderer) {
+      this.worldActorRenderer.destroy();
+      this.worldActorRenderer = null;
+    }
+    if (this.worldActorContainer) {
+      this.mapContainer.removeChild(this.worldActorContainer);
+      this.worldActorContainer.destroy({ children: true });
+    }
+
+    this.worldActorContainer = new Container();
+    this.worldActorContainer.label = "world-actors";
+    this.worldActorContainer.sortableChildren = true;
+    this.mapContainer.addChild(this.worldActorContainer);
+
+    const mapWidth = this.currentMapData?.width ?? 15;
+
+    this.worldActorRenderer = new FighterRenderer(this.worldActorContainer, {
+      mapWidth,
+      groundLevel: 7,
+    });
+  }
+
+  /**
+   * Add a world actor (player/NPC) to the map.
+   */
+  addWorldActor(data: WorldActorData): void {
+    if (!this.worldActorRenderer) {
+      this.initWorldActorContainer();
+    }
+
+    this.worldActorRenderer?.addFighter({
+      id: data.id,
+      name: data.name,
+      team: data.isCurrentPlayer ? 1 : 0, // Blue for self, red for others
+      cellId: data.cellId,
+      direction: data.direction,
+      look: data.look,
+      hp: 100,
+      maxHp: 100,
+      isPlayer: data.isCurrentPlayer,
+    });
+  }
+
+  /**
+   * Remove a world actor from the map.
+   */
+  removeWorldActor(id: number): void {
+    this.worldActorRenderer?.removeFighter(id);
+  }
+
+  /**
+   * Move a world actor along a path.
+   */
+  async moveWorldActor(id: number, path: number[]): Promise<void> {
+    await this.worldActorRenderer?.moveFighter(id, path);
+  }
+
+  /**
+   * Clear all world actors.
+   */
+  clearWorldActors(): void {
+    this.worldActorRenderer?.clear();
   }
 
   private async loadInteractiveObjects(): Promise<void> {
@@ -365,7 +508,12 @@ export class Battlefield {
   /**
    * Get the current viewport bounds in map coordinates for culling
    */
-  private getViewport(): { x: number; y: number; width: number; height: number } | null {
+  private getViewport(): {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null {
     if (!this.mapContainer || !this.app) {
       return null;
     }
@@ -449,7 +597,12 @@ export class Battlefield {
       this.debugOverlay?.clear();
       this.mapHandler.clearCache();
 
-      await this.mapHandler.renderMap(this.currentMapData, this.mapContainer, zoom, this.getViewport());
+      await this.mapHandler.renderMap(
+        this.currentMapData,
+        this.mapContainer,
+        zoom,
+        this.getViewport()
+      );
     } catch (error) {
       console.error("[Battlefield] Render error:", error);
     } finally {
@@ -484,6 +637,30 @@ export class Battlefield {
 
   private handleObjectHover(result: PickResult | null): void {
     // Can be extended for hover effects
+  }
+
+  private handleGroundClick(mapX: number, mapY: number): void {
+    if (!this.currentMapData) return;
+
+    const mapScale = computeMapScale(
+      this.currentMapData.width,
+      this.currentMapData.height
+    );
+    const cell = findCellAtPosition(
+      mapX,
+      mapY,
+      this.currentMapData.cells,
+      this.currentMapData.width,
+      mapScale
+    );
+
+    if (cell?.walkable) {
+      this.onCellClickCallback?.(cell.id);
+    }
+  }
+
+  setOnCellClick(callback: (cellId: number) => void): void {
+    this.onCellClickCallback = callback;
   }
 
   private isZaap(pickableId: number): boolean {
@@ -544,8 +721,18 @@ export class Battlefield {
 
     this.exitCombatMode();
 
+    // Clean up world actors
+    this.worldActorRenderer?.destroy();
+    this.worldActorRenderer = null;
+    if (this.worldActorContainer) {
+      this.worldActorContainer.destroy({ children: true });
+      this.worldActorContainer = null;
+    }
+
     this.debugOverlay?.destroy();
     this.debugOverlay = null;
+    this.gridOverlay?.destroy();
+    this.gridOverlay = null;
 
     this.interactionHandler?.destroy();
     this.pickingSystem?.destroy();
@@ -568,6 +755,14 @@ export class Battlefield {
    */
   isDebugEnabled(): boolean {
     return this.debugOverlay?.isEnabled() ?? false;
+  }
+
+  /**
+   * Toggle grid overlay showing walkable/trigger cells.
+   * Press 'G' key to toggle.
+   */
+  toggleGridOverlay(): boolean {
+    return this.gridOverlay?.toggle() ?? false;
   }
 
   // ============================================================================

@@ -2,13 +2,20 @@
   import { onDestroy, onMount } from "svelte";
 
   import { Battlefield } from "@/ank/battlefield";
+  import { GameClient } from "@/game/game-client";
 
   let canvasContainer: HTMLDivElement;
   let battlefield: Battlefield | null = null;
+  let gameClient: GameClient | null = null;
   let isLoading = true;
   let isResizing = false;
   let error: string | null = null;
   let debugEnabled = false;
+
+  // Connection state
+  let connected = false;
+  let loggedIn = false;
+  let characters: Array<{ id: number; name: string; class: number; level: number }> = [];
 
   function handleResizeStart() {
     isResizing = true;
@@ -25,20 +32,60 @@
         onResizeStart: handleResizeStart,
         onResizeEnd: handleResizeEnd,
         resizeDebounceMs: 300,
-        preferWebGPU: true, // WebGL is more stable for resize operations in CEF
+        preferWebGPU: true,
       });
       await battlefield.init();
 
       try {
         await battlefield.loadManifest();
-        await battlefield.loadMap(7411);
-      } catch (mapErr) {
-        console.warn("Failed to load map, continuing without it:", mapErr);
+      } catch (manifestErr) {
+        console.warn("Failed to load manifest:", manifestErr);
       }
 
-      isLoading = false;
+      // Initialize game client
+      gameClient = new GameClient();
+      gameClient.setBattlefield(battlefield);
 
-      // Add keyboard listener for debug toggle
+      gameClient.setOnConnected(() => {
+        connected = true;
+        console.log("[MapRenderer] Connected — logging in...");
+        // Auto-login for development
+        gameClient?.login("admin", "admin");
+      });
+
+      gameClient.setOnDisconnected(() => {
+        connected = false;
+        loggedIn = false;
+      });
+
+      gameClient.setOnCharacterList((chars) => {
+        characters = chars;
+        loggedIn = true;
+        // Auto-select first character for development
+        if (chars.length > 0) {
+          console.log("[MapRenderer] Auto-selecting character:", chars[0].name);
+          gameClient?.selectCharacter(chars[0].id);
+        }
+      });
+
+      gameClient.setOnLoginFailed((reason) => {
+        console.error("[MapRenderer] Login failed:", reason);
+        // Fall back to local map loading
+        loadLocalMap();
+      });
+
+      // Try connecting to server
+      gameClient.connect();
+
+      // Fallback: if not connected after 3s, load local map
+      setTimeout(() => {
+        if (!connected) {
+          console.log("[MapRenderer] Server unavailable, loading local map");
+          loadLocalMap();
+        }
+      }, 3000);
+
+      isLoading = false;
       window.addEventListener("keydown", handleKeyDown);
     } catch (err) {
       error =
@@ -48,11 +95,18 @@
     }
   });
 
+  async function loadLocalMap() {
+    try {
+      await battlefield?.loadMap(7411);
+    } catch (mapErr) {
+      console.warn("Failed to load local map:", mapErr);
+    }
+  }
+
   onDestroy(() => {
     window.removeEventListener("keydown", handleKeyDown);
-    if (battlefield) {
-      battlefield.destroy();
-    }
+    gameClient?.destroy();
+    battlefield?.destroy();
   });
 
   function handleKeyDown(e: KeyboardEvent) {
@@ -60,6 +114,12 @@
       if (battlefield) {
         debugEnabled = battlefield.toggleDebug();
         console.log(`Debug overlay: ${debugEnabled ? "enabled" : "disabled"}`);
+      }
+    }
+    if (e.key === "g" || e.key === "G") {
+      if (battlefield) {
+        const gridEnabled = battlefield.toggleGridOverlay();
+        console.log(`Grid overlay: ${gridEnabled ? "enabled" : "disabled"}`);
       }
     }
   }
@@ -110,6 +170,12 @@
     <div class="debug-indicator">
       DEBUG MODE (Press D to toggle) - Hover tiles for info
     </div>
+  {/if}
+
+  {#if connected}
+    <div class="connection-indicator connected">Connected</div>
+  {:else}
+    <div class="connection-indicator offline">Offline</div>
   {/if}
 </div>
 
@@ -194,5 +260,28 @@
     font-size: 12px;
     z-index: 1001;
     border: 1px solid #0f0;
+  }
+
+  .connection-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 11px;
+    z-index: 1001;
+  }
+
+  .connection-indicator.connected {
+    background: rgba(0, 100, 0, 0.8);
+    color: #0f0;
+    border: 1px solid #0f0;
+  }
+
+  .connection-indicator.offline {
+    background: rgba(100, 0, 0, 0.8);
+    color: #f66;
+    border: 1px solid #f66;
   }
 </style>

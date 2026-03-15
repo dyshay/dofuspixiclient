@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "animation": "walkS",
+  "width": 713,
+  "height": 89,
+  "offsetX": -23.6,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "walkS_0",
+      "x": 1,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "walkS_1",
+      "x": 90,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "walkS_2",
+      "x": 179,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "walkS_3",
+      "x": 268,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "walkS_4",
+      "x": 357,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "walkS_5",
+      "x": 446,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "walkS_6",
+      "x": 535,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "walkS_7",
+      "x": 624,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "walkS_0",
+    "walkS_1",
+    "walkS_2",
+    "walkS_3",
+    "walkS_4",
+    "walkS_5",
+    "walkS_6",
+    "walkS_7"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

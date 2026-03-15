@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "emote15R",
+  "width": 39,
+  "height": 56,
+  "offsetX": -13.85,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "emote15R_0",
+      "x": 1,
+      "y": 1,
+      "width": 37,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "emote15R_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

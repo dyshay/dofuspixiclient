@@ -1,14 +1,19 @@
-import { Container, Graphics, Text, TextStyle, Ticker } from "pixi.js";
+import { Container, Graphics, Sprite, Text, TextStyle, Ticker } from "pixi.js";
 
 import {
-  CELL_HALF_HEIGHT,
-  CELL_HALF_WIDTH,
   DEFAULT_GROUND_LEVEL,
   DEFAULT_MAP_WIDTH,
 } from "@/constants/battlefield";
-import { Direction, FighterTeam } from "@/ecs/components";
+import { FighterTeam } from "@/ecs/components";
 
+import {
+  type CharacterAnimation,
+  getCharacterSpriteLoader,
+  getDirectionSuffix,
+  isDirectionFlipped,
+} from "./character-sprite";
 import { getCellPosition } from "./datacenter/cell";
+import { DofusPathfinding } from "./dofus-pathfinding";
 
 /**
  * Fighter animation state.
@@ -25,6 +30,19 @@ export const FighterAnimation = {
 
 export type FighterAnimationValue =
   (typeof FighterAnimation)[keyof typeof FighterAnimation];
+
+/**
+ * Map FighterAnimation state to sprite animation base name.
+ */
+const ANIM_TO_SPRITE_BASE: Record<string, string> = {
+  [FighterAnimation.IDLE]: "static",
+  [FighterAnimation.WALK]: "walk",
+  [FighterAnimation.RUN]: "run",
+  [FighterAnimation.ATTACK]: "anim0",
+  [FighterAnimation.HIT]: "hit",
+  [FighterAnimation.DEATH]: "die",
+  [FighterAnimation.CAST]: "anim1",
+};
 
 /**
  * Fighter sprite data.
@@ -47,7 +65,8 @@ export interface FighterSpriteData {
 interface ActiveFighter {
   id: number;
   container: Container;
-  graphics: Graphics;
+  sprite: Sprite | null;
+  placeholderGraphics: Graphics | null;
   nameText: Text;
   hpBar: Graphics;
   cellId: number;
@@ -55,11 +74,29 @@ interface ActiveFighter {
   team: number;
   hp: number;
   maxHp: number;
+  gfxId: number;
   animation: FighterAnimationValue;
+  currentAnimName: string;
+  currentAnimData: CharacterAnimation | null;
+  frameIndex: number;
+  frameTimer: number;
+  /** Full path of cell IDs for current movement. */
   path: number[];
-  pathProgress: number;
+  /** Index into path: currently moving FROM path[pathIndex] TO path[pathIndex+1]. */
+  pathIndex: number;
+  /** Remaining pixel distance to the target cell of the current segment. */
+  moveDistance: number;
+  /** Movement direction unit vector (x component). */
+  moveCosRot: number;
+  /** Movement direction unit vector (y component). */
+  moveSinRot: number;
+  /** Current segment pixel speed in px/ms. */
+  movePixelSpeed: number;
+  /** Whether the current movement uses run speed. */
+  useRun: boolean;
   moving: boolean;
   moveResolve?: () => void;
+  spriteLoading: boolean;
 }
 
 /**
@@ -68,25 +105,41 @@ interface ActiveFighter {
 export interface FighterRendererConfig {
   mapWidth?: number;
   groundLevel?: number;
-  moveSpeed?: number;
+}
+
+/**
+ * Per-direction movement speeds in px/ms (from ank.battlefield.mc.Sprite).
+ */
+const WALK_SPEEDS = [0.07, 0.06, 0.06, 0.06, 0.07, 0.06, 0.06, 0.06];
+const RUN_SPEEDS = [0.17, 0.15, 0.15, 0.15, 0.17, 0.15, 0.15, 0.15];
+/** Maximum frame delta in ms — matches original's cap in basicMove. */
+const MAX_FRAME_MS = 125;
+/** Paths with more steps than this use run animation (original: DEFAULT_RUNLINIT = 6, checked as path.length > 6). */
+const RUN_THRESHOLD = 6;
+
+/**
+ * Parse gfxId from the look string (format: "gfx|color1|color2|color3").
+ */
+function parseGfxId(look: string): number {
+  if (!look) return 0;
+  const parts = look.split("|");
+  return parseInt(parts[0], 10) || 0;
 }
 
 /**
  * Fighter renderer.
- * Manages fighter sprites on the battlefield.
+ * Manages fighter sprites on the battlefield using character sprite atlases.
  */
 export class FighterRenderer {
   private container: Container;
   private fighters: Map<number, ActiveFighter> = new Map();
   private mapWidth: number;
   private groundLevel: number;
-  private moveSpeed: number;
   private tickerCallback: () => void;
 
   constructor(parentContainer: Container, config: FighterRendererConfig = {}) {
     this.mapWidth = config.mapWidth ?? DEFAULT_MAP_WIDTH;
     this.groundLevel = config.groundLevel ?? DEFAULT_GROUND_LEVEL;
-    this.moveSpeed = config.moveSpeed ?? 4; // Cells per second
 
     this.container = new Container();
     this.container.label = "fighter-renderer";
@@ -111,44 +164,46 @@ export class FighterRenderer {
     fighterContainer.label = `fighter-${data.id}`;
     fighterContainer.sortableChildren = true;
 
-    // Placeholder graphics (will be replaced with actual sprites)
-    const graphics = new Graphics();
-    this.drawFighterPlaceholder(graphics, data.team, data.direction);
-    fighterContainer.addChild(graphics);
+    // Start with placeholder graphics while sprite loads
+    const placeholderGraphics = new Graphics();
+    this.drawFighterPlaceholder(placeholderGraphics, data.team, data.direction);
+    fighterContainer.addChild(placeholderGraphics);
 
     // Name text
     const nameStyle = new TextStyle({
       fontFamily: "Arial",
       fontSize: 10,
       fontWeight: "bold",
-      fill: data.team === FighterTeam.RED ? 0xff6666 : 0x6666ff,
+      fill: data.isPlayer ? 0x66ff66 : 0xffffff,
       stroke: { color: 0x000000, width: 2 },
       align: "center",
     });
 
     const nameText = new Text({ text: data.name, style: nameStyle });
     nameText.anchor.set(0.5, 1);
-    nameText.y = -35;
+    nameText.y = -50;
     fighterContainer.addChild(nameText);
 
-    // HP bar
+    // HP bar (hidden for world actors in roleplay mode)
     const hpBar = new Graphics();
-    this.drawHPBar(hpBar, data.hp, data.maxHp, data.team);
-    hpBar.y = -40;
+    hpBar.visible = false;
     fighterContainer.addChild(hpBar);
 
     // Position at cell
     const pos = getCellPosition(data.cellId, this.mapWidth, this.groundLevel);
-    fighterContainer.x = pos.x + CELL_HALF_WIDTH;
-    fighterContainer.y = pos.y + CELL_HALF_HEIGHT;
+    fighterContainer.x = pos.x;
+    fighterContainer.y = pos.y;
     fighterContainer.zIndex = this.calculateZIndex(data.cellId);
 
     this.container.addChild(fighterContainer);
 
+    const gfxId = parseGfxId(data.look);
+
     const fighter: ActiveFighter = {
       id: data.id,
       container: fighterContainer,
-      graphics,
+      sprite: null,
+      placeholderGraphics,
       nameText,
       hpBar,
       cellId: data.cellId,
@@ -156,13 +211,154 @@ export class FighterRenderer {
       team: data.team,
       hp: data.hp,
       maxHp: data.maxHp,
+      gfxId,
       animation: FighterAnimation.IDLE,
+      currentAnimName: "",
+      currentAnimData: null,
+      frameIndex: 0,
+      frameTimer: 0,
       path: [],
-      pathProgress: 0,
+      pathIndex: 0,
+      moveDistance: 0,
+      moveCosRot: 0,
+      moveSinRot: 0,
+      movePixelSpeed: 0,
+      useRun: false,
       moving: false,
+      spriteLoading: false,
     };
 
     this.fighters.set(data.id, fighter);
+
+    // Load the character sprite asynchronously
+    if (gfxId > 0) {
+      this.loadFighterSprite(fighter, "static", data.direction).then(() => {
+        // Preload walk + run animations for common directions so movement is instant
+        if (!this.fighters.has(data.id)) return;
+        const loader = getCharacterSpriteLoader();
+        const suffix = getDirectionSuffix(data.direction);
+        loader.loadAnimation(gfxId, `walk${suffix}`);
+        loader.loadAnimation(gfxId, `run${suffix}`);
+      });
+    }
+  }
+
+  /**
+   * Load and apply a character sprite animation for a fighter.
+   */
+  private async loadFighterSprite(
+    fighter: ActiveFighter,
+    baseAnim: string,
+    direction: number
+  ): Promise<void> {
+    if (fighter.spriteLoading) return;
+    fighter.spriteLoading = true;
+
+    const loader = getCharacterSpriteLoader();
+    const result = await loader.loadAnimationWithFallback(
+      fighter.gfxId,
+      baseAnim,
+      direction
+    );
+
+    fighter.spriteLoading = false;
+
+    // Fighter may have been removed while loading
+    if (!this.fighters.has(fighter.id)) return;
+
+    if (!result) return;
+
+    const { animation, animName } = result;
+    this.applyAnimation(fighter, animation, animName);
+  }
+
+  /**
+   * Apply a loaded animation to a fighter, replacing placeholder or previous sprite.
+   */
+  private applyAnimation(
+    fighter: ActiveFighter,
+    animation: CharacterAnimation,
+    animName: string
+  ): void {
+    // Don't re-apply same animation
+    if (fighter.currentAnimName === animName && fighter.sprite) return;
+
+    fighter.currentAnimData = animation;
+    fighter.currentAnimName = animName;
+    fighter.frameIndex = 0;
+    fighter.frameTimer = 0;
+
+    // Remove placeholder if present
+    if (fighter.placeholderGraphics) {
+      fighter.container.removeChild(fighter.placeholderGraphics);
+      fighter.placeholderGraphics.destroy();
+      fighter.placeholderGraphics = null;
+    }
+
+    // Apply horizontal flip for mirrored directions (SW, W, NE)
+    const flipped = isDirectionFlipped(fighter.direction);
+
+    // Create or update sprite
+    if (!fighter.sprite) {
+      const sprite = new Sprite(animation.textures[0]);
+      sprite.anchor.set(0, 1);
+      sprite.scale.x = flipped ? -1 : 1;
+      sprite.x = flipped ? -animation.offsetX : animation.offsetX;
+      sprite.y = animation.offsetY;
+      sprite.zIndex = 0;
+      fighter.container.addChild(sprite);
+      fighter.sprite = sprite;
+    } else {
+      fighter.sprite.texture = animation.textures[0];
+      fighter.sprite.scale.x = flipped ? -1 : 1;
+      fighter.sprite.x = flipped ? -animation.offsetX : animation.offsetX;
+      fighter.sprite.y = animation.offsetY;
+    }
+
+    // Update name position based on sprite height
+    fighter.nameText.y = animation.offsetY - animation.frameHeight - 5;
+  }
+
+  /**
+   * Switch a fighter's animation (e.g., idle → walk).
+   */
+  private switchAnimation(
+    fighter: ActiveFighter,
+    baseAnim: string,
+    direction: number
+  ): void {
+    const suffix = getDirectionSuffix(direction);
+    const animName = `${baseAnim}${suffix}`;
+
+    // Same animation name but direction may have changed flip state
+    // (e.g., SE uses "R" un-flipped, SW uses "R" flipped)
+    if (fighter.currentAnimName === animName && fighter.sprite) {
+      this.updateFlip(fighter);
+      return;
+    }
+
+    // Check if cached
+    const loader = getCharacterSpriteLoader();
+    const cached = loader.getAnimationSync(fighter.gfxId, animName);
+
+    if (cached) {
+      this.applyAnimation(fighter, cached, animName);
+    } else {
+      // Load asynchronously
+      this.loadFighterSprite(fighter, baseAnim, direction);
+    }
+  }
+
+  /**
+   * Update sprite flip based on current direction (without changing animation).
+   */
+  private updateFlip(fighter: ActiveFighter): void {
+    if (!fighter.sprite || !fighter.currentAnimData) return;
+    const flipped = isDirectionFlipped(fighter.direction);
+    fighter.sprite.scale.x = flipped ? -1 : 1;
+    fighter.sprite.x = flipped
+      ? -fighter.currentAnimData.offsetX
+      : fighter.currentAnimData.offsetX;
   }
 
   /**
@@ -200,17 +396,24 @@ export class FighterRenderer {
 
     if (data.direction !== undefined && data.direction !== fighter.direction) {
       fighter.direction = data.direction;
-      this.drawFighterPlaceholder(
-        fighter.graphics,
-        fighter.team,
-        fighter.direction
-      );
+      if (fighter.sprite) {
+        const baseAnim = ANIM_TO_SPRITE_BASE[fighter.animation] ?? "static";
+        this.switchAnimation(fighter, baseAnim, data.direction);
+      } else if (fighter.placeholderGraphics) {
+        this.drawFighterPlaceholder(
+          fighter.placeholderGraphics,
+          fighter.team,
+          fighter.direction
+        );
+      }
     }
 
     if (data.hp !== undefined || data.maxHp !== undefined) {
       fighter.hp = data.hp ?? fighter.hp;
       fighter.maxHp = data.maxHp ?? fighter.maxHp;
-      this.drawHPBar(fighter.hpBar, fighter.hp, fighter.maxHp, fighter.team);
+      if (fighter.hpBar.visible) {
+        this.drawHPBar(fighter.hpBar, fighter.hp, fighter.maxHp, fighter.team);
+      }
     }
 
     if (data.name !== undefined) {
@@ -225,18 +428,59 @@ export class FighterRenderer {
     return new Promise((resolve) => {
       const fighter = this.fighters.get(id);
 
-      if (!fighter || path.length === 0) {
+      if (!fighter || path.length < 2) {
         resolve();
         return;
       }
 
+      // Choose walk or run based on path length (original: path.length > DEFAULT_RUNLINIT)
+      const useRun = path.length > RUN_THRESHOLD;
       fighter.path = path;
-      fighter.pathProgress = 0;
+      fighter.pathIndex = 0;
+      fighter.useRun = useRun;
       fighter.moving = true;
-      fighter.animation = FighterAnimation.WALK;
-
+      fighter.animation = useRun ? FighterAnimation.RUN : FighterAnimation.WALK;
       fighter.moveResolve = resolve;
+
+      // Start the first segment
+      this.startMoveSegment(fighter);
     });
+  }
+
+  /**
+   * Begin a new cell-to-cell movement segment (matches original moveToCell).
+   * Computes pixel distance, direction vector, and speed for the current segment.
+   */
+  private startMoveSegment(fighter: ActiveFighter): void {
+    const fromCell = fighter.path[fighter.pathIndex];
+    const toCell = fighter.path[fighter.pathIndex + 1];
+
+    // Compute direction
+    const dir = DofusPathfinding.getDirection(fromCell, toCell, this.mapWidth);
+    fighter.direction = dir;
+
+    // Get pixel positions
+    const fromPos = getCellPosition(fromCell, this.mapWidth, this.groundLevel);
+    const toPos = getCellPosition(toCell, this.mapWidth, this.groundLevel);
+
+    // Pixel distance (matches original: Math.sqrt(dx^2 + dy^2))
+    const dx = toPos.x - fromPos.x;
+    const dy = toPos.y - fromPos.y;
+    fighter.moveDistance = Math.sqrt(dx * dx + dy * dy);
+
+    // Direction unit vector (matches original: atan2 → cos/sin)
+    const angle = Math.atan2(dy, dx);
+    fighter.moveCosRot = Math.cos(angle);
+    fighter.moveSinRot = Math.sin(angle);
+
+    // Speed in px/ms (matches original WALK_SPEEDS / RUN_SPEEDS indexed by direction)
+    fighter.movePixelSpeed = fighter.useRun
+      ? RUN_SPEEDS[dir]
+      : WALK_SPEEDS[dir];
+
+    // Switch animation for this segment's direction
+    const baseAnim = fighter.useRun ? "run" : "walk";
+    this.switchAnimation(fighter, baseAnim, dir);
   }
 
   /**
@@ -251,8 +495,8 @@ export class FighterRenderer {
 
     fighter.cellId = cellId;
     const pos = getCellPosition(cellId, this.mapWidth, this.groundLevel);
-    fighter.container.x = pos.x + CELL_HALF_WIDTH;
-    fighter.container.y = pos.y + CELL_HALF_HEIGHT;
+    fighter.container.x = pos.x;
+    fighter.container.y = pos.y;
     fighter.container.zIndex = this.calculateZIndex(cellId);
   }
 
@@ -267,7 +511,8 @@ export class FighterRenderer {
     }
 
     fighter.animation = animation;
-    // TODO: Play actual animation when sprites are loaded
+    const baseAnim = ANIM_TO_SPRITE_BASE[animation] ?? "static";
+    this.switchAnimation(fighter, baseAnim, fighter.direction);
   }
 
   /**
@@ -281,7 +526,8 @@ export class FighterRenderer {
     }
 
     fighter.direction = direction;
-    this.drawFighterPlaceholder(fighter.graphics, fighter.team, direction);
+    const baseAnim = ANIM_TO_SPRITE_BASE[fighter.animation] ?? "static";
+    this.switchAnimation(fighter, baseAnim, direction);
   }
 
   /**
@@ -306,116 +552,81 @@ export class FighterRenderer {
   }
 
   /**
-   * Update animation tick.
+   * Update animation tick — handles movement interpolation and sprite frame animation.
+   * Movement matches original basicMove: deltaPx = speed * min(deltaMs, 125).
    */
   private update(): void {
-    const delta = Ticker.shared.deltaMS / 1000;
+    const deltaMs = Ticker.shared.deltaMS;
+    const deltaS = deltaMs / 1000;
+    const clampedMs = Math.min(deltaMs, MAX_FRAME_MS);
 
     for (const fighter of this.fighters.values()) {
+      // Animate sprite frames
+      this.updateSpriteAnimation(fighter, deltaS);
+
+      // Handle path movement (pixel-based, matching original basicMove)
       if (!fighter.moving || fighter.path.length === 0) {
         continue;
       }
 
-      fighter.pathProgress += delta * this.moveSpeed;
+      const deltaPx = fighter.movePixelSpeed * clampedMs;
 
-      const currentStep = Math.floor(fighter.pathProgress);
+      if (fighter.moveDistance <= deltaPx) {
+        // Segment complete — snap to destination cell and advance
+        const toCell = fighter.path[fighter.pathIndex + 1];
+        const toPos = getCellPosition(toCell, this.mapWidth, this.groundLevel);
+        fighter.container.x = toPos.x;
+        fighter.container.y = toPos.y;
+        fighter.cellId = toCell;
+        fighter.container.zIndex = this.calculateZIndex(toCell);
 
-      if (currentStep >= fighter.path.length - 1) {
-        // Movement complete
-        const finalCell = fighter.path[fighter.path.length - 1];
-        fighter.cellId = finalCell;
-        const pos = getCellPosition(finalCell, this.mapWidth, this.groundLevel);
-        fighter.container.x = pos.x + CELL_HALF_WIDTH;
-        fighter.container.y = pos.y + CELL_HALF_HEIGHT;
-        fighter.container.zIndex = this.calculateZIndex(finalCell);
-        fighter.path = [];
-        fighter.pathProgress = 0;
-        fighter.moving = false;
-        fighter.animation = FighterAnimation.IDLE;
+        fighter.pathIndex++;
 
-        // Resolve move promise
-        if (fighter.moveResolve) {
-          const resolve = fighter.moveResolve;
-          fighter.moveResolve = undefined;
-          resolve();
+        if (fighter.pathIndex >= fighter.path.length - 1) {
+          // Entire path complete — stop and return to idle
+          fighter.path = [];
+          fighter.pathIndex = 0;
+          fighter.moveDistance = 0;
+          fighter.moving = false;
+          fighter.animation = FighterAnimation.IDLE;
+
+          this.switchAnimation(fighter, "static", fighter.direction);
+
+          if (fighter.moveResolve) {
+            const resolve = fighter.moveResolve;
+            fighter.moveResolve = undefined;
+            resolve();
+          }
+        } else {
+          // Start next segment
+          this.startMoveSegment(fighter);
         }
-
-        continue;
-      }
-
-      // Interpolate between cells
-      const fromCell = fighter.path[currentStep];
-      const toCell = fighter.path[currentStep + 1];
-      const t = fighter.pathProgress - currentStep;
-
-      const fromPos = getCellPosition(
-        fromCell,
-        this.mapWidth,
-        this.groundLevel
-      );
-      const toPos = getCellPosition(toCell, this.mapWidth, this.groundLevel);
-
-      fighter.container.x =
-        fromPos.x + CELL_HALF_WIDTH + (toPos.x - fromPos.x) * t;
-      fighter.container.y =
-        fromPos.y + CELL_HALF_HEIGHT + (toPos.y - fromPos.y) * t;
-      fighter.cellId = fromCell;
-      fighter.container.zIndex = this.calculateZIndex(fromCell);
-
-      // Update direction based on movement
-      const newDirection = this.calculateDirection(fromCell, toCell);
-
-      if (newDirection !== fighter.direction) {
-        fighter.direction = newDirection;
-        this.drawFighterPlaceholder(
-          fighter.graphics,
-          fighter.team,
-          fighter.direction
-        );
+      } else {
+        // Mid-segment: advance position by deltaPx along direction vector
+        fighter.container.x += deltaPx * fighter.moveCosRot;
+        fighter.container.y += deltaPx * fighter.moveSinRot;
+        fighter.moveDistance -= deltaPx;
       }
     }
   }
 
   /**
-   * Calculate direction between two cells.
+   * Update sprite frame animation for a fighter.
    */
-  private calculateDirection(fromCell: number, toCell: number): number {
-    const fromPos = getCellPosition(fromCell, this.mapWidth, this.groundLevel);
-    const toPos = getCellPosition(toCell, this.mapWidth, this.groundLevel);
+  private updateSpriteAnimation(fighter: ActiveFighter, deltaS: number): void {
+    if (!fighter.sprite || !fighter.currentAnimData) return;
 
-    const dx = toPos.x - fromPos.x;
-    const dy = toPos.y - fromPos.y;
+    const anim = fighter.currentAnimData;
+    if (anim.textures.length <= 1) return;
 
-    // 8-direction based on vector
-    if (dx > 0 && dy === 0) {
-      return Direction.EAST;
+    fighter.frameTimer += deltaS;
+
+    const frameDuration = 1 / anim.fps;
+    if (fighter.frameTimer >= frameDuration) {
+      fighter.frameTimer -= frameDuration;
+      fighter.frameIndex = (fighter.frameIndex + 1) % anim.textures.length;
+      fighter.sprite.texture = anim.textures[fighter.frameIndex];
     }
-
-    if (dx > 0 && dy > 0) {
-      return Direction.SOUTH_EAST;
-    }
-
-    if (dx === 0 && dy > 0) {
-      return Direction.SOUTH;
-    }
-
-    if (dx < 0 && dy > 0) {
-      return Direction.SOUTH_WEST;
-    }
-
-    if (dx < 0 && dy === 0) {
-      return Direction.WEST;
-    }
-
-    if (dx < 0 && dy < 0) {
-      return Direction.NORTH_WEST;
-    }
-
-    if (dx === 0 && dy < 0) {
-      return Direction.NORTH;
-    }
-
-    return Direction.NORTH_EAST;
   }
 
   /**
@@ -427,7 +638,7 @@ export class FighterRenderer {
   }
 
   /**
-   * Draw placeholder fighter graphic.
+   * Draw placeholder fighter graphic (used while sprite loads).
    */
   private drawFighterPlaceholder(
     graphics: Graphics,

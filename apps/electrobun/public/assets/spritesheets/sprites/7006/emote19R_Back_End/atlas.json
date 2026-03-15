@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "emote19R_Back_End",
+  "width": 16,
+  "height": 11,
+  "offsetX": -7,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "emote19R_Back_End_0",
+      "x": 1,
+      "y": 1,
+      "width": 14,
+      "height": 9,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "emote19R_Back_End_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

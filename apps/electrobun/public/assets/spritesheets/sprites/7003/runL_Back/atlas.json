@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "animation": "runL_Back",
+  "width": 921,
+  "height": 95,
+  "offsetX": -43.05,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "runL_Back_0",
+      "x": 1,
+      "y": 1,
+      "width": 91,
+      "height": 93,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runL_Back_1",
+      "x": 93,
+      "y": 1,
+      "width": 91,
+      "height": 93,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runL_Back_2",
+      "x": 185,
+      "y": 1,
+      "width": 91,
+      "height": 93,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runL_Back_3",
+      "x": 277,
+      "y": 1,
+      "width": 91,
+      "height": 93,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runL_Back_4",
+      "x": 369,
+      "y": 1,
+      "width": 91,
+      "height": 93,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runL_Back_5",
+      "x": 461,
+      "y": 1,
+      "width": 91,
+      "height": 93,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runL_Back_6",
+      "x": 553,
+      "y": 1,
+      "width": 91,
+      "height": 93,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runL_Back_7",
+      "x": 645,
+      "y": 1,
+      "width": 91,
+      "height": 93,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runL_Back_8",
+      "x": 737,
+      "y": 1,
+      "width": 91,
+      "height": 93,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runL_Back_9",
+      "x": 829,
+      "y": 1,
+      "width": 91,
+      "height": 93,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "runL_Back_0",
+    "runL_Back_1",
+    "runL_Back_2",
+    "runL_Back_3",
+    "runL_Back_4",
+    "runL_Back_5",
+    "runL_Back_6",
+    "runL_Back_7",
+    "runL_Back_8",
+    "runL_Back_9"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

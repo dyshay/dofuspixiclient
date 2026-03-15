@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "animation": "runR",
+  "width": 404,
+  "height": 17,
+  "offsetX": -19,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "runR_0",
+      "x": 1,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runR_1",
+      "x": 32,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runR_2",
+      "x": 63,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runR_3",
+      "x": 94,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runR_4",
+      "x": 125,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runR_5",
+      "x": 156,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runR_6",
+      "x": 187,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runR_7",
+      "x": 218,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runR_8",
+      "x": 249,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runR_9",
+      "x": 280,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runR_10",
+      "x": 311,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runR_11",
+      "x": 342,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runR_12",
+      "x": 373,
+      "y": 1,
+      "width": 30,
+      "height": 15,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "runR_0",
+    "runR_1",
+    "runR_2",
+    "runR_3",
+    "runR_4",
+    "runR_5",
+    "runR_6",
+    "runR_7",
+    "runR_8",
+    "runR_9",
+    "runR_10",
+    "runR_11",
+    "runR_12",
+    "runR_13",
+    "runR_14"
+  ],
+  "duplicates": {
+    "runR_13": "runR_12",
+    "runR_14": "runR_12"
+  },
+  "fps": 60
+}

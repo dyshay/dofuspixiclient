@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "circle",
+  "width": 40,
+  "height": 21,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "circle_0",
+      "x": 1,
+      "y": 1,
+      "width": 38,
+      "height": 19,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "circle_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

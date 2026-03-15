@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "tete",
+  "width": 41,
+  "height": 28,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "tete_0",
+      "x": 1,
+      "y": 1,
+      "width": 39,
+      "height": 26,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "tete_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

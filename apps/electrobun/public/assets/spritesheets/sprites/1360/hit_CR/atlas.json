@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "animation": "hit_CR",
+  "width": 281,
+  "height": 57,
+  "offsetX": -24.75,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "hit_CR_0",
+      "x": 1,
+      "y": 1,
+      "width": 55,
+      "height": 55,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "hit_CR_2",
+      "x": 57,
+      "y": 1,
+      "width": 55,
+      "height": 55,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "hit_CR_3",
+      "x": 113,
+      "y": 1,
+      "width": 55,
+      "height": 55,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "hit_CR_6",
+      "x": 169,
+      "y": 1,
+      "width": 55,
+      "height": 55,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "hit_CR_11",
+      "x": 225,
+      "y": 1,
+      "width": 55,
+      "height": 55,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "hit_CR_0",
+    "hit_CR_1",
+    "hit_CR_2",
+    "hit_CR_3",
+    "hit_CR_4",
+    "hit_CR_5",
+    "hit_CR_6",
+    "hit_CR_7",
+    "hit_CR_8",
+    "hit_CR_9",
+    "hit_CR_10",
+    "hit_CR_11",
+    "hit_CR_12",
+    "hit_CR_13",
+    "hit_CR_14",
+    "hit_CR_15",
+    "hit_CR_16",
+    "hit_CR_17"
+  ],
+  "duplicates": {
+    "hit_CR_1": "hit_CR_0",
+    "hit_CR_4": "hit_CR_3",
+    "hit_CR_5": "hit_CR_2",
+    "hit_CR_7": "hit_CR_6",
+    "hit_CR_8": "hit_CR_6",
+    "hit_CR_9": "hit_CR_6",
+    "hit_CR_10": "hit_CR_6",
+    "hit_CR_12": "hit_CR_11",
+    "hit_CR_13": "hit_CR_11",
+    "hit_CR_14": "hit_CR_11",
+    "hit_CR_15": "hit_CR_11",
+    "hit_CR_16": "hit_CR_11",
+    "hit_CR_17": "hit_CR_11"
+  },
+  "fps": 60
+}

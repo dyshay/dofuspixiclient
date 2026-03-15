@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "animation": "bonusL",
+  "width": 441,
+  "height": 78,
+  "offsetX": -58.95,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "bonusL_0",
+      "x": 1,
+      "y": 1,
+      "width": 87,
+      "height": 76,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_1",
+      "x": 89,
+      "y": 1,
+      "width": 87,
+      "height": 76,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_2",
+      "x": 177,
+      "y": 1,
+      "width": 87,
+      "height": 76,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_3",
+      "x": 265,
+      "y": 1,
+      "width": 87,
+      "height": 76,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_8",
+      "x": 353,
+      "y": 1,
+      "width": 87,
+      "height": 76,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "bonusL_0",
+    "bonusL_1",
+    "bonusL_2",
+    "bonusL_3",
+    "bonusL_4",
+    "bonusL_5",
+    "bonusL_6",
+    "bonusL_7",
+    "bonusL_8",
+    "bonusL_9",
+    "bonusL_10",
+    "bonusL_11",
+    "bonusL_12"
+  ],
+  "duplicates": {
+    "bonusL_4": "bonusL_3",
+    "bonusL_5": "bonusL_3",
+    "bonusL_6": "bonusL_3",
+    "bonusL_7": "bonusL_3",
+    "bonusL_9": "bonusL_8",
+    "bonusL_10": "bonusL_8",
+    "bonusL_11": "bonusL_8",
+    "bonusL_12": "bonusL_8"
+  },
+  "fps": 60
+}

@@ -7,6 +7,9 @@ export interface CellData {
   layer2: number;
   groundLevel: number;
   groundSlope?: number;
+  walkable?: boolean;
+  movement?: number;
+  lineOfSight?: boolean;
   layerGroundRot: number;
   layerGroundFlip: boolean;
   layerObject1Rot: number;
@@ -37,8 +40,8 @@ export function getCellPosition(cellId: number, mapWidth: number, groundLevel: n
     }
   }
 
-  const x = Math.floor(loc9 * CELL_WIDTH + loc11);
-  const y = Math.floor(loc10 * CELL_HALF_HEIGHT - LEVEL_HEIGHT * (groundLevel - 7));
+  const x = loc9 * CELL_WIDTH + loc11;
+  const y = loc10 * CELL_HALF_HEIGHT - LEVEL_HEIGHT * (groundLevel - 7);
 
   return { x, y };
 }
@@ -50,22 +53,19 @@ export function findCellAtPosition(
   mapWidth: number,
   mapScale: { scale: number; offsetX: number; offsetY: number }
 ): CellData | null {
+  const hw = CELL_HALF_WIDTH * mapScale.scale;
+  const hh = CELL_HALF_HEIGHT * mapScale.scale;
+
   for (const cell of cells) {
     const pos = getCellPosition(cell.id, mapWidth, cell.groundLevel);
-    const screenX = pos.x * mapScale.scale + mapScale.offsetX;
-    const screenY = pos.y * mapScale.scale + mapScale.offsetY;
+    // pos is the center of the diamond (matching original AS MapHandler.build)
+    const cx = pos.x * mapScale.scale + mapScale.offsetX;
+    const cy = pos.y * mapScale.scale + mapScale.offsetY;
 
-    const relX = mapX - screenX;
-    const relY = mapY - screenY;
+    const dx = mapX - cx;
+    const dy = mapY - cy;
 
-    const hw = CELL_HALF_WIDTH * mapScale.scale;
-    const hh = CELL_HALF_HEIGHT * mapScale.scale;
-
-    const cx = hw;
-    const cy = hh;
-    const dx = relX - cx;
-    const dy = relY - cy;
-
+    // Diamond hit-test: |dx/hw| + |dy/hh| <= 1
     if (Math.abs(dx / hw) + Math.abs(dy / hh) <= 1) {
       return cell;
     }

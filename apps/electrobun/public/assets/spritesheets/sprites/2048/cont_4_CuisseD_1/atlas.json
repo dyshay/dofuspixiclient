@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "cont_4_CuisseD_1",
+  "width": 10,
+  "height": 15,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "cont_4_CuisseD_1_0",
+      "x": 1,
+      "y": 1,
+      "width": 8,
+      "height": 13,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "cont_4_CuisseD_1_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

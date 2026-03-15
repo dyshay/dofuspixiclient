@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "Tenat_Corps",
+  "width": 198,
+  "height": 190,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "Tenat_Corps_0",
+      "x": 1,
+      "y": 1,
+      "width": 196,
+      "height": 188,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "Tenat_Corps_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

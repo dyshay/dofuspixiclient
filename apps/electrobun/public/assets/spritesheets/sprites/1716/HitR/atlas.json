@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "animation": "HitR",
+  "width": 3181,
+  "height": 270,
+  "offsetX": -180,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "HitR_0",
+      "x": 1,
+      "y": 1,
+      "width": 264,
+      "height": 268,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "HitR_1",
+      "x": 266,
+      "y": 1,
+      "width": 264,
+      "height": 268,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "HitR_2",
+      "x": 531,
+      "y": 1,
+      "width": 264,
+      "height": 268,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "HitR_3",
+      "x": 796,
+      "y": 1,
+      "width": 264,
+      "height": 268,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "HitR_4",
+      "x": 1061,
+      "y": 1,
+      "width": 264,
+      "height": 268,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "HitR_5",
+      "x": 1326,
+      "y": 1,
+      "width": 264,
+      "height": 268,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "HitR_6",
+      "x": 1591,
+      "y": 1,
+      "width": 264,
+      "height": 268,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "HitR_7",
+      "x": 1856,
+      "y": 1,
+      "width": 264,
+      "height": 268,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "HitR_8",
+      "x": 2121,
+      "y": 1,
+      "width": 264,
+      "height": 268,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "HitR_9",
+      "x": 2386,
+      "y": 1,
+      "width": 264,
+      "height": 268,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "HitR_10",
+      "x": 2651,
+      "y": 1,
+      "width": 264,
+      "height": 268,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "HitR_12",
+      "x": 2916,
+      "y": 1,
+      "width": 264,
+      "height": 268,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "HitR_0",
+    "HitR_1",
+    "HitR_2",
+    "HitR_3",
+    "HitR_4",
+    "HitR_5",
+    "HitR_6",
+    "HitR_7",
+    "HitR_8",
+    "HitR_9",
+    "HitR_10",
+    "HitR_11",
+    "HitR_12",
+    "HitR_13"
+  ],
+  "duplicates": {
+    "HitR_11": "HitR_10",
+    "HitR_13": "HitR_12"
+  },
+  "fps": 60
+}

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "staticB",
+  "width": 22,
+  "height": 46,
+  "offsetX": -10.4,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "staticB_0",
+      "x": 1,
+      "y": 1,
+      "width": 20,
+      "height": 44,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "staticB_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

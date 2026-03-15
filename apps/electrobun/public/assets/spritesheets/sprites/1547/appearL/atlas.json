@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "animation": "appearL",
+  "width": 622,
+  "height": 76,
+  "offsetX": -34.9,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "appearL_0",
+      "x": 1,
+      "y": 1,
+      "width": 68,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearL_1",
+      "x": 70,
+      "y": 1,
+      "width": 68,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearL_2",
+      "x": 139,
+      "y": 1,
+      "width": 68,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearL_3",
+      "x": 208,
+      "y": 1,
+      "width": 68,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearL_4",
+      "x": 277,
+      "y": 1,
+      "width": 68,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearL_5",
+      "x": 346,
+      "y": 1,
+      "width": 68,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearL_7",
+      "x": 415,
+      "y": 1,
+      "width": 68,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearL_8",
+      "x": 484,
+      "y": 1,
+      "width": 68,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "appearL_9",
+      "x": 553,
+      "y": 1,
+      "width": 68,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "appearL_0",
+    "appearL_1",
+    "appearL_2",
+    "appearL_3",
+    "appearL_4",
+    "appearL_5",
+    "appearL_6",
+    "appearL_7",
+    "appearL_8",
+    "appearL_9",
+    "appearL_10",
+    "appearL_11",
+    "appearL_12",
+    "appearL_13",
+    "appearL_14",
+    "appearL_15",
+    "appearL_16"
+  ],
+  "duplicates": {
+    "appearL_6": "appearL_4",
+    "appearL_10": "appearL_9",
+    "appearL_11": "appearL_9",
+    "appearL_12": "appearL_9",
+    "appearL_13": "appearL_9",
+    "appearL_14": "appearL_9",
+    "appearL_15": "appearL_9",
+    "appearL_16": "appearL_9"
+  },
+  "fps": 60
+}

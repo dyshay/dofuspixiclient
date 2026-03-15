@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "walkS",
+  "width": 29,
+  "height": 40,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "walkS_0",
+      "x": 1,
+      "y": 1,
+      "width": 27,
+      "height": 38,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "walkS_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

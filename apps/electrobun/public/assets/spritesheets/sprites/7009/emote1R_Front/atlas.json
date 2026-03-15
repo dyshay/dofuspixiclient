@@ -1,0 +1,769 @@
+{
+  "version": 1,
+  "animation": "emote1R_Front",
+  "width": 2851,
+  "height": 36,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "emote1R_Front_0",
+      "x": 1,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_1",
+      "x": 39,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_2",
+      "x": 77,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_3",
+      "x": 115,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_4",
+      "x": 153,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_5",
+      "x": 191,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_6",
+      "x": 229,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_7",
+      "x": 267,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_8",
+      "x": 305,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_9",
+      "x": 343,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_10",
+      "x": 381,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_11",
+      "x": 419,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_12",
+      "x": 457,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_13",
+      "x": 495,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_14",
+      "x": 533,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_15",
+      "x": 571,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_16",
+      "x": 609,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_17",
+      "x": 647,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_18",
+      "x": 685,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_19",
+      "x": 723,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_20",
+      "x": 761,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_21",
+      "x": 799,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_22",
+      "x": 837,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_23",
+      "x": 875,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_24",
+      "x": 913,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_25",
+      "x": 951,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_26",
+      "x": 989,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_27",
+      "x": 1027,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_28",
+      "x": 1065,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_29",
+      "x": 1103,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_30",
+      "x": 1141,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_31",
+      "x": 1179,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_32",
+      "x": 1217,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_33",
+      "x": 1255,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_34",
+      "x": 1293,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_35",
+      "x": 1331,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_36",
+      "x": 1369,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_37",
+      "x": 1407,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_38",
+      "x": 1445,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_39",
+      "x": 1483,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_40",
+      "x": 1521,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_41",
+      "x": 1559,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_42",
+      "x": 1597,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_43",
+      "x": 1635,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_44",
+      "x": 1673,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_45",
+      "x": 1711,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_46",
+      "x": 1749,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_47",
+      "x": 1787,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_48",
+      "x": 1825,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_49",
+      "x": 1863,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_50",
+      "x": 1901,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_51",
+      "x": 1939,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_52",
+      "x": 1977,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_53",
+      "x": 2015,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_54",
+      "x": 2053,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_55",
+      "x": 2091,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_56",
+      "x": 2129,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_57",
+      "x": 2167,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_58",
+      "x": 2205,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_59",
+      "x": 2243,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_60",
+      "x": 2281,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_61",
+      "x": 2319,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_62",
+      "x": 2357,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_63",
+      "x": 2395,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_64",
+      "x": 2433,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_65",
+      "x": 2471,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_66",
+      "x": 2509,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_67",
+      "x": 2547,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_68",
+      "x": 2585,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_69",
+      "x": 2623,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_70",
+      "x": 2661,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_71",
+      "x": 2699,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_72",
+      "x": 2737,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_73",
+      "x": 2775,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1R_Front_74",
+      "x": 2813,
+      "y": 1,
+      "width": 37,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "emote1R_Front_0",
+    "emote1R_Front_1",
+    "emote1R_Front_2",
+    "emote1R_Front_3",
+    "emote1R_Front_4",
+    "emote1R_Front_5",
+    "emote1R_Front_6",
+    "emote1R_Front_7",
+    "emote1R_Front_8",
+    "emote1R_Front_9",
+    "emote1R_Front_10",
+    "emote1R_Front_11",
+    "emote1R_Front_12",
+    "emote1R_Front_13",
+    "emote1R_Front_14",
+    "emote1R_Front_15",
+    "emote1R_Front_16",
+    "emote1R_Front_17",
+    "emote1R_Front_18",
+    "emote1R_Front_19",
+    "emote1R_Front_20",
+    "emote1R_Front_21",
+    "emote1R_Front_22",
+    "emote1R_Front_23",
+    "emote1R_Front_24",
+    "emote1R_Front_25",
+    "emote1R_Front_26",
+    "emote1R_Front_27",
+    "emote1R_Front_28",
+    "emote1R_Front_29",
+    "emote1R_Front_30",
+    "emote1R_Front_31",
+    "emote1R_Front_32",
+    "emote1R_Front_33",
+    "emote1R_Front_34",
+    "emote1R_Front_35",
+    "emote1R_Front_36",
+    "emote1R_Front_37",
+    "emote1R_Front_38",
+    "emote1R_Front_39",
+    "emote1R_Front_40",
+    "emote1R_Front_41",
+    "emote1R_Front_42",
+    "emote1R_Front_43",
+    "emote1R_Front_44",
+    "emote1R_Front_45",
+    "emote1R_Front_46",
+    "emote1R_Front_47",
+    "emote1R_Front_48",
+    "emote1R_Front_49",
+    "emote1R_Front_50",
+    "emote1R_Front_51",
+    "emote1R_Front_52",
+    "emote1R_Front_53",
+    "emote1R_Front_54",
+    "emote1R_Front_55",
+    "emote1R_Front_56",
+    "emote1R_Front_57",
+    "emote1R_Front_58",
+    "emote1R_Front_59",
+    "emote1R_Front_60",
+    "emote1R_Front_61",
+    "emote1R_Front_62",
+    "emote1R_Front_63",
+    "emote1R_Front_64",
+    "emote1R_Front_65",
+    "emote1R_Front_66",
+    "emote1R_Front_67",
+    "emote1R_Front_68",
+    "emote1R_Front_69",
+    "emote1R_Front_70",
+    "emote1R_Front_71",
+    "emote1R_Front_72",
+    "emote1R_Front_73",
+    "emote1R_Front_74",
+    "emote1R_Front_75",
+    "emote1R_Front_76"
+  ],
+  "duplicates": {
+    "emote1R_Front_75": "emote1R_Front_74",
+    "emote1R_Front_76": "emote1R_Front_74"
+  },
+  "fps": 60
+}

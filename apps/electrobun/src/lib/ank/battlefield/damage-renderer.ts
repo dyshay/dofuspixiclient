@@ -1,8 +1,6 @@
 import { Container, Text, TextStyle, Ticker } from "pixi.js";
 
 import {
-  CELL_HALF_HEIGHT,
-  CELL_HALF_WIDTH,
   DEFAULT_GROUND_LEVEL,
   DEFAULT_MAP_WIDTH,
 } from "@/constants/battlefield";
@@ -191,9 +189,9 @@ export class DamageRenderer {
     const text = this.acquireText();
     const pos = getCellPosition(config.cellId, this.mapWidth, this.groundLevel);
 
-    // Position at cell center
-    text.x = pos.x + CELL_HALF_WIDTH;
-    text.y = pos.y + CELL_HALF_HEIGHT - yOffset;
+    // Position at cell center (pos is already the center)
+    text.x = pos.x;
+    text.y = pos.y - yOffset;
 
     // Format text
     let displayValue = String(Math.abs(config.value));

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "patteG_R",
+  "width": 9,
+  "height": 8,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "patteG_R_0",
+      "x": 1,
+      "y": 1,
+      "width": 7,
+      "height": 6,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "patteG_R_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

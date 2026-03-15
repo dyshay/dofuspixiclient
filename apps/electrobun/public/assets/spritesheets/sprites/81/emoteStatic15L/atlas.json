@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "animation": "emoteStatic15L",
+  "width": 29,
+  "height": 48,
+  "offsetX": -18.35,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "emoteStatic15L_0",
+      "x": 1,
+      "y": 1,
+      "width": 27,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "emoteStatic15L_0",
+    "emoteStatic15L_1",
+    "emoteStatic15L_2",
+    "emoteStatic15L_3",
+    "emoteStatic15L_4",
+    "emoteStatic15L_5",
+    "emoteStatic15L_6",
+    "emoteStatic15L_7"
+  ],
+  "duplicates": {
+    "emoteStatic15L_1": "emoteStatic15L_0",
+    "emoteStatic15L_2": "emoteStatic15L_0",
+    "emoteStatic15L_3": "emoteStatic15L_0",
+    "emoteStatic15L_4": "emoteStatic15L_0",
+    "emoteStatic15L_5": "emoteStatic15L_0",
+    "emoteStatic15L_6": "emoteStatic15L_0",
+    "emoteStatic15L_7": "emoteStatic15L_0"
+  },
+  "fps": 60
+}

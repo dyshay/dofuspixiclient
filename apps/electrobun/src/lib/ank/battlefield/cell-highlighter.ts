@@ -3,8 +3,6 @@ import { Container, Graphics } from "pixi.js";
 import {
   CELL_HALF_HEIGHT,
   CELL_HALF_WIDTH,
-  CELL_HEIGHT,
-  CELL_WIDTH,
   DEFAULT_GROUND_LEVEL,
   DEFAULT_MAP_WIDTH,
 } from "@/constants/battlefield";
@@ -236,16 +234,16 @@ export class CellHighlighter {
   ): void {
     const pos = getCellPosition(cellId, this.mapWidth, this.groundLevel);
 
-    // Diamond shape points for isometric cell
+    // Diamond shape centered at pos (matching original AS CELL_COORD for groundSlope=1)
     const points = [
-      pos.x + CELL_HALF_WIDTH,
-      pos.y, // Top
-      pos.x + CELL_WIDTH,
-      pos.y + CELL_HALF_HEIGHT, // Right
-      pos.x + CELL_HALF_WIDTH,
-      pos.y + CELL_HEIGHT, // Bottom
       pos.x,
-      pos.y + CELL_HALF_HEIGHT, // Left
+      pos.y - CELL_HALF_HEIGHT, // Top
+      pos.x + CELL_HALF_WIDTH,
+      pos.y, // Right
+      pos.x,
+      pos.y + CELL_HALF_HEIGHT, // Bottom
+      pos.x - CELL_HALF_WIDTH,
+      pos.y, // Left
     ];
 
     // Fill

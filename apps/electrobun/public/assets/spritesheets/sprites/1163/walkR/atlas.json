@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "walkR",
+  "width": 98,
+  "height": 118,
+  "offsetX": -57.15,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "walkR_0",
+      "x": 1,
+      "y": 1,
+      "width": 96,
+      "height": 116,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "walkR_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

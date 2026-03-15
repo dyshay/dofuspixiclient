@@ -388,13 +388,16 @@ export class Banner {
   private async loadMinimap(): Promise<void> {
     this.minimapRenderer = new MinimapRenderer({
       app: this.app,
-      zoom: 300,
       centerOnCoordinates: { x: 4, y: -19 },
       parentContainer: this.minimapContainer,
     });
 
     await this.minimapRenderer.loadWorldMap(0);
     this.minimapRenderer.show();
+  }
+
+  public updateMinimapPosition(mapId: number): void {
+    this.minimapRenderer?.centerOnMap(mapId, true);
   }
 
   public init(width: number, zoom: number): void {
@@ -469,7 +472,8 @@ export class Banner {
     this.minimapHitArea.circle(xpCircleCenterX, xpCircleCenterY, minimapRadius);
     this.minimapHitArea.fill({ color: 0x000000, alpha: 0 });
 
-    const minimapScale = (minimapRadius * 2) / 742;
+    const MINIMAP_VIEW_WIDTH = 250;
+    const minimapScale = (minimapRadius * 2) / MINIMAP_VIEW_WIDTH;
     this.minimapContainer.position.set(0, 0);
     this.minimapContainer.scale.set(minimapScale);
 
@@ -538,7 +542,7 @@ export class Banner {
     const bannerOffsetY = Math.floor(this.displayHeight * this.currentZoom);
     const xpCircleCenterX = 417 * s;
     const xpCircleCenterY = bannerOffsetY + 65.4 * s;
-    const minimapScale = (CIRCLE_INNER_CONTENT_RADIUS * 2 * s) / 742;
+    const minimapScale = (CIRCLE_INNER_CONTENT_RADIUS * 2 * s) / 250;
 
     const heartStartY = bannerOffsetY - 5 * s;
     const heartEndY = bannerOffsetY - 35 * s;
@@ -578,7 +582,7 @@ export class Banner {
     const bannerOffsetY = Math.floor(this.displayHeight * this.currentZoom);
     const xpCircleCenterX = 417 * s;
     const xpCircleCenterY = bannerOffsetY + 65.4 * s;
-    const minimapScale = (CIRCLE_INNER_CONTENT_RADIUS * 2 * s) / 742;
+    const minimapScale = (CIRCLE_INNER_CONTENT_RADIUS * 2 * s) / 250;
 
     const heartStartY = bannerOffsetY - 35 * s;
     const heartEndY = bannerOffsetY - 5 * s;

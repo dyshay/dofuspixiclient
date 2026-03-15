@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "spriteId": "1237",
+  "generatedAt": "2026-02-02T14:56:19.710Z",
+  "totalAnimations": 4,
+  "totalFrames": 270,
+  "uniqueFrames": 258,
+  "totalInputSize": 750910,
+  "totalOutputSize": 203992,
+  "compressionPercent": 72.8,
+  "animations": {
+    "dieL": {
+      "frameCount": 81,
+      "uniqueFrames": 77,
+      "atlasWidth": 4048,
+      "atlasHeight": 173,
+      "file": "dieL/atlas.svg",
+      "manifestFile": "dieL/atlas.json"
+    },
+    "dieR": {
+      "frameCount": 81,
+      "uniqueFrames": 77,
+      "atlasWidth": 4048,
+      "atlasHeight": 173,
+      "file": "dieR/atlas.svg",
+      "manifestFile": "dieR/atlas.json"
+    },
+    "staticL": {
+      "frameCount": 54,
+      "uniqueFrames": 52,
+      "atlasWidth": 937,
+      "atlasHeight": 69,
+      "file": "staticL/atlas.svg",
+      "manifestFile": "staticL/atlas.json"
+    },
+    "staticR": {
+      "frameCount": 54,
+      "uniqueFrames": 52,
+      "atlasWidth": 937,
+      "atlasHeight": 69,
+      "file": "staticR/atlas.svg",
+      "manifestFile": "staticR/atlas.json"
+    }
+  }
+}

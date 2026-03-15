@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "animation": "runS",
+  "width": 713,
+  "height": 89,
+  "offsetX": -23.6,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "runS_0",
+      "x": 1,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runS_1",
+      "x": 90,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runS_2",
+      "x": 179,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runS_3",
+      "x": 268,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runS_4",
+      "x": 357,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runS_5",
+      "x": 446,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runS_6",
+      "x": 535,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "runS_7",
+      "x": 624,
+      "y": 1,
+      "width": 88,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "runS_0",
+    "runS_1",
+    "runS_2",
+    "runS_3",
+    "runS_4",
+    "runS_5",
+    "runS_6",
+    "runS_7"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

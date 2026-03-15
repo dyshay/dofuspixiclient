@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "staticS",
+  "width": 58,
+  "height": 65,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "staticS_0",
+      "x": 1,
+      "y": 1,
+      "width": 56,
+      "height": 63,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "staticS_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

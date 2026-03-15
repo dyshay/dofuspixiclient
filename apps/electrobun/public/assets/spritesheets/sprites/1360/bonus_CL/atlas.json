@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "animation": "bonus_CL",
+  "width": 323,
+  "height": 54,
+  "offsetX": -10.55,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "bonus_CL_0",
+      "x": 1,
+      "y": 1,
+      "width": 45,
+      "height": 52,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonus_CL_1",
+      "x": 47,
+      "y": 1,
+      "width": 45,
+      "height": 52,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonus_CL_2",
+      "x": 93,
+      "y": 1,
+      "width": 45,
+      "height": 52,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonus_CL_3",
+      "x": 139,
+      "y": 1,
+      "width": 45,
+      "height": 52,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonus_CL_4",
+      "x": 185,
+      "y": 1,
+      "width": 45,
+      "height": 52,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonus_CL_5",
+      "x": 231,
+      "y": 1,
+      "width": 45,
+      "height": 52,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonus_CL_12",
+      "x": 277,
+      "y": 1,
+      "width": 45,
+      "height": 52,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "bonus_CL_0",
+    "bonus_CL_1",
+    "bonus_CL_2",
+    "bonus_CL_3",
+    "bonus_CL_4",
+    "bonus_CL_5",
+    "bonus_CL_6",
+    "bonus_CL_7",
+    "bonus_CL_8",
+    "bonus_CL_9",
+    "bonus_CL_10",
+    "bonus_CL_11",
+    "bonus_CL_12",
+    "bonus_CL_13",
+    "bonus_CL_14",
+    "bonus_CL_15",
+    "bonus_CL_16",
+    "bonus_CL_17",
+    "bonus_CL_18",
+    "bonus_CL_19",
+    "bonus_CL_20",
+    "bonus_CL_21",
+    "bonus_CL_22"
+  ],
+  "duplicates": {
+    "bonus_CL_6": "bonus_CL_5",
+    "bonus_CL_7": "bonus_CL_5",
+    "bonus_CL_8": "bonus_CL_5",
+    "bonus_CL_9": "bonus_CL_5",
+    "bonus_CL_10": "bonus_CL_5",
+    "bonus_CL_11": "bonus_CL_5",
+    "bonus_CL_13": "bonus_CL_12",
+    "bonus_CL_14": "bonus_CL_12",
+    "bonus_CL_15": "bonus_CL_12",
+    "bonus_CL_16": "bonus_CL_12",
+    "bonus_CL_17": "bonus_CL_12",
+    "bonus_CL_18": "bonus_CL_12",
+    "bonus_CL_19": "bonus_CL_12",
+    "bonus_CL_20": "bonus_CL_12",
+    "bonus_CL_21": "bonus_CL_12",
+    "bonus_CL_22": "bonus_CL_12"
+  },
+  "fps": 60
+}

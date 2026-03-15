@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "Boule_degat_exterieur",
+  "width": 37,
+  "height": 31,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "Boule_degat_exterieur_0",
+      "x": 1,
+      "y": 1,
+      "width": 35,
+      "height": 29,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "Boule_degat_exterieur_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

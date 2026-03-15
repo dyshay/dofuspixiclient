@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "animation": "CapRunR-123",
+  "width": 73,
+  "height": 23,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "CapRunR-123_0",
+      "x": 1,
+      "y": 1,
+      "width": 35,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "CapRunR-123_5",
+      "x": 37,
+      "y": 1,
+      "width": 35,
+      "height": 21,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "CapRunR-123_0",
+    "CapRunR-123_1",
+    "CapRunR-123_2",
+    "CapRunR-123_3",
+    "CapRunR-123_4",
+    "CapRunR-123_5",
+    "CapRunR-123_6",
+    "CapRunR-123_7",
+    "CapRunR-123_8"
+  ],
+  "duplicates": {
+    "CapRunR-123_1": "CapRunR-123_0",
+    "CapRunR-123_2": "CapRunR-123_0",
+    "CapRunR-123_3": "CapRunR-123_0",
+    "CapRunR-123_4": "CapRunR-123_0",
+    "CapRunR-123_6": "CapRunR-123_5",
+    "CapRunR-123_7": "CapRunR-123_5",
+    "CapRunR-123_8": "CapRunR-123_5"
+  },
+  "fps": 60
+}

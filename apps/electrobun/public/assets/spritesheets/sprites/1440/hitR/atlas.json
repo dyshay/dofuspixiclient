@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "hitR",
+  "width": 69,
+  "height": 85,
+  "offsetX": -41.55,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "hitR_0",
+      "x": 1,
+      "y": 1,
+      "width": 67,
+      "height": 83,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "hitR_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

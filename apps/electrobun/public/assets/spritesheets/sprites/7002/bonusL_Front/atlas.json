@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "bonusL_Front",
+  "width": 25,
+  "height": 25,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "bonusL_Front_0",
+      "x": 1,
+      "y": 1,
+      "width": 23,
+      "height": 23,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "bonusL_Front_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

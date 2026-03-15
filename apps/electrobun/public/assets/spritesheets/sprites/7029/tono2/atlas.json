@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "tono2",
+  "width": 25,
+  "height": 54,
+  "offsetX": 0,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "tono2_0",
+      "x": 1,
+      "y": 1,
+      "width": 23,
+      "height": 52,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "tono2_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

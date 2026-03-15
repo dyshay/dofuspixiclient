@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "animation": "bonusL",
+  "width": 236,
+  "height": 48,
+  "offsetX": -8.25,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "bonusL_0",
+      "x": 1,
+      "y": 1,
+      "width": 46,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_1",
+      "x": 48,
+      "y": 1,
+      "width": 46,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_2",
+      "x": 95,
+      "y": 1,
+      "width": 46,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_3",
+      "x": 142,
+      "y": 1,
+      "width": 46,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusL_8",
+      "x": 189,
+      "y": 1,
+      "width": 46,
+      "height": 46,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "bonusL_0",
+    "bonusL_1",
+    "bonusL_2",
+    "bonusL_3",
+    "bonusL_4",
+    "bonusL_5",
+    "bonusL_6",
+    "bonusL_7",
+    "bonusL_8",
+    "bonusL_9"
+  ],
+  "duplicates": {
+    "bonusL_4": "bonusL_3",
+    "bonusL_5": "bonusL_3",
+    "bonusL_6": "bonusL_3",
+    "bonusL_7": "bonusL_3",
+    "bonusL_9": "bonusL_8"
+  },
+  "fps": 60
+}

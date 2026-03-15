@@ -1,0 +1,217 @@
+{
+  "version": 1,
+  "animation": "spShoot0R",
+  "width": 1021,
+  "height": 76,
+  "offsetX": -22.6,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "spShoot0R_0",
+      "x": 1,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_1",
+      "x": 61,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_2",
+      "x": 121,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_3",
+      "x": 181,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_4",
+      "x": 241,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_5",
+      "x": 301,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_6",
+      "x": 361,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_7",
+      "x": 421,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_8",
+      "x": 481,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_9",
+      "x": 541,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_10",
+      "x": 601,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_11",
+      "x": 661,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_12",
+      "x": 721,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_13",
+      "x": 781,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_14",
+      "x": 841,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_15",
+      "x": 901,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "spShoot0R_17",
+      "x": 961,
+      "y": 1,
+      "width": 59,
+      "height": 74,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "spShoot0R_0",
+    "spShoot0R_1",
+    "spShoot0R_2",
+    "spShoot0R_3",
+    "spShoot0R_4",
+    "spShoot0R_5",
+    "spShoot0R_6",
+    "spShoot0R_7",
+    "spShoot0R_8",
+    "spShoot0R_9",
+    "spShoot0R_10",
+    "spShoot0R_11",
+    "spShoot0R_12",
+    "spShoot0R_13",
+    "spShoot0R_14",
+    "spShoot0R_15",
+    "spShoot0R_16",
+    "spShoot0R_17",
+    "spShoot0R_18",
+    "spShoot0R_19",
+    "spShoot0R_20",
+    "spShoot0R_21",
+    "spShoot0R_22",
+    "spShoot0R_23",
+    "spShoot0R_24",
+    "spShoot0R_25",
+    "spShoot0R_26",
+    "spShoot0R_27",
+    "spShoot0R_28",
+    "spShoot0R_29",
+    "spShoot0R_30",
+    "spShoot0R_31",
+    "spShoot0R_32"
+  ],
+  "duplicates": {
+    "spShoot0R_16": "spShoot0R_15",
+    "spShoot0R_18": "spShoot0R_17",
+    "spShoot0R_19": "spShoot0R_17",
+    "spShoot0R_20": "spShoot0R_17",
+    "spShoot0R_21": "spShoot0R_17",
+    "spShoot0R_22": "spShoot0R_17",
+    "spShoot0R_23": "spShoot0R_17",
+    "spShoot0R_24": "spShoot0R_17",
+    "spShoot0R_25": "spShoot0R_17",
+    "spShoot0R_26": "spShoot0R_17",
+    "spShoot0R_27": "spShoot0R_17",
+    "spShoot0R_28": "spShoot0R_17",
+    "spShoot0R_29": "spShoot0R_17",
+    "spShoot0R_30": "spShoot0R_17",
+    "spShoot0R_31": "spShoot0R_17",
+    "spShoot0R_32": "spShoot0R_17"
+  },
+  "fps": 60
+}

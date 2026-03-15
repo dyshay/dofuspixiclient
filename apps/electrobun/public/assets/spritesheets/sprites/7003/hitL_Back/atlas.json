@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "animation": "hitL_Back",
+  "width": 316,
+  "height": 89,
+  "offsetX": -27.05,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "hitL_Back_0",
+      "x": 1,
+      "y": 1,
+      "width": 62,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "hitL_Back_1",
+      "x": 64,
+      "y": 1,
+      "width": 62,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "hitL_Back_2",
+      "x": 127,
+      "y": 1,
+      "width": 62,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "hitL_Back_4",
+      "x": 190,
+      "y": 1,
+      "width": 62,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "hitL_Back_7",
+      "x": 253,
+      "y": 1,
+      "width": 62,
+      "height": 87,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "hitL_Back_0",
+    "hitL_Back_1",
+    "hitL_Back_2",
+    "hitL_Back_3",
+    "hitL_Back_4",
+    "hitL_Back_5",
+    "hitL_Back_6",
+    "hitL_Back_7",
+    "hitL_Back_8",
+    "hitL_Back_9",
+    "hitL_Back_10",
+    "hitL_Back_11",
+    "hitL_Back_12"
+  ],
+  "duplicates": {
+    "hitL_Back_3": "hitL_Back_1",
+    "hitL_Back_5": "hitL_Back_4",
+    "hitL_Back_6": "hitL_Back_4",
+    "hitL_Back_8": "hitL_Back_7",
+    "hitL_Back_9": "hitL_Back_7",
+    "hitL_Back_10": "hitL_Back_7",
+    "hitL_Back_11": "hitL_Back_7",
+    "hitL_Back_12": "hitL_Back_7"
+  },
+  "fps": 60
+}

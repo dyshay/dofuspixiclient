@@ -1,4 +1,7 @@
-import { DISPLAY_WIDTH, DISPLAY_HEIGHT, CELL_WIDTH, CELL_HEIGHT, DEFAULT_WIDTH, DEFAULT_HEIGHT } from '@/constants/battlefield';
+import { decompressSync } from 'fflate';
+
+import { CELL_HEIGHT, CELL_WIDTH, DEFAULT_HEIGHT, DEFAULT_WIDTH, DISPLAY_HEIGHT, DISPLAY_WIDTH } from '@/constants/battlefield';
+
 import type { CellData } from './cell';
 
 export interface MapData {
@@ -7,6 +10,7 @@ export interface MapData {
   height: number;
   backgroundNum?: number;
   cells: CellData[];
+  triggerCellIds?: number[];
 }
 
 export interface MapScale {
@@ -64,4 +68,32 @@ export function computeMapScale(mapWidth: number, mapHeight: number): MapScale {
 export async function loadMapData(mapId: number): Promise<MapData> {
   const response = await fetch(`/assets/maps/${mapId}.json`);
   return response.json();
+}
+
+export interface ServerMapDataPayload {
+  mapId: number;
+  width: number;
+  height: number;
+  background: number;
+  compressed: Uint8Array;
+  encoding: 'gzip';
+  triggerCellIds?: number[];
+}
+
+export function loadMapDataFromServer(payload: ServerMapDataPayload): MapData {
+  const compressed = payload.compressed instanceof Uint8Array
+    ? payload.compressed
+    : new Uint8Array(payload.compressed);
+  const decompressed = decompressSync(compressed);
+  const json = new TextDecoder().decode(decompressed);
+  const cells: CellData[] = JSON.parse(json);
+
+  return {
+    id: payload.mapId,
+    width: payload.width,
+    height: payload.height,
+    backgroundNum: payload.background,
+    cells,
+    triggerCellIds: payload.triggerCellIds,
+  };
 }

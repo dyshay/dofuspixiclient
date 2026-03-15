@@ -1,8 +1,16 @@
-import { Container, ColorMatrixFilter } from 'pixi.js';
-import type { FederatedPointerEvent } from 'pixi.js';
-import { DISPLAY_WIDTH, DISPLAY_HEIGHT, ZOOM_LEVELS } from '@/constants/battlefield';
-import type { PickingSystem } from '@/render/picking-system';
-import type { PickResult } from '@/types/picking';
+import {
+  ColorMatrixFilter,
+  type Container,
+  type FederatedPointerEvent,
+} from "pixi.js";
+
+import type { PickingSystem } from "@/render/picking-system";
+import type { PickResult } from "@/types/picking";
+import {
+  DISPLAY_HEIGHT,
+  DISPLAY_WIDTH,
+  ZOOM_LEVELS,
+} from "@/constants/battlefield";
 
 export interface InteractionHandlerConfig {
   mapContainer: Container;
@@ -12,6 +20,7 @@ export interface InteractionHandlerConfig {
   onPan?: (dx: number, dy: number) => void;
   onObjectClick?: (result: PickResult) => void;
   onObjectHover?: (result: PickResult | null) => void;
+  onGroundClick?: (mapX: number, mapY: number) => void;
 }
 
 export class InteractionHandler {
@@ -20,6 +29,8 @@ export class InteractionHandler {
   private canvas: HTMLCanvasElement;
 
   private isDragging = false;
+  private dragDistance = 0;
+  private pointerDownPos = { x: 0, y: 0 };
   private lastPointerPos = { x: 0, y: 0 };
 
   private baseZoom = 1;
@@ -32,6 +43,7 @@ export class InteractionHandler {
   private onPan?: (dx: number, dy: number) => void;
   private onObjectClick?: (result: PickResult) => void;
   private onObjectHover?: (result: PickResult | null) => void;
+  private onGroundClick?: (mapX: number, mapY: number) => void;
 
   constructor(config: InteractionHandlerConfig) {
     this.mapContainer = config.mapContainer;
@@ -41,10 +53,11 @@ export class InteractionHandler {
     this.onPan = config.onPan;
     this.onObjectClick = config.onObjectClick;
     this.onObjectHover = config.onObjectHover;
+    this.onGroundClick = config.onGroundClick;
   }
 
   init(): void {
-    this.canvas.addEventListener('wheel', (e) => this.handleWheel(e));
+    this.canvas.addEventListener("wheel", (e) => this.handleWheel(e));
   }
 
   setBaseZoom(zoom: number): void {
@@ -80,6 +93,8 @@ export class InteractionHandler {
     }
 
     this.isDragging = true;
+    this.dragDistance = 0;
+    this.pointerDownPos = { x: e.global.x, y: e.global.y };
     this.lastPointerPos = { x: e.global.x, y: e.global.y };
   }
 
@@ -106,16 +121,14 @@ export class InteractionHandler {
           // Apply ColorMatrixFilter exactly like the old MapRendererEngine
           const colorMatrix = new ColorMatrixFilter();
           colorMatrix.matrix = [
-            0.6, 0, 0, 0, 0.3,
-            0, 0.6, 0, 0, 0.3,
-            0, 0, 0.6, 0, 0.3,
-            0, 0, 0, 1, 0
+            0.6, 0, 0, 0, 0.3, 0, 0.6, 0, 0, 0.3, 0, 0, 0.6, 0, 0.3, 0, 0, 0, 1,
+            0,
           ];
           colorMatrix.resolution = window.devicePixelRatio;
           sprite.filters = [colorMatrix];
         }
 
-        this.canvas.style.cursor = pickResult ? 'pointer' : 'default';
+        this.canvas.style.cursor = pickResult ? "pointer" : "default";
         this.onObjectHover?.(pickResult);
       }
       return;
@@ -123,6 +136,8 @@ export class InteractionHandler {
 
     const dx = e.global.x - this.lastPointerPos.x;
     const dy = e.global.y - this.lastPointerPos.y;
+
+    this.dragDistance += Math.abs(dx) + Math.abs(dy);
 
     this.mapContainer.x += dx;
     this.mapContainer.y += dy;
@@ -135,6 +150,13 @@ export class InteractionHandler {
   }
 
   handlePointerUp(): void {
+    if (this.isDragging && this.dragDistance < 5) {
+      // Click detected (not a drag) — convert to map-local coordinates
+      const zoom = this.mapContainer.scale.x || 1;
+      const mapX = (this.pointerDownPos.x - this.mapContainer.x) / zoom;
+      const mapY = (this.pointerDownPos.y - this.mapContainer.y) / zoom;
+      this.onGroundClick?.(mapX, mapY);
+    }
     this.isDragging = false;
   }
 
@@ -149,8 +171,15 @@ export class InteractionHandler {
     this.stepZoom(direction, mouseX, mouseY);
   }
 
-  private stepZoom(direction: number, anchorX?: number, anchorY?: number): void {
-    const newIndex = Math.max(0, Math.min(ZOOM_LEVELS.length - 1, this.currentZoomIndex + direction));
+  private stepZoom(
+    direction: number,
+    anchorX?: number,
+    anchorY?: number
+  ): void {
+    const newIndex = Math.max(
+      0,
+      Math.min(ZOOM_LEVELS.length - 1, this.currentZoomIndex + direction)
+    );
 
     if (newIndex === this.currentZoomIndex) {
       return;
@@ -252,6 +281,6 @@ export class InteractionHandler {
   }
 
   destroy(): void {
-    this.canvas.removeEventListener('wheel', this.handleWheel);
+    this.canvas.removeEventListener("wheel", this.handleWheel);
   }
 }

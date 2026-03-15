@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "walkL",
+  "width": 16,
+  "height": 18,
+  "offsetX": -6.85,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "walkL_0",
+      "x": 1,
+      "y": 1,
+      "width": 14,
+      "height": 16,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "walkL_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "staticR",
+  "width": 75,
+  "height": 79,
+  "offsetX": -36.45,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "staticR_0",
+      "x": 1,
+      "y": 1,
+      "width": 73,
+      "height": 77,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "staticR_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

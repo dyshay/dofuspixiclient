@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "animation": "emoteStatic14R",
+  "width": 23,
+  "height": 47,
+  "offsetX": -11.45,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "emoteStatic14R_0",
+      "x": 1,
+      "y": 1,
+      "width": 21,
+      "height": 45,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "emoteStatic14R_0",
+    "emoteStatic14R_1",
+    "emoteStatic14R_2",
+    "emoteStatic14R_3",
+    "emoteStatic14R_4",
+    "emoteStatic14R_5",
+    "emoteStatic14R_6",
+    "emoteStatic14R_7"
+  ],
+  "duplicates": {
+    "emoteStatic14R_1": "emoteStatic14R_0",
+    "emoteStatic14R_2": "emoteStatic14R_0",
+    "emoteStatic14R_3": "emoteStatic14R_0",
+    "emoteStatic14R_4": "emoteStatic14R_0",
+    "emoteStatic14R_5": "emoteStatic14R_0",
+    "emoteStatic14R_6": "emoteStatic14R_0",
+    "emoteStatic14R_7": "emoteStatic14R_0"
+  },
+  "fps": 60
+}

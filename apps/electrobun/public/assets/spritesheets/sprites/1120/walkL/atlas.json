@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "animation": "walkL",
+  "width": 142,
+  "height": 36,
+  "offsetX": -13.7,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "walkL_0",
+      "x": 1,
+      "y": 1,
+      "width": 46,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "walkL_3",
+      "x": 48,
+      "y": 1,
+      "width": 46,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "walkL_6",
+      "x": 95,
+      "y": 1,
+      "width": 46,
+      "height": 34,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "walkL_0",
+    "walkL_1",
+    "walkL_2",
+    "walkL_3",
+    "walkL_4",
+    "walkL_5",
+    "walkL_6",
+    "walkL_7",
+    "walkL_8"
+  ],
+  "duplicates": {
+    "walkL_1": "walkL_0",
+    "walkL_2": "walkL_0",
+    "walkL_4": "walkL_3",
+    "walkL_5": "walkL_3",
+    "walkL_7": "walkL_6",
+    "walkL_8": "walkL_6"
+  },
+  "fps": 60
+}

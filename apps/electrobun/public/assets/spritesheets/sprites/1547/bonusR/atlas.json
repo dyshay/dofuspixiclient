@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "animation": "bonusR",
+  "width": 236,
+  "height": 47,
+  "offsetX": -36.85,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "bonusR_0",
+      "x": 1,
+      "y": 1,
+      "width": 46,
+      "height": 45,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusR_1",
+      "x": 48,
+      "y": 1,
+      "width": 46,
+      "height": 45,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusR_2",
+      "x": 95,
+      "y": 1,
+      "width": 46,
+      "height": 45,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusR_3",
+      "x": 142,
+      "y": 1,
+      "width": 46,
+      "height": 45,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "bonusR_8",
+      "x": 189,
+      "y": 1,
+      "width": 46,
+      "height": 45,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "bonusR_0",
+    "bonusR_1",
+    "bonusR_2",
+    "bonusR_3",
+    "bonusR_4",
+    "bonusR_5",
+    "bonusR_6",
+    "bonusR_7",
+    "bonusR_8",
+    "bonusR_9"
+  ],
+  "duplicates": {
+    "bonusR_4": "bonusR_3",
+    "bonusR_5": "bonusR_3",
+    "bonusR_6": "bonusR_3",
+    "bonusR_7": "bonusR_3",
+    "bonusR_9": "bonusR_8"
+  },
+  "fps": 60
+}

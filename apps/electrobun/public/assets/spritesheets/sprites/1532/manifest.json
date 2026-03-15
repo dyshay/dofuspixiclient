@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "spriteId": "1532",
+  "generatedAt": "2026-02-02T15:08:25.360Z",
+  "totalAnimations": 2,
+  "totalFrames": 25,
+  "uniqueFrames": 25,
+  "totalInputSize": 1424829,
+  "totalOutputSize": 126150,
+  "compressionPercent": 91.1,
+  "animations": {
+    "staticR": {
+      "frameCount": 1,
+      "uniqueFrames": 1,
+      "atlasWidth": 177,
+      "atlasHeight": 325,
+      "file": "staticR/atlas.svg",
+      "manifestFile": "staticR/atlas.json"
+    },
+    "walkR": {
+      "frameCount": 24,
+      "uniqueFrames": 24,
+      "atlasWidth": 4041,
+      "atlasHeight": 1303,
+      "file": "walkR/atlas.svg",
+      "manifestFile": "walkR/atlas.json"
+    }
+  }
+}

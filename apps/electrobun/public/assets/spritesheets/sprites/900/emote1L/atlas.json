@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "animation": "emote1L",
+  "width": 313,
+  "height": 24,
+  "offsetX": -12.1,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "emote1L_0",
+      "x": 1,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1L_1",
+      "x": 25,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1L_2",
+      "x": 49,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1L_3",
+      "x": 73,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1L_4",
+      "x": 97,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1L_5",
+      "x": 121,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1L_6",
+      "x": 145,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1L_7",
+      "x": 169,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1L_8",
+      "x": 193,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1L_9",
+      "x": 217,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1L_10",
+      "x": 241,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1L_11",
+      "x": 265,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "emote1L_12",
+      "x": 289,
+      "y": 1,
+      "width": 23,
+      "height": 22,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "emote1L_0",
+    "emote1L_1",
+    "emote1L_2",
+    "emote1L_3",
+    "emote1L_4",
+    "emote1L_5",
+    "emote1L_6",
+    "emote1L_7",
+    "emote1L_8",
+    "emote1L_9",
+    "emote1L_10",
+    "emote1L_11",
+    "emote1L_12",
+    "emote1L_13",
+    "emote1L_14"
+  ],
+  "duplicates": {
+    "emote1L_13": "emote1L_12",
+    "emote1L_14": "emote1L_12"
+  },
+  "fps": 60
+}

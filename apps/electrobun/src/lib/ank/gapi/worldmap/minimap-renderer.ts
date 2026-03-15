@@ -1,5 +1,5 @@
 import type { Application } from 'pixi.js';
-import { Assets, Container, Sprite } from 'pixi.js';
+import { Assets, Container, Graphics, Sprite } from 'pixi.js';
 import type {
   WorldMapManifest,
   HintManifest,
@@ -11,7 +11,6 @@ import { loadWorldMapData, mapCoordToPixel, filterHintsByArea } from './world-ma
 interface MinimapRendererConfig {
   app: Application;
   parentContainer?: Container;
-  zoom?: number;
   centerOnMapId?: number;
   centerOnCoordinates?: { x: number; y: number };
 }
@@ -20,6 +19,7 @@ export class MinimapRenderer {
   private worldContainer: Container;
   private mapContainer: Container;
   private hintsContainer: Container;
+  private positionMarker: Graphics;
 
   private manifest: WorldMapManifest | null = null;
   private hintManifest: HintManifest | null = null;
@@ -27,25 +27,26 @@ export class MinimapRenderer {
   private mapCoordinates: MapCoordinates | null = null;
 
   private currentSuperarea = 0;
-  private currentZoom: number;
 
   private tileSprites: Sprite[] = [];
   private hintSprites: Sprite[] = [];
 
   private centerMapId?: number;
   private initialCenterCoordinates?: { x: number; y: number };
+  private animationFrame: number | null = null;
 
   constructor(config: MinimapRendererConfig) {
-    this.currentZoom = config.zoom ?? 300;
     this.centerMapId = config.centerOnMapId;
     this.initialCenterCoordinates = config.centerOnCoordinates;
 
     this.worldContainer = new Container();
     this.mapContainer = new Container();
     this.hintsContainer = new Container();
+    this.positionMarker = new Graphics();
 
     this.worldContainer.addChild(this.mapContainer);
     this.worldContainer.addChild(this.hintsContainer);
+    this.worldContainer.addChild(this.positionMarker);
 
     const parent = config.parentContainer ?? config.app.stage;
     parent.addChild(this.worldContainer);
@@ -87,15 +88,18 @@ export class MinimapRenderer {
       const texturePath = `/assets/maps/world/${worldmap}/${tileInfo.file}`;
 
       try {
-        const texture = await Assets.load(texturePath);
+        const texture = await Assets.load({
+          src: texturePath,
+          data: { autoGenerateMipmaps: true },
+        });
 
         if (!texture) {
           return;
         }
 
-        // Enable mipmaps for smooth downscaling
         if (texture.source) {
           texture.source.autoGenerateMipmaps = true;
+          texture.source.scaleMode = 'linear';
           texture.source.updateMipmaps();
         }
 
@@ -202,7 +206,7 @@ export class MinimapRenderer {
     }
   }
 
-  private centerOnMap(mapId: number): void {
+  centerOnMap(mapId: number, animate = false): void {
     if (!this.mapCoordinates || !this.manifest) {
       return;
     }
@@ -221,7 +225,11 @@ export class MinimapRenderer {
       bounds.yMin
     );
 
-    this.applyCenter(pixelX, pixelY);
+    if (animate) {
+      this.animateCenter(pixelX, pixelY);
+    } else {
+      this.applyCenter(pixelX, pixelY);
+    }
   }
 
   centerOnCoordinates(x: number, y: number): void {
@@ -236,11 +244,50 @@ export class MinimapRenderer {
   }
 
   private applyCenter(pixelX: number, pixelY: number): void {
-    const scale = this.currentZoom / 100;
+    this.worldContainer.x = -pixelX;
+    this.worldContainer.y = -pixelY;
+    this.drawPositionMarker(pixelX, pixelY);
+  }
 
-    this.worldContainer.scale.set(scale);
-    this.worldContainer.x = -pixelX * scale;
-    this.worldContainer.y = -pixelY * scale;
+  private animateCenter(targetX: number, targetY: number): void {
+    if (this.animationFrame !== null) {
+      cancelAnimationFrame(this.animationFrame);
+      this.animationFrame = null;
+    }
+
+    const startX = -this.worldContainer.x;
+    const startY = -this.worldContainer.y;
+    const startTime = performance.now();
+    const duration = 300;
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - (1 - progress) ** 3;
+
+      const currentX = startX + (targetX - startX) * eased;
+      const currentY = startY + (targetY - startY) * eased;
+
+      this.worldContainer.x = -currentX;
+      this.worldContainer.y = -currentY;
+      this.drawPositionMarker(currentX, currentY);
+
+      if (progress < 1) {
+        this.animationFrame = requestAnimationFrame(animate);
+      } else {
+        this.animationFrame = null;
+      }
+    };
+
+    this.animationFrame = requestAnimationFrame(animate);
+  }
+
+  private drawPositionMarker(pixelX: number, pixelY: number): void {
+    this.positionMarker.clear();
+    this.positionMarker.circle(pixelX, pixelY, 8);
+    this.positionMarker.fill({ color: 0xffffff, alpha: 0.9 });
+    this.positionMarker.circle(pixelX, pixelY, 5);
+    this.positionMarker.fill({ color: 0x44aaff, alpha: 1 });
   }
 
   show(): void {
@@ -252,6 +299,9 @@ export class MinimapRenderer {
   }
 
   destroy(): void {
+    if (this.animationFrame !== null) {
+      cancelAnimationFrame(this.animationFrame);
+    }
     this.worldContainer.destroy({ children: true, texture: false });
   }
 }

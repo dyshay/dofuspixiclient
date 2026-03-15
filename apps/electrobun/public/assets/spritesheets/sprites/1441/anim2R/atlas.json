@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "animation": "anim2R",
+  "width": 78,
+  "height": 70,
+  "offsetX": -31.55,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "anim2R_0",
+      "x": 1,
+      "y": 1,
+      "width": 76,
+      "height": 68,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "anim2R_0"
+  ],
+  "duplicates": {},
+  "fps": 60
+}

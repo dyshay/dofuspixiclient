@@ -13,6 +13,9 @@ export interface MapCell {
   layer2: number;
   groundLevel: number;
   groundSlope?: number;
+  walkable?: boolean;
+  movement?: number;
+  lineOfSight?: boolean;
   layerGroundRot: number;
   layerGroundFlip: boolean;
   layerObject1Rot: number;

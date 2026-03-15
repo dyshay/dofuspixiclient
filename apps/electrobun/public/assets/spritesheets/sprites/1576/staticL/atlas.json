@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "animation": "staticL",
+  "width": 606,
+  "height": 65,
+  "offsetX": -33.65,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "staticL_0",
+      "x": 1,
+      "y": 1,
+      "width": 54,
+      "height": 63,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "staticL_1",
+      "x": 56,
+      "y": 1,
+      "width": 54,
+      "height": 63,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "staticL_2",
+      "x": 111,
+      "y": 1,
+      "width": 54,
+      "height": 63,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "staticL_3",
+      "x": 166,
+      "y": 1,
+      "width": 54,
+      "height": 63,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "staticL_4",
+      "x": 221,
+      "y": 1,
+      "width": 54,
+      "height": 63,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "staticL_5",
+      "x": 276,
+      "y": 1,
+      "width": 54,
+      "height": 63,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "staticL_6",
+      "x": 331,
+      "y": 1,
+      "width": 54,
+      "height": 63,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "staticL_7",
+      "x": 386,
+      "y": 1,
+      "width": 54,
+      "height": 63,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "staticL_8",
+      "x": 441,
+      "y": 1,
+      "width": 54,
+      "height": 63,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "staticL_9",
+      "x": 496,
+      "y": 1,
+      "width": 54,
+      "height": 63,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "staticL_11",
+      "x": 551,
+      "y": 1,
+      "width": 54,
+      "height": 63,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "staticL_0",
+    "staticL_1",
+    "staticL_2",
+    "staticL_3",
+    "staticL_4",
+    "staticL_5",
+    "staticL_6",
+    "staticL_7",
+    "staticL_8",
+    "staticL_9",
+    "staticL_10",
+    "staticL_11",
+    "staticL_12",
+    "staticL_13",
+    "staticL_14",
+    "staticL_15",
+    "staticL_16",
+    "staticL_17",
+    "staticL_18",
+    "staticL_19",
+    "staticL_20"
+  ],
+  "duplicates": {
+    "staticL_10": "staticL_9",
+    "staticL_12": "staticL_11",
+    "staticL_13": "staticL_11",
+    "staticL_14": "staticL_11",
+    "staticL_15": "staticL_11",
+    "staticL_16": "staticL_11",
+    "staticL_17": "staticL_11",
+    "staticL_18": "staticL_11",
+    "staticL_19": "staticL_11",
+    "staticL_20": "staticL_11"
+  },
+  "fps": 60
+}

@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "spriteId": "1668",
+  "generatedAt": "2026-02-02T15:15:26.456Z",
+  "totalAnimations": 9,
+  "totalFrames": 81,
+  "uniqueFrames": 74,
+  "totalInputSize": 6741127,
+  "totalOutputSize": 745067,
+  "compressionPercent": 88.9,
+  "animations": {
+    "hitR": {
+      "frameCount": 12,
+      "uniqueFrames": 5,
+      "atlasWidth": 506,
+      "atlasHeight": 85,
+      "file": "hitR/atlas.svg",
+      "manifestFile": "hitR/atlas.json"
+    },
+    "runF": {
+      "frameCount": 12,
+      "uniqueFrames": 12,
+      "atlasWidth": 973,
+      "atlasHeight": 88,
+      "file": "runF/atlas.svg",
+      "manifestFile": "runF/atlas.json"
+    },
+    "runR": {
+      "frameCount": 12,
+      "uniqueFrames": 12,
+      "atlasWidth": 1237,
+      "atlasHeight": 89,
+      "file": "runR/atlas.svg",
+      "manifestFile": "runR/atlas.json"
+    },
+    "staticF": {
+      "frameCount": 1,
+      "uniqueFrames": 1,
+      "atlasWidth": 65,
+      "atlasHeight": 93,
+      "file": "staticF/atlas.svg",
+      "manifestFile": "staticF/atlas.json"
+    },
+    "staticR": {
+      "frameCount": 1,
+      "uniqueFrames": 1,
+      "atlasWidth": 32,
+      "atlasHeight": 17,
+      "file": "staticR/atlas.svg",
+      "manifestFile": "staticR/atlas.json"
+    },
+    "staticS": {
+      "frameCount": 1,
+      "uniqueFrames": 1,
+      "atlasWidth": 78,
+      "atlasHeight": 84,
+      "file": "staticS/atlas.svg",
+      "manifestFile": "staticS/atlas.json"
+    },
+    "walkF": {
+      "frameCount": 14,
+      "uniqueFrames": 14,
+      "atlasWidth": 995,
+      "atlasHeight": 88,
+      "file": "walkF/atlas.svg",
+      "manifestFile": "walkF/atlas.json"
+    },
+    "walkR": {
+      "frameCount": 14,
+      "uniqueFrames": 14,
+      "atlasWidth": 1163,
+      "atlasHeight": 90,
+      "file": "walkR/atlas.svg",
+      "manifestFile": "walkR/atlas.json"
+    },
+    "walkS": {
+      "frameCount": 14,
+      "uniqueFrames": 14,
+      "atlasWidth": 1163,
+      "atlasHeight": 89,
+      "file": "walkS/atlas.svg",
+      "manifestFile": "walkS/atlas.json"
+    }
+  }
+}

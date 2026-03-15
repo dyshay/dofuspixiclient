@@ -1,0 +1,172 @@
+import type { MapChangePayload } from "../protocol/types.ts";
+import type { ClientSession } from "../ws/client-session.ts";
+import { db } from "../db/database.ts";
+import {
+  getCharacterById,
+  updateCharacterPosition,
+} from "../game/character.ts";
+import {
+  cleanupEmptyMap,
+  getMapInstance,
+  getOrCreateMapInstance,
+} from "../game/game-manager.ts";
+import { getCompressedMap, getMap, mapExists } from "../maps/map-store.ts";
+import { getPathfinding } from "../maps/pathfinding.ts";
+import { encodeServerMessage } from "../protocol/codec.ts";
+import { ServerMessageType } from "../protocol/types.ts";
+
+export interface MapTrigger {
+  targetMapId: number;
+  targetCellId: number;
+}
+
+// Per-map trigger cache: Map<mapId, Map<cellId, MapTrigger>>
+const triggerCache = new Map<number, Map<number, MapTrigger>>();
+
+async function loadMapTriggers(
+  mapId: number
+): Promise<Map<number, MapTrigger>> {
+  const cached = triggerCache.get(mapId);
+  if (cached) return cached;
+
+  const rows = await db
+    .selectFrom("scripted_cells")
+    .select(["cell_id", "action_args"])
+    .where("map_id", "=", mapId)
+    .where("action_id", "=", 0)
+    .where("event_id", "=", 1)
+    .execute();
+
+  const triggers = new Map<number, MapTrigger>();
+  for (const row of rows) {
+    if (!row.action_args) continue;
+    const parts = row.action_args.split(",");
+    if (parts.length < 2) continue;
+    triggers.set(row.cell_id, {
+      targetMapId: Number.parseInt(parts[0], 10),
+      targetCellId: Number.parseInt(parts[1], 10),
+    });
+  }
+
+  triggerCache.set(mapId, triggers);
+  return triggers;
+}
+
+export async function getTrigger(
+  mapId: number,
+  cellId: number
+): Promise<MapTrigger | null> {
+  const triggers = await loadMapTriggers(mapId);
+  return triggers.get(cellId) ?? null;
+}
+
+export async function getMapTriggers(
+  mapId: number
+): Promise<Map<number, MapTrigger>> {
+  return loadMapTriggers(mapId);
+}
+
+export async function handleMapChange(
+  session: ClientSession,
+  payload: MapChangePayload
+): Promise<void> {
+  if (!session.characterId || !session.characterName) return;
+  await changeMap(session, payload.mapId);
+}
+
+export async function changeMap(
+  session: ClientSession,
+  newMapId: number,
+  targetCellId?: number
+): Promise<void> {
+  if (!session.characterId || !session.characterName) return;
+
+  if (!(await mapExists(newMapId))) {
+    session.ws.send(
+      encodeServerMessage(ServerMessageType.ERROR, { reason: "Map not found" })
+    );
+    return;
+  }
+
+  const oldMapId = session.mapId;
+
+  // Remove from old map
+  if (oldMapId !== null) {
+    const oldInstance = getMapInstance(oldMapId);
+    if (oldInstance) {
+      oldInstance.removeActor(session.characterId);
+      cleanupEmptyMap(oldMapId);
+    }
+
+    const oldPf = await getPathfinding(oldMapId);
+    if (oldPf && session.cellId !== null) {
+      oldPf.removeOccupied(session.cellId);
+    }
+  }
+
+  // Load new map
+  const map = await getMap(newMapId);
+  const compressed = await getCompressedMap(newMapId);
+  if (!map || !compressed) return;
+
+  // Use trigger target cell, or fall back to first walkable
+  const newCellId = targetCellId ?? map.walkableIds[0] ?? 0;
+
+  // Update session
+  session.mapId = newMapId;
+  session.cellId = newCellId;
+
+  // Persist to DB
+  await updateCharacterPosition(
+    session.characterId,
+    newMapId,
+    newCellId,
+    session.direction
+  );
+
+  // Load triggers for this map
+  const triggers = await getMapTriggers(newMapId);
+  const triggerCellIds = Array.from(triggers.keys());
+
+  // Send MAP_DATA
+  session.ws.send(
+    encodeServerMessage(ServerMessageType.MAP_DATA, {
+      mapId: map.id,
+      width: map.width,
+      height: map.height,
+      background: map.background,
+      compressed: new Uint8Array(compressed),
+      encoding: "gzip",
+      triggerCellIds,
+    })
+  );
+
+  // Get character look
+  const character = await getCharacterById(session.characterId);
+  const look = character
+    ? `${character.gfx}|${character.color1}|${character.color2}|${character.color3}`
+    : "";
+
+  // Join new map instance — add self first so we appear in the actors list
+  const newInstance = getOrCreateMapInstance(newMapId);
+  newInstance.addActor(
+    session,
+    session.characterId,
+    session.characterName,
+    newCellId,
+    session.direction,
+    look
+  );
+
+  // Send all actors (including self) to the joining player
+  const actors = newInstance.getActors();
+  session.ws.send(
+    encodeServerMessage(ServerMessageType.MAP_ACTORS, { actors })
+  );
+
+  // Update pathfinding
+  const newPf = await getPathfinding(newMapId);
+  if (newPf) {
+    newPf.addOccupied(newCellId);
+  }
+}

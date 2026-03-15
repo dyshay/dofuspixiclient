@@ -1,0 +1,539 @@
+{
+  "version": 1,
+  "animation": "carringThrow_CL",
+  "width": 1405,
+  "height": 56,
+  "offsetX": -11.65,
+  "offsetY": 0,
+  "frames": [
+    {
+      "id": "carringThrow_CL_0",
+      "x": 1,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_1",
+      "x": 28,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_2",
+      "x": 55,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_3",
+      "x": 82,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_4",
+      "x": 109,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_5",
+      "x": 136,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_6",
+      "x": 163,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_7",
+      "x": 190,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_8",
+      "x": 217,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_9",
+      "x": 244,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_10",
+      "x": 271,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_11",
+      "x": 298,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_12",
+      "x": 325,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_13",
+      "x": 352,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_14",
+      "x": 379,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_15",
+      "x": 406,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_16",
+      "x": 433,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_17",
+      "x": 460,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_18",
+      "x": 487,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_19",
+      "x": 514,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_20",
+      "x": 541,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_21",
+      "x": 568,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_22",
+      "x": 595,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_23",
+      "x": 622,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_24",
+      "x": 649,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_25",
+      "x": 676,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_26",
+      "x": 703,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_27",
+      "x": 730,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_28",
+      "x": 757,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_29",
+      "x": 784,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_30",
+      "x": 811,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_31",
+      "x": 838,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_32",
+      "x": 865,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_33",
+      "x": 892,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_34",
+      "x": 919,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_35",
+      "x": 946,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_36",
+      "x": 973,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_37",
+      "x": 1000,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_38",
+      "x": 1027,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_39",
+      "x": 1054,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_40",
+      "x": 1081,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_41",
+      "x": 1108,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_42",
+      "x": 1135,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_43",
+      "x": 1162,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_44",
+      "x": 1189,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_45",
+      "x": 1216,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_46",
+      "x": 1243,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_47",
+      "x": 1270,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_48",
+      "x": 1297,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_49",
+      "x": 1324,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_50",
+      "x": 1351,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "carringThrow_CL_51",
+      "x": 1378,
+      "y": 1,
+      "width": 26,
+      "height": 54,
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ],
+  "frameOrder": [
+    "carringThrow_CL_0",
+    "carringThrow_CL_1",
+    "carringThrow_CL_2",
+    "carringThrow_CL_3",
+    "carringThrow_CL_4",
+    "carringThrow_CL_5",
+    "carringThrow_CL_6",
+    "carringThrow_CL_7",
+    "carringThrow_CL_8",
+    "carringThrow_CL_9",
+    "carringThrow_CL_10",
+    "carringThrow_CL_11",
+    "carringThrow_CL_12",
+    "carringThrow_CL_13",
+    "carringThrow_CL_14",
+    "carringThrow_CL_15",
+    "carringThrow_CL_16",
+    "carringThrow_CL_17",
+    "carringThrow_CL_18",
+    "carringThrow_CL_19",
+    "carringThrow_CL_20",
+    "carringThrow_CL_21",
+    "carringThrow_CL_22",
+    "carringThrow_CL_23",
+    "carringThrow_CL_24",
+    "carringThrow_CL_25",
+    "carringThrow_CL_26",
+    "carringThrow_CL_27",
+    "carringThrow_CL_28",
+    "carringThrow_CL_29",
+    "carringThrow_CL_30",
+    "carringThrow_CL_31",
+    "carringThrow_CL_32",
+    "carringThrow_CL_33",
+    "carringThrow_CL_34",
+    "carringThrow_CL_35",
+    "carringThrow_CL_36",
+    "carringThrow_CL_37",
+    "carringThrow_CL_38",
+    "carringThrow_CL_39",
+    "carringThrow_CL_40",
+    "carringThrow_CL_41",
+    "carringThrow_CL_42",
+    "carringThrow_CL_43",
+    "carringThrow_CL_44",
+    "carringThrow_CL_45",
+    "carringThrow_CL_46",
+    "carringThrow_CL_47",
+    "carringThrow_CL_48",
+    "carringThrow_CL_49",
+    "carringThrow_CL_50",
+    "carringThrow_CL_51",
+    "carringThrow_CL_52",
+    "carringThrow_CL_53"
+  ],
+  "duplicates": {
+    "carringThrow_CL_52": "carringThrow_CL_51",
+    "carringThrow_CL_53": "carringThrow_CL_51"
+  },
+  "fps": 60
+}

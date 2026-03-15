@@ -1,8 +1,6 @@
 import { Container, Graphics, Ticker } from "pixi.js";
 
 import {
-  CELL_HALF_HEIGHT,
-  CELL_HALF_WIDTH,
   DEFAULT_GROUND_LEVEL,
   DEFAULT_MAP_WIDTH,
 } from "@/constants/battlefield";
@@ -117,8 +115,8 @@ export class SpellRenderer {
   playCastAnimation(cellId: number, _element?: number): Promise<void> {
     return new Promise((resolve) => {
       const pos = getCellPosition(cellId, this.mapWidth, this.groundLevel);
-      const x = pos.x + CELL_HALF_WIDTH;
-      const y = pos.y + CELL_HALF_HEIGHT;
+      const x = pos.x;
+      const y = pos.y;
 
       const animContainer = new Container();
       animContainer.x = x;
@@ -164,10 +162,10 @@ export class SpellRenderer {
       );
       const toPos = getCellPosition(toCellId, this.mapWidth, this.groundLevel);
 
-      const startX = fromPos.x + CELL_HALF_WIDTH;
-      const startY = fromPos.y + CELL_HALF_HEIGHT;
-      const endX = toPos.x + CELL_HALF_WIDTH;
-      const endY = toPos.y + CELL_HALF_HEIGHT;
+      const startX = fromPos.x;
+      const startY = fromPos.y;
+      const endX = toPos.x;
+      const endY = toPos.y;
 
       const animContainer = new Container();
       animContainer.x = startX;
@@ -214,8 +212,8 @@ export class SpellRenderer {
   ): Promise<void> {
     return new Promise((resolve) => {
       const pos = getCellPosition(cellId, this.mapWidth, this.groundLevel);
-      const x = pos.x + CELL_HALF_WIDTH;
-      const y = pos.y + CELL_HALF_HEIGHT;
+      const x = pos.x;
+      const y = pos.y;
 
       const animContainer = new Container();
       animContainer.x = x;
@@ -254,8 +252,8 @@ export class SpellRenderer {
   playGlyphAnimation(cellId: number, element?: number): Promise<void> {
     return new Promise((resolve) => {
       const pos = getCellPosition(cellId, this.mapWidth, this.groundLevel);
-      const x = pos.x + CELL_HALF_WIDTH;
-      const y = pos.y + CELL_HALF_HEIGHT;
+      const x = pos.x;
+      const y = pos.y;
 
       const animContainer = new Container();
       animContainer.x = x;
