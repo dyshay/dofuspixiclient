@@ -186,9 +186,11 @@ export class GameClient {
         // Clear existing world actors
         this.battlefield.clearWorldActors();
 
+        const spritePromises: Promise<void>[] = [];
+
         for (const actor of actors) {
           const isCurrentPlayer = actor.id === this.currentCharacter?.id;
-          this.battlefield.addWorldActor({
+          const promise = this.battlefield.addWorldActor({
             id: actor.id,
             name: actor.name ?? `Player ${actor.id}`,
             cellId: actor.cellId,
@@ -196,12 +198,17 @@ export class GameClient {
             look: actor.look ?? "",
             isCurrentPlayer,
           });
+          spritePromises.push(promise);
 
           // Sync current cell from server after map change
           if (isCurrentPlayer) {
             this.currentCellId = actor.cellId;
           }
         }
+
+        // Wait for all sprites to load, then reveal map
+        await Promise.all(spritePromises);
+        this.battlefield.revealMap();
       }
     );
 

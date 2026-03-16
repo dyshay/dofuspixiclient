@@ -4,6 +4,7 @@ import {
   Container,
   extensions,
   type Sprite,
+  Sprite as PixiSprite,
   TextureSource,
   Ticker,
 } from "pixi.js";
@@ -108,6 +109,9 @@ export class Battlefield {
   // Debug overlay
   private debugOverlay: DebugOverlay | null = null;
   private gridOverlay: GridOverlay | null = null;
+
+  // Transition snapshot: keeps old map visible while new one loads
+  private transitionSnapshot: PixiSprite | null = null;
 
   // Ground click callback
   // ECS
@@ -320,6 +324,7 @@ export class Battlefield {
 
     this.mapHandler = new MapHandler({
       atlasLoader: this.atlasLoader,
+      interactiveGfxIds: this.interactiveGfxIds,
       onSpriteCreated: (sprite, tileId, cellId, layer) => {
         if (layer > 0 && this.isInteractiveTile(tileId)) {
           const pickableId = this.nextPickableId++;
@@ -379,9 +384,25 @@ export class Battlefield {
   }
 
   async loadMapFromData(mapData: MapData): Promise<void> {
-    if (!this.mapContainer || !this.mapHandler || !this.atlasLoader) {
+    if (!this.mapContainer || !this.mapHandler || !this.atlasLoader || !this.app) {
       return;
     }
+
+    // Take a snapshot of the current map to keep it visible during transition
+    try {
+      const renderer = this.app.renderer;
+      const texture = renderer.generateTexture(this.mapContainer);
+      this.transitionSnapshot = new PixiSprite(texture);
+      this.transitionSnapshot.x = this.mapContainer.x;
+      this.transitionSnapshot.y = this.mapContainer.y;
+      this.transitionSnapshot.label = "transition-snapshot";
+      this.app.stage.addChild(this.transitionSnapshot);
+    } catch {
+      // First load or empty map — no snapshot needed
+    }
+
+    // Now hide the real map container while we rebuild it
+    this.mapContainer.visible = false;
 
     this.currentMapData = mapData;
 
@@ -417,6 +438,25 @@ export class Battlefield {
 
     // Re-create world actor container on top of the map
     this.initWorldActorContainer();
+
+    // Map container stays hidden — revealed by revealMap() after actors are added
+  }
+
+  /**
+   * Reveal the map container after map + actors are ready.
+   * Called by GameClient after MAP_ACTORS have been added.
+   * Removes the transition snapshot so the swap is instant with no black frame.
+   */
+  revealMap(): void {
+    if (this.mapContainer) {
+      this.mapContainer.visible = true;
+    }
+
+    // Remove transition snapshot — the new map is now fully ready
+    if (this.transitionSnapshot) {
+      this.transitionSnapshot.destroy({ texture: true });
+      this.transitionSnapshot = null;
+    }
   }
 
   // ============================================================================
@@ -452,13 +492,14 @@ export class Battlefield {
 
   /**
    * Add a world actor (player/NPC) to the map.
+   * Returns a promise that resolves when the sprite is loaded.
    */
-  addWorldActor(data: WorldActorData): void {
+  addWorldActor(data: WorldActorData): Promise<void> {
     if (!this.worldActorRenderer) {
       this.initWorldActorContainer();
     }
 
-    this.worldActorRenderer?.addFighter({
+    return this.worldActorRenderer?.addFighter({
       id: data.id,
       name: data.name,
       team: data.isCurrentPlayer ? 1 : 0, // Blue for self, red for others
@@ -468,7 +509,7 @@ export class Battlefield {
       hp: 100,
       maxHp: 100,
       isPlayer: data.isCurrentPlayer,
-    });
+    }) ?? Promise.resolve();
   }
 
   /**
@@ -768,6 +809,12 @@ export class Battlefield {
   }
 
   destroy(): void {
+    // Clear transition snapshot
+    if (this.transitionSnapshot) {
+      this.transitionSnapshot.destroy({ texture: true });
+      this.transitionSnapshot = null;
+    }
+
     // Clear zoom debounce timer
     if (this.zoomDebounceTimer) {
       clearTimeout(this.zoomDebounceTimer);

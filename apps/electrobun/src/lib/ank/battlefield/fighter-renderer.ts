@@ -168,15 +168,18 @@ export class FighterRenderer {
   /**
    * Add a fighter to the battlefield.
    */
-  addFighter(data: FighterSpriteData): void {
+  addFighter(data: FighterSpriteData): Promise<void> {
     if (this.fighters.has(data.id)) {
       this.updateFighter(data.id, data);
-      return;
+      return Promise.resolve();
     }
 
     const fighterContainer = new Container();
     fighterContainer.label = `fighter-${data.id}`;
     fighterContainer.sortableChildren = true;
+
+    // Hide container until sprite is loaded to avoid placeholder flash
+    fighterContainer.visible = false;
 
     // Start with placeholder graphics while sprite loads
     const placeholderGraphics = new Graphics();
@@ -244,17 +247,37 @@ export class FighterRenderer {
 
     this.fighters.set(data.id, fighter);
 
-    // Load the character sprite asynchronously
+    // Try to apply sprite synchronously from cache first (avoids flicker on map change)
     if (gfxId > 0) {
-      this.loadFighterSprite(fighter, "static", data.direction).then(() => {
-        // Preload walk + run animations for common directions so movement is instant
-        if (!this.fighters.has(data.id)) return;
-        const loader = getCharacterSpriteLoader();
-        const suffix = getDirectionSuffix(data.direction);
+      const loader = getCharacterSpriteLoader();
+      const suffix = getDirectionSuffix(data.direction);
+      const cached = loader.getAnimationSync(gfxId, `static${suffix}`);
+
+      if (cached) {
+        // Sprite already in cache — apply immediately, no flicker
+        this.applyAnimation(fighter, cached, `static${suffix}`);
+        fighterContainer.visible = true;
+
+        // Preload walk + run in background
         loader.loadAnimation(gfxId, `walk${suffix}`);
         loader.loadAnimation(gfxId, `run${suffix}`);
+        return Promise.resolve();
+      }
+
+      // Not in cache — load async
+      return this.loadFighterSprite(fighter, "static", data.direction).then(() => {
+        // Show container now that sprite is ready
+        fighterContainer.visible = true;
+        // Preload walk + run animations for common directions so movement is instant
+        if (!this.fighters.has(data.id)) return;
+        const loaderRef = getCharacterSpriteLoader();
+        loaderRef.loadAnimation(gfxId, `walk${suffix}`);
+        loaderRef.loadAnimation(gfxId, `run${suffix}`);
       });
     }
+
+    fighterContainer.visible = true;
+    return Promise.resolve();
   }
 
   /**

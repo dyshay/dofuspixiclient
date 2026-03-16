@@ -14,6 +14,7 @@ import {
 
 export interface MapHandlerConfig {
   atlasLoader: AtlasLoader;
+  interactiveGfxIds?: Set<number>;
   onSpriteCreated?: (
     sprite: Sprite,
     tileId: number,
@@ -44,6 +45,7 @@ interface SpriteRef {
 
 export class MapHandler {
   private atlasLoader: AtlasLoader;
+  private interactiveGfxIds: Set<number>;
   // Opt #2: Cache Texture directly instead of Sprite wrapper
   private textureCache = new Map<string, Texture>();
   private animatedSprites: AnimatedSprite[] = [];
@@ -66,6 +68,7 @@ export class MapHandler {
 
   constructor(config: MapHandlerConfig) {
     this.atlasLoader = config.atlasLoader;
+    this.interactiveGfxIds = config.interactiveGfxIds ?? new Set();
     this.onSpriteCreated = config.onSpriteCreated;
 
     // Opt #5: Configure sortable once
@@ -345,7 +348,10 @@ export class MapHandler {
       // Opt #4: Single manifest lookup for layer2
       const tileKey = `objects_${cell.layer2}`;
       const tile = this.atlasLoader.getTileManifestSync(tileKey);
-      const isAnimated = tile?.behavior === "animated" && (tile?.frameCount ?? 0) > 1;
+      // Interactive objects (zaaps, crafting stations, etc.) should NOT auto-animate.
+      // They only animate when a player interacts with them.
+      const isInteractive = this.interactiveGfxIds.has(cell.layer2);
+      const isAnimated = !isInteractive && tile?.behavior === "animated" && (tile?.frameCount ?? 0) > 1;
 
       if (isAnimated) {
         const animSprite = this.createAnimatedTileSpriteWithManifest(
