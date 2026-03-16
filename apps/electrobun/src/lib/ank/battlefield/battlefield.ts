@@ -14,6 +14,8 @@ import { ZaapContextMenu } from "@/ank/gapi/controls";
 import { DISPLAY_HEIGHT } from "@/constants/battlefield";
 import { type GameWorld, getGameWorld } from "@/ecs/world";
 import { Banner } from "@/hud/banner";
+import { StatsPanel } from "@/hud/stats";
+import { initTooltipBounds } from "@/hud/core/tooltip";
 import { AtlasLoader } from "@/render/atlas-loader";
 import { Engine } from "@/render/engine";
 import { PickingSystem } from "@/render/picking-system";
@@ -84,6 +86,7 @@ export class Battlefield {
   private interactionHandler: InteractionHandler | null = null;
   private pickingSystem: PickingSystem | null = null;
   private banner: Banner | null = null;
+  private statsPanel: StatsPanel | null = null;
 
   private currentMapData: MapData | null = null;
   private cellDataMap: Map<number, CellData> = new Map();
@@ -120,12 +123,17 @@ export class Battlefield {
 
   private onCellClickCallback?: (cellId: number) => void;
   private onMinimapTeleportCallback?: (mapId: number) => void;
+  private onBoostStatCallback?: (statId: number) => void;
 
   private onResizeStartCallback?: () => void;
   private onResizeEndCallback?: () => void;
 
   // Render state management
   private isRendering = false;
+  // Debug: track player fighter visibility per-frame
+  private debugPlayerId: number | null = null;
+  private debugLastState = "";
+  private debugTickerCb: (() => void) | null = null;
   private pendingZoom: number | null = null;
   private zoomDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -156,6 +164,8 @@ export class Battlefield {
     if (this.banner && this.app) {
       this.banner.resize(width, this.engine.getBaseZoom());
     }
+
+    this.updateStatsPanelPosition();
 
     if (this.interactionHandler) {
       this.interactionHandler.setBaseZoom(this.engine.getBaseZoom());
@@ -261,7 +271,23 @@ export class Battlefield {
     this.banner.setOnMinimapTeleport((mapId) => {
       this.onMinimapTeleportCallback?.(mapId);
     });
+    this.banner.setOnStatsToggle(() => {
+      this.statsPanel?.toggle();
+    });
     this.app.stage.addChild(this.banner.getGraphics());
+
+    // Stats panel — anchored above the banner, right side
+    this.statsPanel = new StatsPanel();
+    this.updateStatsPanelPosition();
+    this.statsPanel.setOnBoostStat((statId) => {
+      this.onBoostStatCallback?.(statId);
+    });
+    this.statsPanel.setOnClose(() => {
+      this.banner?.setStatsPressed(false);
+    });
+    this.app.stage.addChild(this.statsPanel.container);
+
+    initTooltipBounds(this.app);
 
     this.app.stage.eventMode = "static";
     this.mapContainer.eventMode = "static";
@@ -278,9 +304,10 @@ export class Battlefield {
     this.interactionHandler.init();
     this.interactionHandler.setBaseZoom(this.engine.getBaseZoom());
 
-    this.app.stage.on("pointerdown", (e) =>
-      this.interactionHandler?.handlePointerDown(e)
-    );
+    this.app.stage.on("pointerdown", (e) => {
+      if (this.isPointOverUI(e.global.x, e.global.y)) return;
+      this.interactionHandler?.handlePointerDown(e);
+    });
     this.app.stage.on("pointermove", (e) =>
       this.interactionHandler?.handlePointerMove(e)
     );
@@ -307,6 +334,10 @@ export class Battlefield {
     this.ecsTickerCallback = () => {
       this.gameWorld.execute();
     };
+
+    // DEBUG: per-frame visibility monitor for player character
+    this.debugTickerCb = () => this.debugCheckPlayerVisibility();
+    Ticker.shared.add(this.debugTickerCb);
     Ticker.shared.add(this.ecsTickerCallback);
   }
 
@@ -388,21 +419,9 @@ export class Battlefield {
       return;
     }
 
-    // Take a snapshot of the current map to keep it visible during transition
-    try {
-      const renderer = this.app.renderer;
-      const texture = renderer.generateTexture(this.mapContainer);
-      this.transitionSnapshot = new PixiSprite(texture);
-      this.transitionSnapshot.x = this.mapContainer.x;
-      this.transitionSnapshot.y = this.mapContainer.y;
-      this.transitionSnapshot.label = "transition-snapshot";
-      this.app.stage.addChild(this.transitionSnapshot);
-    } catch {
-      // First load or empty map — no snapshot needed
-    }
-
-    // Now hide the real map container while we rebuild it
-    this.mapContainer.visible = false;
+    // Keep mapContainer visible during the entire transition.
+    // Old world actors stay alive until MAP_ACTORS replaces them (avoids flicker).
+    // Tiles are rebuilt in-place (the layers just swap their children).
 
     this.currentMapData = mapData;
 
@@ -415,9 +434,12 @@ export class Battlefield {
     this.mapContainer.y = 0;
 
     this.clearPickableObjects();
-    this.clearWorldActors();
     this.debugOverlay?.clear();
     this.gridOverlay?.clear();
+
+    // NOTE: we intentionally do NOT clear world actors here.
+    // The old actors stay visible on the old map until MAP_ACTORS replaces them.
+    // This prevents the character from disappearing during the transition.
 
     const zoom = this.interactionHandler?.getZoom() ?? this.engine.getZoom();
     this.atlasLoader.setZoom(zoom);
@@ -436,10 +458,8 @@ export class Battlefield {
       mapData.triggerCellIds ?? []
     );
 
-    // Re-create world actor container on top of the map
-    this.initWorldActorContainer();
-
-    // Map container stays hidden — revealed by revealMap() after actors are added
+    // Map is ready for actors. World actor container will be re-created
+    // when MAP_ACTORS calls clearWorldActors + addWorldActor.
   }
 
   /**
@@ -447,15 +467,55 @@ export class Battlefield {
    * Called by GameClient after MAP_ACTORS have been added.
    * Removes the transition snapshot so the swap is instant with no black frame.
    */
+  /**
+   * Prepare world actors for the new map.
+   * Destroys old actor container + renderer and creates fresh ones.
+   * Called by GameClient right before adding MAP_ACTORS.
+   */
+  prepareWorldActors(): void {
+    this.initWorldActorContainer();
+  }
+
   revealMap(): void {
-    if (this.mapContainer) {
-      this.mapContainer.visible = true;
+    // No-op now — mapContainer is never hidden.
+  }
+
+  /** DEBUG: Set the player character ID for per-frame visibility tracking. */
+  setDebugPlayerId(id: number): void {
+    this.debugPlayerId = id;
+    console.log("[DEBUG] Tracking player fighter", id);
+  }
+
+  /** DEBUG: Runs every frame. Logs ONLY when state changes. */
+  private debugCheckPlayerVisibility(): void {
+    if (this.debugPlayerId === null) return;
+
+    const parts: string[] = [];
+
+    // 1. mapContainer
+    if (!this.mapContainer) { parts.push("NO_MAP_CTR"); }
+    else if (!this.mapContainer.visible) { parts.push("MAP_HIDDEN"); }
+    else { parts.push("map:ok"); }
+
+    // 2. worldActorContainer
+    if (!this.worldActorContainer) { parts.push("NO_WAC"); }
+    else if (!this.worldActorContainer.parent) { parts.push("WAC_ORPHAN"); }
+    else if (!this.worldActorContainer.visible) { parts.push("WAC_HIDDEN"); }
+    else { parts.push("wac:ok"); }
+
+    // 3. worldActorRenderer and the specific fighter
+    if (!this.worldActorRenderer) {
+      parts.push("NO_RENDERER");
+    } else if (!this.worldActorRenderer.hasFighter(this.debugPlayerId)) {
+      parts.push("NO_FIGHTER");
+    } else {
+      parts.push("fighter:ok");
     }
 
-    // Remove transition snapshot — the new map is now fully ready
-    if (this.transitionSnapshot) {
-      this.transitionSnapshot.destroy({ texture: true });
-      this.transitionSnapshot = null;
+    const state = parts.join("|");
+    if (state !== this.debugLastState) {
+      console.log(`[DEBUG] Player visibility CHANGED: ${this.debugLastState || "(init)"} → ${state}`);
+      this.debugLastState = state;
     }
   }
 
@@ -464,6 +524,7 @@ export class Battlefield {
   // ============================================================================
 
   private initWorldActorContainer(): void {
+    console.log("[Battlefield] initWorldActorContainer called", new Error().stack?.split("\n")[2]?.trim());
     if (!this.mapContainer) return;
 
     // Destroy previous
@@ -495,6 +556,7 @@ export class Battlefield {
    * Returns a promise that resolves when the sprite is loaded.
    */
   addWorldActor(data: WorldActorData): Promise<void> {
+    console.log("[Battlefield] addWorldActor", data.id, data.name, data.isCurrentPlayer ? "(SELF)" : "");
     if (!this.worldActorRenderer) {
       this.initWorldActorContainer();
     }
@@ -516,6 +578,7 @@ export class Battlefield {
    * Remove a world actor from the map.
    */
   removeWorldActor(id: number): void {
+    console.log("[Battlefield] removeWorldActor", id);
     this.worldActorRenderer?.removeFighter(id);
   }
 
@@ -530,6 +593,7 @@ export class Battlefield {
    * Clear all world actors.
    */
   clearWorldActors(): void {
+    console.log("[Battlefield] clearWorldActors called", new Error().stack?.split("\n")[2]?.trim());
     this.worldActorRenderer?.clear();
   }
 
@@ -736,12 +800,52 @@ export class Battlefield {
     }
   }
 
+  /**
+   * Check if a screen point falls over an open UI panel (stats, etc.)
+   */
+  private isPointOverUI(x: number, y: number): boolean {
+    if (this.statsPanel?.isVisible()) {
+      const c = this.statsPanel.container;
+      const bounds = c.getBounds();
+      if (x >= bounds.x && x <= bounds.x + bounds.width &&
+          y >= bounds.y && y <= bounds.y + bounds.height) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private updateStatsPanelPosition(): void {
+    if (!this.statsPanel || !this.app) return;
+    const zoom = this.engine.getBaseZoom();
+    const bannerY = Math.floor(DISPLAY_HEIGHT * zoom);
+    // Panel sticks to the top of the banner, right-aligned
+    const panelH = 420; // must match stats-panel.ts H
+    const panelW = 250; // must match stats-panel.ts W
+    const availableHeight = bannerY;
+    const fitScale = Math.min(zoom, availableHeight / panelH);
+    this.statsPanel.setScale(fitScale);
+    const scaledH = panelH * fitScale;
+    this.statsPanel.setPosition(
+      this.app.screen.width - panelW * fitScale - 4,
+      (bannerY - scaledH) / 2
+    );
+  }
+
   setOnCellClick(callback: (cellId: number) => void): void {
     this.onCellClickCallback = callback;
   }
 
   setOnMinimapTeleport(callback: (mapId: number) => void): void {
     this.onMinimapTeleportCallback = callback;
+  }
+
+  setOnBoostStat(callback: (statId: number) => void): void {
+    this.onBoostStatCallback = callback;
+  }
+
+  getStatsPanel(): StatsPanel | null {
+    return this.statsPanel;
   }
 
   private isZaap(pickableId: number): boolean {
@@ -848,6 +952,8 @@ export class Battlefield {
     this.gridOverlay?.destroy();
     this.gridOverlay = null;
 
+    this.statsPanel?.destroy();
+    this.statsPanel = null;
     this.interactionHandler?.destroy();
     this.pickingSystem?.destroy();
     this.atlasLoader?.clearCache();

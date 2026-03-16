@@ -3,6 +3,7 @@
 
   import { Battlefield } from "@/ank/battlefield";
   import { GameClient } from "@/game/game-client";
+  import { Keybindings } from "@/hud/core/keybindings";
 
   let canvasContainer: HTMLDivElement;
   let battlefield: Battlefield | null = null;
@@ -45,6 +46,8 @@
       // Initialize game client
       gameClient = new GameClient();
       gameClient.setBattlefield(battlefield);
+      // Expose for debug console: window.gc.debugGiveCapital(10)
+      (window as any).gc = gameClient;
 
       gameClient.setOnConnected(() => {
         connected = true;
@@ -64,7 +67,7 @@
         // Auto-select first character for development
         if (chars.length > 0) {
           console.log("[MapRenderer] Auto-selecting character:", chars[0].name);
-          gameClient?.selectCharacter(chars[0].id);
+          gameClient?.selectCharacter(chars[0].id, chars[0].class);
         }
       });
 
@@ -86,7 +89,7 @@
       }, 3000);
 
       isLoading = false;
-      window.addEventListener("keydown", handleKeyDown);
+      setupKeybindings();
     } catch (err) {
       error =
         err instanceof Error ? err.message : "Failed to initialize renderer";
@@ -103,26 +106,33 @@
     }
   }
 
+  let keybindings: Keybindings | null = null;
+
+  function setupKeybindings() {
+    keybindings = new Keybindings();
+    keybindings.on('toggleStats', () => {
+      if (battlefield) {
+        battlefield.getStatsPanel()?.toggle();
+      }
+    });
+    keybindings.on('toggleDebug', () => {
+      if (battlefield) {
+        debugEnabled = battlefield.toggleDebug();
+      }
+    });
+    keybindings.on('toggleGrid', () => {
+      if (battlefield) {
+        battlefield.toggleGridOverlay();
+      }
+    });
+    keybindings.attach();
+  }
+
   onDestroy(() => {
-    window.removeEventListener("keydown", handleKeyDown);
+    keybindings?.destroy();
     gameClient?.destroy();
     battlefield?.destroy();
   });
-
-  function handleKeyDown(e: KeyboardEvent) {
-    if (e.key === "d" || e.key === "D") {
-      if (battlefield) {
-        debugEnabled = battlefield.toggleDebug();
-        console.log(`Debug overlay: ${debugEnabled ? "enabled" : "disabled"}`);
-      }
-    }
-    if (e.key === "g" || e.key === "G") {
-      if (battlefield) {
-        const gridEnabled = battlefield.toggleGridOverlay();
-        console.log(`Grid overlay: ${gridEnabled ? "enabled" : "disabled"}`);
-      }
-    }
-  }
 
   function handleWheel(e: WheelEvent) {
     if (battlefield) {
