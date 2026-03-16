@@ -21,6 +21,8 @@ export const ClientMessageType = {
   COMBAT_FORFEIT: 0x67,
   COMBAT_SPECTATE: 0x68,
   COMBAT_PLACEMENT: 0x69,
+  CHARACTER_BOOST_STAT: 0x70,
+  DEBUG_GIVE_CAPITAL: 0xd0,
   PING: 0xff,
 } as const;
 
@@ -166,4 +168,34 @@ export interface AuthSuccessPayload {
     mapId: number;
     cellId: number;
   }>;
+}
+
+export interface CharacterStatsPayload {
+  vitality: { base: number; items: number; boost: number };
+  wisdom: { base: number; items: number; boost: number };
+  strength: { base: number; items: number; boost: number };
+  chance: { base: number; items: number; boost: number };
+  agility: { base: number; items: number; boost: number };
+  intelligence: { base: number; items: number; boost: number };
+  hp: number;
+  maxHp: number;
+  ap: number;
+  mp: number;
+  energy: number;
+  maxEnergy: number;
+  bonusPoints: number;
+  bonusPointsSpell: number;
+  xp: number;
+  xpLow: number;
+  xpHigh: number;
+  level: number;
+  kama: number;
+  initiative: number;
+  discernment: number;
+  range: number;
+  summonLimit: number;
+}
+
+export interface BoostStatPayload {
+  statId: number; // 0=vita, 1=wisdom, 2=strength, 3=chance, 4=agility, 5=intel
 }
