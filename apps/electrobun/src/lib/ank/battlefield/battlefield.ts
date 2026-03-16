@@ -130,10 +130,6 @@ export class Battlefield {
 
   // Render state management
   private isRendering = false;
-  // Debug: track player fighter visibility per-frame
-  private debugPlayerId: number | null = null;
-  private debugLastState = "";
-  private debugTickerCb: (() => void) | null = null;
   private pendingZoom: number | null = null;
   private zoomDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -335,9 +331,6 @@ export class Battlefield {
       this.gameWorld.execute();
     };
 
-    // DEBUG: per-frame visibility monitor for player character
-    this.debugTickerCb = () => this.debugCheckPlayerVisibility();
-    Ticker.shared.add(this.debugTickerCb);
     Ticker.shared.add(this.ecsTickerCallback);
   }
 
@@ -480,43 +473,9 @@ export class Battlefield {
     // No-op now — mapContainer is never hidden.
   }
 
-  /** DEBUG: Set the player character ID for per-frame visibility tracking. */
-  setDebugPlayerId(id: number): void {
-    this.debugPlayerId = id;
-    console.log("[DEBUG] Tracking player fighter", id);
-  }
-
-  /** DEBUG: Runs every frame. Logs ONLY when state changes. */
-  private debugCheckPlayerVisibility(): void {
-    if (this.debugPlayerId === null) return;
-
-    const parts: string[] = [];
-
-    // 1. mapContainer
-    if (!this.mapContainer) { parts.push("NO_MAP_CTR"); }
-    else if (!this.mapContainer.visible) { parts.push("MAP_HIDDEN"); }
-    else { parts.push("map:ok"); }
-
-    // 2. worldActorContainer
-    if (!this.worldActorContainer) { parts.push("NO_WAC"); }
-    else if (!this.worldActorContainer.parent) { parts.push("WAC_ORPHAN"); }
-    else if (!this.worldActorContainer.visible) { parts.push("WAC_HIDDEN"); }
-    else { parts.push("wac:ok"); }
-
-    // 3. worldActorRenderer and the specific fighter
-    if (!this.worldActorRenderer) {
-      parts.push("NO_RENDERER");
-    } else if (!this.worldActorRenderer.hasFighter(this.debugPlayerId)) {
-      parts.push("NO_FIGHTER");
-    } else {
-      parts.push("fighter:ok");
-    }
-
-    const state = parts.join("|");
-    if (state !== this.debugLastState) {
-      console.log(`[DEBUG] Player visibility CHANGED: ${this.debugLastState || "(init)"} → ${state}`);
-      this.debugLastState = state;
-    }
+  /** Set the player character ID (used for tracking). */
+  setDebugPlayerId(_id: number): void {
+    // Reserved for future use
   }
 
   // ============================================================================

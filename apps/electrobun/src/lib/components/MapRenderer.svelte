@@ -46,8 +46,6 @@
       // Initialize game client
       gameClient = new GameClient();
       gameClient.setBattlefield(battlefield);
-      // Expose for debug console: window.gc.debugGiveCapital(10)
-      (window as any).gc = gameClient;
 
       gameClient.setOnConnected(() => {
         connected = true;
