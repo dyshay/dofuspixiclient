@@ -25,6 +25,7 @@ import {
   SessionState,
   transitionTo,
 } from "../ws/client-session.ts";
+import { sendCharacterStats } from "./stats.ts";
 
 export async function handleLogin(
   session: ClientSession,
@@ -111,6 +112,9 @@ export async function handleCharacterSelect(
   session.ws.send(
     encodeServerMessage(ServerMessageType.CHARACTER_INFO, charInfo)
   );
+
+  // Send CHARACTER_STATS
+  await sendCharacterStats(session);
 
   // Send MAP_DATA
   const map = await getMap(character.map_id);

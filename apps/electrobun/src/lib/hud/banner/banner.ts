@@ -101,6 +101,7 @@ export class Banner {
   private minimapHitArea: Graphics;
   private minimapRenderer: MinimapRenderer | null = null;
   private onMinimapTeleport?: (mapId: number) => void;
+  private onStatsToggle?: () => void;
 
   constructor(app: Application, displayHeight: number) {
     this.app = app;
@@ -214,6 +215,14 @@ export class Banner {
       this.buttonDownTexture,
       (path) => this.getIconTexture(path)
     );
+
+    // Wire stats button (index 0) to toggle callback
+    const statsBtn = this.iconButtons[0];
+    if (statsBtn) {
+      statsBtn.button.container.on('pointerdown', () => {
+        this.onStatsToggle?.();
+      });
+    }
 
     this.shortcutsContainer = new Container();
     this.shortcutCells = createShortcutGrid(
@@ -626,6 +635,18 @@ export class Banner {
 
   public setOnMinimapTeleport(callback: (mapId: number) => void): void {
     this.onMinimapTeleport = callback;
+  }
+
+  public setOnStatsToggle(callback: () => void): void {
+    this.onStatsToggle = callback;
+  }
+
+  public setStatsPressed(pressed: boolean): void {
+    const statsButton = this.iconButtons[0]?.button;
+    if (statsButton) {
+      statsButton.isPressed = pressed;
+      statsButton.button.texture = pressed ? statsButton.buttonDownTexture : statsButton.buttonUpTexture;
+    }
   }
 
   private handleMinimapDoubleClick(globalX: number, globalY: number): void {

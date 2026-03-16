@@ -6,3 +6,4 @@ export * from './interactive';
 export * from './render';
 export * from './worldmap';
 export * from './banner';
+export * from './stats';

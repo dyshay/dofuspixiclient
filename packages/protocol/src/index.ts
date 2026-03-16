@@ -25,4 +25,6 @@ export {
   type ServerMessage,
   ServerMessageType,
   type ServerMessageTypeValue,
+  type CharacterStatsPayload,
+  type BoostStatPayload,
 } from "./types.ts";
