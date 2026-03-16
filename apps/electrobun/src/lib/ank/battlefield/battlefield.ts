@@ -483,7 +483,6 @@ export class Battlefield {
   // ============================================================================
 
   private initWorldActorContainer(): void {
-    console.log("[Battlefield] initWorldActorContainer called", new Error().stack?.split("\n")[2]?.trim());
     if (!this.mapContainer) return;
 
     // Destroy previous
@@ -515,7 +514,6 @@ export class Battlefield {
    * Returns a promise that resolves when the sprite is loaded.
    */
   addWorldActor(data: WorldActorData): Promise<void> {
-    console.log("[Battlefield] addWorldActor", data.id, data.name, data.isCurrentPlayer ? "(SELF)" : "");
     if (!this.worldActorRenderer) {
       this.initWorldActorContainer();
     }
@@ -537,7 +535,6 @@ export class Battlefield {
    * Remove a world actor from the map.
    */
   removeWorldActor(id: number): void {
-    console.log("[Battlefield] removeWorldActor", id);
     this.worldActorRenderer?.removeFighter(id);
   }
 
@@ -552,7 +549,6 @@ export class Battlefield {
    * Clear all world actors.
    */
   clearWorldActors(): void {
-    console.log("[Battlefield] clearWorldActors called", new Error().stack?.split("\n")[2]?.trim());
     this.worldActorRenderer?.clear();
   }
 
