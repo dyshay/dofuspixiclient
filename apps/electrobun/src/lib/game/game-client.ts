@@ -15,10 +15,12 @@ import {
   type ActorAddPayload,
   type ActorMovePayload,
   type ActorRemovePayload,
+  type CharacterStatsPayload,
   ClientMessageType,
   encodeMessage,
   ServerMessageType,
 } from "@/network/protocol";
+import type { CharacterStats } from "@/types/stats";
 
 export interface CharacterInfo {
   id: number;
@@ -48,6 +50,12 @@ export class GameClient {
   private isMoving = false;
   private mapLoadPromise: Promise<void> = Promise.resolve();
   private gameWorld: GameWorld | null = null;
+  private currentStats: CharacterStats | null = null;
+
+  /** Incremented on each MAP_DATA to invalidate stale MAP_ACTORS handlers. */
+  private mapGeneration = 0;
+  /** True while a map transition is in progress (between MAP_DATA and revealMap). */
+  private mapTransitioning = false;
 
   private onCharacterList?: (characters: CharacterInfo[]) => void;
   private onLoginFailed?: (reason: string) => void;
@@ -83,10 +91,7 @@ export class GameClient {
     // AUTH_SUCCESS — receive character list
     this.messageHandler.on(ServerMessageType.AUTH_SUCCESS, (payload: any) => {
       this.accountCharacters = payload.characters ?? [];
-      console.log(
-        "[GameClient] Login success, characters:",
-        this.accountCharacters.length
-      );
+      console.log("[GameClient] Login success, characters:", this.accountCharacters.length);
       this.onCharacterList?.(this.accountCharacters);
     });
 
@@ -110,14 +115,16 @@ export class GameClient {
       };
       this.currentMapId = payload.mapId;
       this.currentCellId = payload.cellId;
-      console.log(
-        "[GameClient] Character selected:",
-        payload.name,
-        "on map",
-        payload.mapId,
-        "cell",
-        payload.cellId
-      );
+      console.log("[GameClient] Character selected:", payload.name, "on map", payload.mapId, "cell", payload.cellId);
+      this.battlefield?.getStatsPanel()?.setCharacterName(payload.name);
+      this.battlefield?.setDebugPlayerId(payload.id);
+    });
+
+    // CHARACTER_STATS — receive stats from server
+    this.messageHandler.on(ServerMessageType.CHARACTER_STATS, (payload: any) => {
+      const stats = payload as CharacterStatsPayload;
+      this.currentStats = stats as CharacterStats;
+      this.battlefield?.getStatsPanel()?.updateStats(this.currentStats);
     });
 
     // MAP_DATA — receive compressed map data from server
@@ -127,6 +134,10 @@ export class GameClient {
         "[GameClient] Received MAP_DATA for map",
         serverPayload.mapId
       );
+
+      // Increment generation to invalidate any in-flight MAP_ACTORS handler
+      this.mapGeneration++;
+      this.mapTransitioning = true;
 
       try {
         const mapData = loadMapDataFromServer(serverPayload);
@@ -176,15 +187,24 @@ export class GameClient {
       ServerMessageType.MAP_ACTORS,
       async (payload: any) => {
         const actors: ActorAddPayload[] = payload.actors ?? [];
-        console.log("[GameClient] MAP_ACTORS:", actors.length, "actors");
+        const generation = this.mapGeneration;
+        console.log("[GameClient] MAP_ACTORS:", actors.length, "actors", "gen:", generation);
 
         if (!this.battlefield) return;
 
         // Wait for map to finish rendering before adding actors
         await this.mapLoadPromise;
 
-        // Clear existing world actors
-        this.battlefield.clearWorldActors();
+        // If a newer MAP_DATA arrived while we were waiting, abort — the newer
+        // MAP_ACTORS handler will take care of revealing the correct map.
+        if (generation !== this.mapGeneration) {
+          console.log("[GameClient] MAP_ACTORS gen", generation, "stale (current:", this.mapGeneration, "), skipping");
+          return;
+        }
+
+        // Destroy old actor container and create a fresh one for the new map.
+        // This is the ONLY moment actors are removed — minimizing the visible gap.
+        this.battlefield.prepareWorldActors();
 
         const spritePromises: Promise<void>[] = [];
 
@@ -206,8 +226,16 @@ export class GameClient {
           }
         }
 
-        // Wait for all sprites to load, then reveal map
-        await Promise.all(spritePromises);
+        // Wait for all sprites to load (or fail).
+        await Promise.allSettled(spritePromises);
+
+        // Check generation again — another MAP_DATA may have arrived during sprite loading
+        if (generation !== this.mapGeneration) {
+          console.log("[GameClient] MAP_ACTORS gen", generation, "stale after sprites, skipping");
+          return;
+        }
+
+        this.mapTransitioning = false;
         this.battlefield.revealMap();
       }
     );
@@ -223,6 +251,12 @@ export class GameClient {
         payload: actor,
         timestamp: Date.now(),
       });
+
+      // Skip visual add during map transitions — MAP_ACTORS will provide the full list
+      if (this.mapTransitioning) {
+        console.log("[GameClient] ACTOR_ADD skipped during map transition");
+        return;
+      }
 
       this.battlefield?.addWorldActor({
         id: actor.id,
@@ -282,6 +316,12 @@ export class GameClient {
     this.gameWorld = battlefield.getGameWorld();
     this.battlefield.setOnCellClick((cellId) => this.handleCellClick(cellId));
     this.battlefield.setOnMinimapTeleport((mapId) => this.handleMinimapTeleport(mapId));
+    this.battlefield.setOnBoostStat((statId) => this.boostStat(statId));
+
+    // If stats were received before battlefield was set, update the panel now
+    if (this.currentStats) {
+      this.battlefield.getStatsPanel()?.updateStats(this.currentStats);
+    }
   }
 
   private handleMinimapTeleport(mapId: number): void {
@@ -325,7 +365,10 @@ export class GameClient {
     );
   }
 
-  selectCharacter(characterId: number): void {
+  selectCharacter(characterId: number, classId?: number): void {
+    if (classId != null) {
+      this.battlefield?.getStatsPanel()?.setClassId(classId);
+    }
     this.connection.send(
       encodeMessage(ClientMessageType.CHARACTER_SELECT, { characterId })
     );
@@ -343,6 +386,12 @@ export class GameClient {
     );
   }
 
+  boostStat(statId: number): void {
+    this.connection.send(
+      encodeMessage(ClientMessageType.CHARACTER_BOOST_STAT, { statId })
+    );
+  }
+
   isConnected(): boolean {
     return this.connection.isConnected();
   }
@@ -357,6 +406,17 @@ export class GameClient {
 
   getCurrentMapId(): number | null {
     return this.currentMapId;
+  }
+
+  getCurrentStats(): CharacterStats | null {
+    return this.currentStats;
+  }
+
+  /** Debug: give capital points (persisted server-side) */
+  debugGiveCapital(amount: number): void {
+    this.connection.send(
+      encodeMessage(ClientMessageType.DEBUG_GIVE_CAPITAL, { amount })
+    );
   }
 
   // Event callbacks

@@ -16,6 +16,8 @@ export {
   type ActorMovePayload,
   type ActorRemovePayload,
   type CharacterInfoPayload,
+  type CharacterStatsPayload,
+  type BoostStatPayload,
   type MapDataPayload,
   type MapActorsPayload,
   type AuthSuccessPayload,

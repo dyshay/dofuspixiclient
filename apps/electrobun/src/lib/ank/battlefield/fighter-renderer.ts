@@ -97,6 +97,8 @@ interface ActiveFighter {
   moving: boolean;
   moveResolve?: () => void;
   spriteLoading: boolean;
+  /** Queued animation request while spriteLoading is true. */
+  pendingAnim: { baseAnim: string; direction: number } | null;
 }
 
 /**
@@ -243,6 +245,7 @@ export class FighterRenderer {
       useRun: false,
       moving: false,
       spriteLoading: false,
+      pendingAnim: null,
     };
 
     this.fighters.set(data.id, fighter);
@@ -253,26 +256,22 @@ export class FighterRenderer {
       const suffix = getDirectionSuffix(data.direction);
       const cached = loader.getAnimationSync(gfxId, `static${suffix}`);
 
+      // Kick off preloading ALL common animations (static/walk/run × all directions)
+      const preloadDone = this.preloadCommonAnimations(loader, gfxId);
+
       if (cached) {
         // Sprite already in cache — apply immediately, no flicker
         this.applyAnimation(fighter, cached, `static${suffix}`);
         fighterContainer.visible = true;
-
-        // Preload walk + run in background
-        loader.loadAnimation(gfxId, `walk${suffix}`);
-        loader.loadAnimation(gfxId, `run${suffix}`);
-        return Promise.resolve();
+        // Return the preload promise so MAP_ACTORS can wait for all animations
+        return preloadDone;
       }
 
-      // Not in cache — load async
+      // Not in cache — load initial static, then show, then wait for all preloads
       return this.loadFighterSprite(fighter, "static", data.direction).then(() => {
-        // Show container now that sprite is ready
         fighterContainer.visible = true;
-        // Preload walk + run animations for common directions so movement is instant
         if (!this.fighters.has(data.id)) return;
-        const loaderRef = getCharacterSpriteLoader();
-        loaderRef.loadAnimation(gfxId, `walk${suffix}`);
-        loaderRef.loadAnimation(gfxId, `run${suffix}`);
+        return preloadDone;
       });
     }
 
@@ -281,15 +280,39 @@ export class FighterRenderer {
   }
 
   /**
+   * Preload common animations in background so direction/animation switches are instant.
+   * Loads static + walk + run for ALL direction suffixes.
+   * Returns a promise that resolves when all preloads complete.
+   */
+  private preloadCommonAnimations(
+    loader: ReturnType<typeof getCharacterSpriteLoader>,
+    gfxId: number,
+  ): Promise<void> {
+    const promises: Promise<unknown>[] = [];
+    for (const s of ["S", "R", "F", "L", "B"]) {
+      promises.push(loader.loadAnimation(gfxId, `static${s}`));
+      promises.push(loader.loadAnimation(gfxId, `walk${s}`));
+      promises.push(loader.loadAnimation(gfxId, `run${s}`));
+    }
+    return Promise.allSettled(promises).then(() => {});
+  }
+
+  /**
    * Load and apply a character sprite animation for a fighter.
+   * If already loading, queues the request so the latest animation is applied after.
    */
   private async loadFighterSprite(
     fighter: ActiveFighter,
     baseAnim: string,
     direction: number
   ): Promise<void> {
-    if (fighter.spriteLoading) return;
+    if (fighter.spriteLoading) {
+      // Queue the latest request — only the most recent matters
+      fighter.pendingAnim = { baseAnim, direction };
+      return;
+    }
     fighter.spriteLoading = true;
+    fighter.pendingAnim = null;
 
     const loader = getCharacterSpriteLoader();
     const result = await loader.loadAnimationWithFallback(
@@ -303,10 +326,17 @@ export class FighterRenderer {
     // Fighter may have been removed while loading
     if (!this.fighters.has(fighter.id)) return;
 
-    if (!result) return;
+    if (result) {
+      const { animation, animName } = result;
+      this.applyAnimation(fighter, animation, animName);
+    }
 
-    const { animation, animName } = result;
-    this.applyAnimation(fighter, animation, animName);
+    // Process queued animation request if any
+    if (fighter.pendingAnim) {
+      const { baseAnim: nextAnim, direction: nextDir } = fighter.pendingAnim;
+      fighter.pendingAnim = null;
+      this.switchAnimation(fighter, nextAnim, nextDir);
+    }
   }
 
   /**
@@ -381,7 +411,8 @@ export class FighterRenderer {
     if (cached) {
       this.applyAnimation(fighter, cached, animName);
     } else {
-      // Load asynchronously
+      // Load asynchronously — the old animation keeps showing until this completes
+      console.warn(`[FighterRenderer] Animation "${animName}" not cached for gfx ${fighter.gfxId}, loading async`);
       this.loadFighterSprite(fighter, baseAnim, direction);
     }
   }
@@ -408,6 +439,7 @@ export class FighterRenderer {
       return;
     }
 
+    console.log("[FighterRenderer] removeFighter", id);
     this.container.removeChild(fighter.container);
     fighter.container.destroy({ children: true });
     this.fighters.delete(id);
@@ -764,6 +796,7 @@ export class FighterRenderer {
    * Clear all fighters.
    */
   clear(): void {
+    console.log("[FighterRenderer] clear() — removing", this.fighters.size, "fighters");
     for (const fighter of this.fighters.values()) {
       fighter.container.destroy({ children: true });
     }

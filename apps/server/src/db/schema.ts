@@ -43,6 +43,29 @@ export interface CharactersTable {
   map_id: number;
   cell_id: number;
   direction: number;
+  // Stats
+  vitality: number;
+  wisdom: number;
+  strength: number;
+  chance: number;
+  agility: number;
+  intelligence: number;
+  hp: number;
+  max_hp: number;
+  ap: number;
+  mp: number;
+  energy: number;
+  max_energy: number;
+  bonus_points: number;
+  bonus_points_spell: number;
+  xp: number;
+  xp_low: number;
+  xp_high: number;
+  kama: number;
+  initiative: number;
+  discernment: number;
+  range: number;
+  summon_limit: number;
 }
 
 export interface ScriptedCellsTable {
