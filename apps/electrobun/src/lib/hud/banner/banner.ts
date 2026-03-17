@@ -17,6 +17,7 @@ import {
 } from './banner-chat';
 import type { BannerManifest, IconButtonWithOffset, ShortcutCell } from '@/types/banner';
 import { BANNER_ASSETS_PATH, ICON_BUTTON_CONFIGS } from '@/types/banner';
+import { getColors, getLayout } from '@/themes';
 
 const MASK_TEXTURE_SIZE = 256;
 const MASK_FEATHER_SIZE = 2;
@@ -85,6 +86,7 @@ export class Banner {
   private currentWidth = 0;
   private displayHeight = 432;
   private loaded = false;
+  private loadedPromise: Promise<void>;
 
   /** All SVG icon paths for zoom-dependent reloading */
   private allIconSvgPaths: string[] = [];
@@ -143,7 +145,12 @@ export class Banner {
       }
     });
 
-    this.loadAssets();
+    this.loadedPromise = this.loadAssets();
+  }
+
+  /** Resolves when all banner assets are loaded and drawn. */
+  whenLoaded(): Promise<void> {
+    return this.loadedPromise;
   }
 
   private async loadAssets(): Promise<void> {
@@ -449,14 +456,16 @@ export class Banner {
   private draw(): void {
     const bannerOffsetY = Math.floor(this.displayHeight * this.currentZoom);
     const s = this.currentZoom;
+    const bannerColors = getColors().banner;
+    const bannerLayout = getLayout().banner;
 
     this.background.clear();
-    this.background.rect(0, bannerOffsetY, this.currentWidth, 125 * s);
-    this.background.fill({ color: 0xd5cfaa });
+    this.background.rect(0, bannerOffsetY, this.currentWidth, bannerLayout.offsetY * s);
+    this.background.fill({ color: bannerColors.background });
 
     this.whiteZoneBottomLeft.clear();
     this.whiteZoneBottomLeft.rect(-7.5 * s, bannerOffsetY + 104 * s, 430 * s, 21 * s);
-    this.whiteZoneBottomLeft.fill({ color: 0xffffff });
+    this.whiteZoneBottomLeft.fill({ color: bannerColors.whiteZone });
 
     if (!this.loaded) {
       return;
@@ -465,12 +474,13 @@ export class Banner {
     const textureScale = s / this.manifest.scale;
     const iconTextureScale = s / this.manifest.iconScale;
 
-    this.whiteZoneTopRight.position.set(415 * s, bannerOffsetY - 0.05 * s);
+    const wz = bannerLayout.whiteZoneTopRight;
+    this.whiteZoneTopRight.position.set(wz.x * s, bannerOffsetY - 0.05 * s);
     this.whiteZoneTopRight.removeChildren();
 
     const rectangle = new Graphics();
-    rectangle.rect(0, 0, 327 * s, 40 * s);
-    rectangle.fill({ color: 0xffffff });
+    rectangle.rect(0, 0, wz.w * s, wz.h * s);
+    rectangle.fill({ color: bannerColors.whiteZone });
     this.whiteZoneTopRight.addChild(rectangle);
 
     const buttonLogicalWidth = this.manifest.icons['button-up'].width / this.manifest.iconScale;
@@ -489,8 +499,8 @@ export class Banner {
       this.whiteZoneTopRight.addChild(iconButton.container);
     }
 
-    const xpCircleCenterX = 417 * s;
-    const xpCircleCenterY = bannerOffsetY + 65.4 * s;
+    const xpCircleCenterX = bannerLayout.xpCircle.x * s;
+    const xpCircleCenterY = bannerOffsetY + bannerLayout.xpCircle.yOffset * s;
     const minimapRadius = CIRCLE_INNER_CONTENT_RADIUS * s;
 
     const maskScale = minimapRadius / MASK_VISIBLE_RADIUS;
@@ -509,35 +519,37 @@ export class Banner {
     this.xpCircle.container.position.set(xpCircleCenterX, xpCircleCenterY);
     this.xpCircle.redraw(s);
 
-    this.heartDefaultFiller.position.set(395 * s, bannerOffsetY - 5 * s);
+    const heartX = bannerLayout.heart.x * s;
+    const heartY = bannerOffsetY + bannerLayout.heart.yOffset * s;
+    this.heartDefaultFiller.position.set(heartX, heartY);
     this.heartDefaultFiller.scale.set(textureScale);
 
-    this.heartFiller.position.set(395 * s, bannerOffsetY - 5 * s);
+    this.heartFiller.position.set(heartX, heartY);
     this.heartFiller.scale.set(textureScale);
 
     const heartHeight = 41;
     const hpPercentage = 0.54;
     const visibleHeight = heartHeight * hpPercentage;
-    const maskStartY = bannerOffsetY - 5 * s + (heartHeight - visibleHeight) * s;
+    const maskStartY = heartY + (heartHeight - visibleHeight) * s;
 
     this.heartFillerMask.clear();
-    this.heartFillerMask.rect(395 * s, maskStartY, 44 * s, visibleHeight * s);
+    this.heartFillerMask.rect(heartX, maskStartY, 44 * s, visibleHeight * s);
     this.heartFillerMask.fill({ color: 0xffffff });
 
-    this.heart.position.set(395 * s, bannerOffsetY - 5 * s);
+    this.heart.position.set(heartX, heartY);
     this.heart.scale.set(textureScale);
 
-    this.bannerContainer.position.set(464 * s, bannerOffsetY + 50 * s);
+    this.bannerContainer.position.set(bannerLayout.bannerContainer.x * s, bannerOffsetY + bannerLayout.bannerContainer.yOffset * s);
     this.bannerContainer.scale.set(textureScale);
 
     const cellHeight = this.manifest.container.background.height / this.manifest.scale;
-    const cellSpacingX = 28;
-    const cellSpacingY = 29;
+    const cellSpacingX = bannerLayout.shortcuts.spacingX;
+    const cellSpacingY = bannerLayout.shortcuts.spacingY;
     const containerHeight = 64;
     const gridHeight = cellSpacingY + cellHeight;
     const paddingY = (containerHeight - gridHeight) / 2;
-    const shortcutsStartX = 518.35;
-    const shortcutsStartY = 50 + paddingY;
+    const shortcutsStartX = bannerLayout.shortcuts.startX;
+    const shortcutsStartY = bannerLayout.shortcuts.yOffset + paddingY;
 
     updateShortcutGridPositions(
       this.shortcutCells,
@@ -568,12 +580,13 @@ export class Banner {
     }
 
     const s = this.currentZoom;
+    const bl = getLayout().banner;
     const bannerOffsetY = Math.floor(this.displayHeight * this.currentZoom);
-    const xpCircleCenterX = 417 * s;
-    const xpCircleCenterY = bannerOffsetY + 65.4 * s;
+    const xpCircleCenterX = bl.xpCircle.x * s;
+    const xpCircleCenterY = bannerOffsetY + bl.xpCircle.yOffset * s;
     const minimapScale = (CIRCLE_INNER_CONTENT_RADIUS * 2 * s) / 250;
 
-    const heartStartY = bannerOffsetY - 5 * s;
+    const heartStartY = bannerOffsetY + bl.heart.yOffset * s;
     const heartEndY = bannerOffsetY - 35 * s;
     const heartDelta = heartEndY - heartStartY;
 
@@ -608,13 +621,14 @@ export class Banner {
     }
 
     const s = this.currentZoom;
+    const bl = getLayout().banner;
     const bannerOffsetY = Math.floor(this.displayHeight * this.currentZoom);
-    const xpCircleCenterX = 417 * s;
-    const xpCircleCenterY = bannerOffsetY + 65.4 * s;
+    const xpCircleCenterX = bl.xpCircle.x * s;
+    const xpCircleCenterY = bannerOffsetY + bl.xpCircle.yOffset * s;
     const minimapScale = (CIRCLE_INNER_CONTENT_RADIUS * 2 * s) / 250;
 
     const heartStartY = bannerOffsetY - 35 * s;
-    const heartEndY = bannerOffsetY - 5 * s;
+    const heartEndY = bannerOffsetY + bl.heart.yOffset * s;
     const heartDelta = heartEndY - heartStartY;
 
     this.xpCircle.collapse((currentRadius) => {

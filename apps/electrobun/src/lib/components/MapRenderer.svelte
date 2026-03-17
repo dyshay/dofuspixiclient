@@ -5,6 +5,13 @@
   import { GameClient } from "@/game/game-client";
   import { Keybindings } from "@/hud/core/keybindings";
 
+  interface Props {
+    onReady?: () => void;
+    onProgress?: (percent: number, label: string) => void;
+  }
+
+  let { onReady, onProgress }: Props = $props();
+
   let canvasContainer: HTMLDivElement;
   let battlefield: Battlefield | null = null;
   let gameClient: GameClient | null = null;
@@ -34,6 +41,8 @@
 
   onMount(async () => {
     try {
+      onProgress?.(5, "Initializing engine...");
+
       battlefield = new Battlefield({
         container: canvasContainer,
         onResizeStart: handleResizeStart,
@@ -42,12 +51,14 @@
         preferWebGPU: true,
       });
       await battlefield.init();
+      onProgress?.(30, "Loading assets...");
 
       try {
         await battlefield.loadManifest();
       } catch (manifestErr) {
         console.warn("Failed to load manifest:", manifestErr);
       }
+      onProgress?.(50, "Loading UI...");
 
       // Initialize game client
       gameClient = new GameClient();
@@ -82,6 +93,7 @@
       });
 
       // Try connecting to server
+      onProgress?.(65, "Connecting to server...");
       gameClient.connect();
 
       // Fallback: if not connected after 3s, load local map
@@ -92,13 +104,18 @@
         }
       }, 3000);
 
+      onProgress?.(80, "Loading banner...");
+      await battlefield.waitForBannerLoaded();
+      onProgress?.(100, "Ready!");
       isLoading = false;
+      onReady?.();
       setupKeybindings();
     } catch (err) {
       error =
         err instanceof Error ? err.message : "Failed to initialize renderer";
       console.error("Initialization error:", err);
       isLoading = false;
+      onReady?.();
     }
   });
 
@@ -179,13 +196,6 @@
   on:contextmenu={handleContextMenu}
   role="application"
 >
-  {#if isLoading}
-    <div class="loading-overlay">
-      <div class="spinner"></div>
-      <p>Loading map...</p>
-    </div>
-  {/if}
-
   {#if isResizing}
     <div class="resize-overlay">
       <div class="spinner"></div>

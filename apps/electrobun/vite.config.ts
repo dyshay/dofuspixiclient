@@ -1,8 +1,9 @@
-import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 import type { Plugin } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { lingui } from "@lingui/vite-plugin";
+import babel from "vite-plugin-babel";
 import compression from "compression";
 import { defineConfig } from "vite";
 
@@ -28,7 +29,20 @@ function compressionPlugin(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [compressionPlugin(), svelte()],
+  plugins: [
+    compressionPlugin(),
+    babel({
+      babelConfig: {
+        plugins: [
+          ["@babel/plugin-transform-typescript", { isTSX: false, allowDeclareFields: true }],
+          "@lingui/babel-plugin-lingui-macro",
+        ],
+      },
+      filter: /\.messages\.ts$/,
+    }),
+    svelte(),
+    lingui(),
+  ],
   root: "src/mainview",
   publicDir: resolve(__dirname, "public"),
   resolve: {

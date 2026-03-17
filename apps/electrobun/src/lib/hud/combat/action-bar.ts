@@ -1,5 +1,9 @@
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
 
+import { i18n } from "@/i18n";
+import { combatLabels } from "@/i18n/hud.messages";
+import { getColors, getFonts } from "@/themes";
+
 /**
  * Action bar configuration.
  */
@@ -58,14 +62,15 @@ export class ActionBar {
     apContainer.y = 10;
     this.container.addChild(apContainer);
 
-    const apLabel = this.createLabel("AP", 0x00aaff);
+    const combat = getColors().combat;
+    const apLabel = this.createLabel("AP", combat.apBar);
     apContainer.addChild(apLabel);
 
     this.apBar = new Graphics();
     this.apBar.y = 16;
     apContainer.addChild(this.apBar);
 
-    this.apText = this.createValueText("0/0", 0x00aaff);
+    this.apText = this.createValueText("0/0", combat.apBar);
     this.apText.x = 60;
     this.apText.y = 2;
     apContainer.addChild(this.apText);
@@ -76,20 +81,20 @@ export class ActionBar {
     mpContainer.y = 40;
     this.container.addChild(mpContainer);
 
-    const mpLabel = this.createLabel("MP", 0x00ff00);
+    const mpLabel = this.createLabel("MP", combat.mpBar);
     mpContainer.addChild(mpLabel);
 
     this.mpBar = new Graphics();
     this.mpBar.y = 16;
     mpContainer.addChild(this.mpBar);
 
-    this.mpText = this.createValueText("0/0", 0x00ff00);
+    this.mpText = this.createValueText("0/0", combat.mpBar);
     this.mpText.x = 60;
     this.mpText.y = 2;
     mpContainer.addChild(this.mpText);
 
     // Pass turn button
-    this.passTurnButton = this.createButton("Pass", 0x4444aa, () => {
+    this.passTurnButton = this.createButton(i18n._(combatLabels.pass), combat.passTurnButton, () => {
       if (this.isMyTurn) {
         this.callbacks.onPassTurn?.();
       }
@@ -99,7 +104,7 @@ export class ActionBar {
     this.container.addChild(this.passTurnButton);
 
     // Forfeit button
-    this.forfeitButton = this.createButton("Forfeit", 0xaa4444, () => {
+    this.forfeitButton = this.createButton(i18n._(combatLabels.forfeit), combat.forfeitButton, () => {
       this.callbacks.onForfeit?.();
     });
     this.forfeitButton.x = this.width - 70;
@@ -194,9 +199,10 @@ export class ActionBar {
    */
   private drawBackground(): void {
     this.background.clear();
+    const combat = getColors().combat;
     this.background.roundRect(0, 0, this.width, 70, 8);
-    this.background.fill({ color: 0x000000, alpha: 0.7 });
-    this.background.stroke({ color: 0x333333, width: 1 });
+    this.background.fill({ color: combat.actionBarBg, alpha: 0.7 });
+    this.background.stroke({ color: combat.spellSlotActive, width: 1 });
   }
 
   /**
@@ -204,7 +210,7 @@ export class ActionBar {
    */
   private createLabel(text: string, color: number): Text {
     const style = new TextStyle({
-      fontFamily: "Arial",
+      fontFamily: getFonts().primary,
       fontSize: 12,
       fontWeight: "bold",
       fill: color,
@@ -218,7 +224,7 @@ export class ActionBar {
    */
   private createValueText(text: string, color: number): Text {
     const style = new TextStyle({
-      fontFamily: "Arial",
+      fontFamily: getFonts().primary,
       fontSize: 14,
       fontWeight: "bold",
       fill: color,
@@ -248,7 +254,7 @@ export class ActionBar {
     button.addChild(bg);
 
     const textStyle = new TextStyle({
-      fontFamily: "Arial",
+      fontFamily: getFonts().primary,
       fontSize: 11,
       fontWeight: "bold",
       fill: 0xffffff,
@@ -285,6 +291,7 @@ export class ActionBar {
   private updateAPDisplay(): void {
     this.apText.text = `${this.currentAP}/${this.maxAP}`;
 
+    const combat = getColors().combat;
     const barWidth = 100;
     const barHeight = 8;
     const ratio = this.maxAP > 0 ? this.currentAP / this.maxAP : 0;
@@ -293,12 +300,12 @@ export class ActionBar {
 
     // Background
     this.apBar.roundRect(0, 0, barWidth, barHeight, 2);
-    this.apBar.fill({ color: 0x222222 });
+    this.apBar.fill({ color: combat.spellSlotBg });
 
     // Fill
     if (ratio > 0) {
       this.apBar.roundRect(0, 0, barWidth * ratio, barHeight, 2);
-      this.apBar.fill({ color: 0x00aaff });
+      this.apBar.fill({ color: combat.apBar });
     }
 
     // Border
@@ -312,6 +319,7 @@ export class ActionBar {
   private updateMPDisplay(): void {
     this.mpText.text = `${this.currentMP}/${this.maxMP}`;
 
+    const combat = getColors().combat;
     const barWidth = 100;
     const barHeight = 8;
     const ratio = this.maxMP > 0 ? this.currentMP / this.maxMP : 0;
@@ -320,12 +328,12 @@ export class ActionBar {
 
     // Background
     this.mpBar.roundRect(0, 0, barWidth, barHeight, 2);
-    this.mpBar.fill({ color: 0x222222 });
+    this.mpBar.fill({ color: combat.spellSlotBg });
 
     // Fill
     if (ratio > 0) {
       this.mpBar.roundRect(0, 0, barWidth * ratio, barHeight, 2);
-      this.mpBar.fill({ color: 0x00ff00 });
+      this.mpBar.fill({ color: combat.mpBar });
     }
 
     // Border
@@ -337,18 +345,19 @@ export class ActionBar {
    * Update button states based on turn.
    */
   private updateButtonStates(): void {
+    const combat = getColors().combat;
     const passBg = this.passTurnButton.getChildByLabel("bg") as Graphics;
 
     if (this.isMyTurn) {
       passBg.clear();
       passBg.roundRect(0, 0, 60, 30, 4);
-      passBg.fill({ color: 0x4444aa, alpha: 0.8 });
+      passBg.fill({ color: combat.passTurnButton, alpha: 0.8 });
       passBg.stroke({ color: 0x000000, width: 1 });
       this.passTurnButton.alpha = 1;
     } else {
       passBg.clear();
       passBg.roundRect(0, 0, 60, 30, 4);
-      passBg.fill({ color: 0x333333, alpha: 0.8 });
+      passBg.fill({ color: combat.spellSlotActive, alpha: 0.8 });
       passBg.stroke({ color: 0x000000, width: 1 });
       this.passTurnButton.alpha = 0.5;
     }

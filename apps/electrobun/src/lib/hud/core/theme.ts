@@ -1,40 +1,83 @@
 import { TextStyle } from 'pixi.js';
+import { getColors, getMetrics, getFonts } from '@/themes';
 
-export const COLORS = {
-  BG: 0xddd7b2,
-  BG_ALT: 0xc4be96,
-  HEADER_BG: 0x5c5040,
-  BORDER: 0x8a7f5f,
-  TEXT_DARK: 0x3d3529,
-  TEXT_WHITE: 0xffffff,
-  BAR_BG: 0x3d3529,
-  BAR_FILL: 0xe86420,
-  BAR_BORDER: 0x2a2218,
-  CLOSE_BG: 0xcc4400,
-  BOOST: 0xe86420,
-  BOOST_HOVER: 0xffaa44,
-  SLOT_BG: 0xdcd5bf,
-  ALIGN_BORDER: 0x88bbcc,
-} as const;
+/**
+ * Lazy proxy that reads from the active theme on every access.
+ * Keeps backward-compat with existing `COLORS.BG` usage.
+ */
+export const COLORS = new Proxy({} as {
+  readonly BG: number;
+  readonly BG_ALT: number;
+  readonly HEADER_BG: number;
+  readonly BORDER: number;
+  readonly TEXT_DARK: number;
+  readonly TEXT_WHITE: number;
+  readonly BAR_BG: number;
+  readonly BAR_FILL: number;
+  readonly BAR_BORDER: number;
+  readonly CLOSE_BG: number;
+  readonly BOOST: number;
+  readonly BOOST_HOVER: number;
+  readonly SLOT_BG: number;
+  readonly ALIGN_BORDER: number;
+}, {
+  get(_target, prop: string) {
+    const c = getColors();
+    const map: Record<string, number> = {
+      BG: c.bg,
+      BG_ALT: c.bgAlt,
+      HEADER_BG: c.headerBg,
+      BORDER: c.border,
+      TEXT_DARK: c.textDark,
+      TEXT_WHITE: c.textWhite,
+      BAR_BG: c.barBg,
+      BAR_FILL: c.barFill,
+      BAR_BORDER: c.barBorder,
+      CLOSE_BG: c.closeBg,
+      BOOST: c.boost,
+      BOOST_HOVER: c.boostHover,
+      SLOT_BG: c.slotBg,
+      ALIGN_BORDER: c.alignBorder,
+    };
+    return map[prop];
+  },
+});
 
-export const METRICS = {
-  ROW_H: 18,
-  HEADER_H: 17,
-  PX: 10,
-  ICON_SIZE: 14,
-  BAR_H: 12,
-  CLOSE_SIZE: 16,
-  ALIGN_FRAME: 50,
-  JOB_SLOT: 42,
-  SPEC_SLOT: 30,
-} as const;
-
-export const FONT = 'Arial';
+/**
+ * Lazy proxy that reads from the active theme on every access.
+ */
+export const METRICS = new Proxy({} as {
+  readonly ROW_H: number;
+  readonly HEADER_H: number;
+  readonly PX: number;
+  readonly ICON_SIZE: number;
+  readonly BAR_H: number;
+  readonly CLOSE_SIZE: number;
+  readonly ALIGN_FRAME: number;
+  readonly JOB_SLOT: number;
+  readonly SPEC_SLOT: number;
+}, {
+  get(_target, prop: string) {
+    const m = getMetrics();
+    const map: Record<string, number> = {
+      ROW_H: m.rowH,
+      HEADER_H: m.headerH,
+      PX: m.px,
+      ICON_SIZE: m.iconSize,
+      BAR_H: m.barH,
+      CLOSE_SIZE: m.closeSize,
+      ALIGN_FRAME: m.alignFrame,
+      JOB_SLOT: m.jobSlot,
+      SPEC_SLOT: m.specSlot,
+    };
+    return map[prop];
+  },
+});
 
 export function boldText(size: number, color: number): TextStyle {
-  return new TextStyle({ fontFamily: FONT, fontSize: size, fill: color, fontWeight: 'bold' });
+  return new TextStyle({ fontFamily: getFonts().primary, fontSize: size, fill: color, fontWeight: 'bold' });
 }
 
 export function regularText(size: number, color: number): TextStyle {
-  return new TextStyle({ fontFamily: FONT, fontSize: size, fill: color });
+  return new TextStyle({ fontFamily: getFonts().primary, fontSize: size, fill: color });
 }

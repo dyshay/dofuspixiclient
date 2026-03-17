@@ -1,0 +1,20 @@
+@font-face {
+  font-family: "bit-mini-6";
+  src: url("/assets/fonts/bitMini6.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "impact";
+  src: url("/assets/fonts/265_Impact.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "eras";
+  src: url("/assets/fonts/624_Eras Bold ITC.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}

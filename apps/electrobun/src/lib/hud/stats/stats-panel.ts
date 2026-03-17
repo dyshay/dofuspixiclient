@@ -1,42 +1,40 @@
-import { Assets, Container, Graphics, Sprite, Text, Texture } from 'pixi.js';
-import type { CharacterStats } from '@/types/stats';
-import { STAT_IDS } from '@/types/stats';
-import { StatRow } from './stat-row';
-import { getBoostCost } from './boost-costs';
+import { Assets, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
+
+import type { CharacterStats } from "@/types/stats";
+import { i18n } from "@/i18n";
 import {
-  COLORS, METRICS, boldText, regularText,
+  statsLabels as LABELS,
+  statsTooltips as TOOLTIPS,
+} from "@/i18n/hud.messages";
+import { getAssetPath } from "@/themes";
+import { STAT_IDS } from "@/types/stats";
+
+import {
+  boldText,
+  COLORS,
+  createCloseButton,
+  createProgressBar,
   createSectionHeader,
-  createProgressBar, createCloseButton, createSlot,
-  showTooltip, hideTooltip,
-} from '../core';
+  createSlot,
+  hideTooltip,
+  METRICS,
+  regularText,
+  showTooltip,
+} from "../core";
+import { getBoostCost } from "./boost-costs";
+import { StatRow } from "./stat-row";
 
-const W = 250;
-const ICON = '/assets/hud/stats';
-
-// Tooltip texts (from Dofus 1.29 lang files)
-const TOOLTIPS: Record<string, string> = {
-  energy: 'Points d\'énergie : perdus en cas de mort. Régénérés en se déconnectant dans une zone de sauvegarde.',
-  xp: 'Points d\'expérience : en gagnant suffisamment de points d\'expérience, vous gagnez un niveau.',
-  hp: 'Points de vie : si vos points de vie tombent à 0 en combat, vous êtes vaincu.',
-  ap: 'Points d\'action : utilisés pour lancer des sorts et effectuer des actions en combat.',
-  mp: 'Points de mouvement : chaque case de déplacement en combat coûte 1 PM.',
-  initiative: 'Initiative : détermine l\'ordre de jeu en combat. Plus elle est élevée, plus vous jouez tôt.',
-  prospection: 'Prospection : augmente vos chances de trouver des objets sur les monstres vaincus.',
-  vitality: 'Vitalité : chaque point de vitalité augmente vos points de vie maximum de 1.',
-  wisdom: 'Sagesse : augmente les points d\'expérience gagnés et la résistance aux pertes de PA/PM.',
-  strength: 'Force : augmente les dégâts de terre et le pods transportable.',
-  intelligence: 'Intelligence : augmente les dégâts de feu et les soins.',
-  chance: 'Chance : augmente les dégâts d\'eau et la prospection.',
-  agility: 'Agilité : augmente les dégâts d\'air, l\'esquive PA/PM et la fuite.',
-  capital: 'Points de capital : utilisez-les pour augmenter vos caractéristiques.',
-  quill: 'Plus de statistiques',
-};
+const ICON = () => getAssetPath("stats");
 
 export class StatsPanel {
   public container: Container;
 
-  private nameText: Text;
-  private levelText: Text;
+  /** Actual pixel dimensions after zoom */
+  public panelW: number;
+  public panelH: number;
+
+  private nameText!: Text;
+  private levelText!: Text;
   private energyBar!: { graphics: Graphics; redraw: (pct: number) => void };
   private xpBar!: { graphics: Graphics; redraw: (pct: number) => void };
   private lpVal!: Text;
@@ -48,224 +46,401 @@ export class StatsPanel {
   private statRows = new Map<number, StatRow>();
   private iconSizes = new Map<Sprite, { w: number; h: number }>();
   private classId = 0;
-  private energyTip = '';
-  private xpTip = '';
+  private energyTip = "";
+  private xpTip = "";
+  private zoom: number;
+
+  // State for rebuild
+  private storedName = "";
+  private storedStats: CharacterStats | null = null;
 
   private onBoostStat?: (statId: number) => void;
   private onClose?: () => void;
 
-  constructor() {
+  constructor(zoom: number) {
+    this.zoom = zoom;
     this.container = new Container();
-    this.container.label = 'stats-panel';
+    this.container.label = "stats-panel";
     this.container.visible = false;
-    this.container.eventMode = 'static';
+    this.container.eventMode = "static";
+
+    // Compute zoomed dimensions
+    this.panelW = Math.round(250 * zoom);
+    this.panelH = Math.round(420 * zoom);
+
+    this.build();
+  }
+
+  rebuild(zoom: number): void {
+    this.zoom = zoom;
+    this.panelW = Math.round(250 * zoom);
+    this.panelH = Math.round(420 * zoom);
+
+    // Clear old children
+    for (const row of this.statRows.values()) row.destroy();
+    this.statRows.clear();
+    this.iconSizes.clear();
+    this.container.removeChildren();
+
+    this.build();
+
+    // Restore state
+    if (this.storedName) this.nameText.text = this.storedName;
+    if (this.storedStats) this.updateStats(this.storedStats);
+  }
+
+  private build(): void {
+    const z = this.zoom;
+    const W = this.panelW;
+    const panelH = this.panelH;
+
+    // Scaled helpers
+    const p = (n: number) => Math.round(n * z);
+    const f = (n: number) => n * z;
+
+    // Scaled metrics
+    const ROW_H = p(METRICS.ROW_H);
+    const HEADER_H = p(METRICS.HEADER_H);
+    const PX = p(METRICS.PX);
+    const ICON_SIZE = p(METRICS.ICON_SIZE);
+    const BAR_H = p(METRICS.BAR_H);
+    const CLOSE_SIZE = p(METRICS.CLOSE_SIZE);
+    const ALIGN_FRAME = p(METRICS.ALIGN_FRAME);
+    const JOB_SLOT = p(METRICS.JOB_SLOT);
+    const SPEC_SLOT = p(METRICS.SPEC_SLOT);
 
     let y = 0;
 
     // ═══════ TOP: Name header (dark) ═══════
-    const headerH = 28;
+    const headerH = p(28);
     const headerBg = new Graphics();
-    headerBg.roundRect(0, 0, W, headerH, 3);
+    headerBg.roundRect(0, 0, W, headerH, p(3));
     headerBg.fill({ color: COLORS.HEADER_BG });
-    headerBg.rect(0, 3, W, headerH - 3);
+    headerBg.rect(0, p(3), W, headerH - p(3));
     headerBg.fill({ color: COLORS.HEADER_BG });
-    headerBg.eventMode = 'static';
+    headerBg.eventMode = "static";
     this.container.addChild(headerBg);
 
-    this.nameText = new Text({ text: '', style: boldText(13, COLORS.TEXT_WHITE) });
+    this.nameText = new Text({
+      text: "",
+      style: boldText(f(13), COLORS.TEXT_WHITE),
+    });
     this.nameText.anchor.set(0, 0.5);
-    this.nameText.x = METRICS.ALIGN_FRAME + METRICS.PX + 12;
+    this.nameText.x = ALIGN_FRAME + PX + p(12);
     this.nameText.y = headerH / 2;
     this.container.addChild(this.nameText);
 
-    const closeBtn = createCloseButton(() => { this.hide(); this.onClose?.(); });
-    closeBtn.x = W - 19;
-    closeBtn.y = (headerH - METRICS.CLOSE_SIZE) / 2;
+    const closeBtn = createCloseButton(() => {
+      this.hide();
+      this.onClose?.();
+    }, z);
+    closeBtn.x = W - p(19);
+    closeBtn.y = (headerH - CLOSE_SIZE) / 2;
     this.container.addChild(closeBtn);
 
     // ═══════ Level (below header, beige zone) ═══════
-    this.levelText = new Text({ text: 'Niveau 1', style: boldText(11, COLORS.TEXT_DARK) });
-    this.levelText.x = METRICS.ALIGN_FRAME + METRICS.PX + 6;
-    this.levelText.y = headerH + 8;
+    this.levelText = new Text({
+      text: i18n._(LABELS.level.id, { level: 1 }),
+      style: boldText(f(11), COLORS.TEXT_DARK),
+    });
+    this.levelText.x = ALIGN_FRAME + PX + p(6);
+    this.levelText.y = headerH + p(8);
     this.container.addChild(this.levelText);
 
-    y = headerH + METRICS.ROW_H + 18;
+    y = headerH + ROW_H + p(18);
 
     // Alignment icon frame — added at end for z-index
     const alignFrame = new Container();
     const alignBg = new Graphics();
-    alignBg.roundRect(0, 0, METRICS.ALIGN_FRAME, METRICS.ALIGN_FRAME, 3);
+    alignBg.roundRect(0, 0, ALIGN_FRAME, ALIGN_FRAME, p(3));
     alignBg.fill({ color: COLORS.SLOT_BG });
     alignBg.stroke({ color: COLORS.ALIGN_BORDER, width: 2 });
     alignFrame.addChild(alignBg);
-    alignFrame.x = METRICS.PX;
-    alignFrame.y = 4;
+    alignFrame.x = PX;
+    alignFrame.y = p(4);
 
-    const alignIcon = this.makeIcon('AlignIcon.svg', METRICS.ALIGN_FRAME - 6, METRICS.ALIGN_FRAME - 6);
-    alignIcon.x = 3;
-    alignIcon.y = 3;
-    // Move from this.container to alignFrame
+    const alignIcon = this.makeIcon(
+      "AlignIcon.svg",
+      ALIGN_FRAME - p(6),
+      ALIGN_FRAME - p(6)
+    );
+    alignIcon.x = p(3);
+    alignIcon.y = p(3);
     this.container.removeChild(alignIcon);
     alignFrame.addChild(alignIcon);
 
     // ═══════ ALTERNATING ROW BACKGROUNDS — single Graphics ═══════
-    let rowIdx = 0;
-    const rowStartY = y;
-    // Pre-count: 2 bar rows + 5 combat rows = 7, then header, then 6 stat rows = 13 total
     const totalRows = 13;
     const altBg = new Graphics();
-    let tempY = rowStartY;
+    let tempY = y;
     for (let i = 0; i < totalRows; i++) {
       if (i % 2 === 1) {
-        altBg.rect(0, tempY, W, METRICS.ROW_H);
+        altBg.rect(0, tempY, W, ROW_H);
         altBg.fill({ color: COLORS.BG_ALT });
       }
-      tempY += METRICS.ROW_H;
-      // After 7 rows (energy, xp, 5 combat), skip header height
-      if (i === 6) tempY += METRICS.HEADER_H;
+      tempY += ROW_H;
+      if (i === 6) tempY += HEADER_H;
     }
     this.container.addChild(altBg);
 
     // ═══════ ENERGY BAR (row 0) ═══════
-    this.energyBar = createProgressBar(90, y + (METRICS.ROW_H - METRICS.BAR_H) / 2, W - 90 - METRICS.PX, METRICS.BAR_H);
-    const energyLabel = new Text({ text: 'Energie', style: boldText(11, COLORS.TEXT_DARK) });
+    const barLabelX = p(90);
+    this.energyBar = createProgressBar(
+      barLabelX,
+      y + (ROW_H - BAR_H) / 2,
+      W - barLabelX - PX,
+      BAR_H
+    );
+    const energyLabel = new Text({
+      text: i18n._(LABELS.energy),
+      style: boldText(f(11), COLORS.TEXT_DARK),
+    });
     energyLabel.anchor.set(0, 0.5);
-    energyLabel.x = METRICS.PX;
-    energyLabel.y = y + METRICS.ROW_H / 2;
+    energyLabel.x = PX;
+    energyLabel.y = y + ROW_H / 2;
     this.container.addChild(energyLabel);
-    this.withTooltip(energyLabel, TOOLTIPS.energy);
+    this.withTooltip(energyLabel, i18n._(TOOLTIPS.energy));
     this.container.addChild(this.energyBar.graphics);
     this.withDynamicTooltip(this.energyBar.graphics, () => this.energyTip);
-    y += METRICS.ROW_H;
-    rowIdx++;
+    y += ROW_H;
 
     // ═══════ XP BAR (row 1) ═══════
-    this.xpBar = createProgressBar(90, y + (METRICS.ROW_H - METRICS.BAR_H) / 2, W - 90 - METRICS.PX, METRICS.BAR_H);
-    const xpLabel = new Text({ text: 'Expérience', style: boldText(11, COLORS.TEXT_DARK) });
+    this.xpBar = createProgressBar(
+      barLabelX,
+      y + (ROW_H - BAR_H) / 2,
+      W - barLabelX - PX,
+      BAR_H
+    );
+    const xpLabel = new Text({
+      text: i18n._(LABELS.xp),
+      style: boldText(f(11), COLORS.TEXT_DARK),
+    });
     xpLabel.anchor.set(0, 0.5);
-    xpLabel.x = METRICS.PX;
-    xpLabel.y = y + METRICS.ROW_H / 2;
+    xpLabel.x = PX;
+    xpLabel.y = y + ROW_H / 2;
     this.container.addChild(xpLabel);
-    this.withTooltip(xpLabel, TOOLTIPS.xp);
+    this.withTooltip(xpLabel, i18n._(TOOLTIPS.xp));
     this.container.addChild(this.xpBar.graphics);
     this.withDynamicTooltip(this.xpBar.graphics, () => this.xpTip);
-    y += METRICS.ROW_H;
-    rowIdx++;
+    y += ROW_H;
 
     // ═══════ COMBAT STATS (rows 2-6) ═══════
-    const combatRows: Array<{ icon: string; label: string; isLP: boolean; tip: string; tint?: number; onVal: (t: Text) => void }> = [
-      { icon: 'IconVita.svg', label: 'Points de vie', isLP: true, tip: TOOLTIPS.hp, onVal: (t) => { this.lpVal = t; } },
-      { icon: 'StarSymbol.svg', label: 'Points d\'actions', isLP: false, tip: TOOLTIPS.ap, tint: 0xffcc00, onVal: (t) => { this.apVal = t; } },
-      { icon: 'IconMP.svg', label: 'Points de mouvement', isLP: false, tip: TOOLTIPS.mp, onVal: (t) => { this.mpVal = t; } },
-      { icon: 'IconInit.svg', label: 'Initiative', isLP: false, tip: TOOLTIPS.initiative, onVal: (t) => { this.initVal = t; } },
-      { icon: 'IconPP.svg', label: 'Prospection', isLP: false, tip: TOOLTIPS.prospection, onVal: (t) => { this.discVal = t; } },
+    const combatRows: Array<{
+      icon: string;
+      label: string;
+      isLP: boolean;
+      tip: string;
+      tint?: number;
+      onVal: (t: Text) => void;
+    }> = [
+      {
+        icon: "IconVita.svg",
+        label: i18n._(LABELS.hp),
+        isLP: true,
+        tip: i18n._(TOOLTIPS.hp),
+        onVal: (t) => {
+          this.lpVal = t;
+        },
+      },
+      {
+        icon: "StarSymbol.svg",
+        label: i18n._(LABELS.ap),
+        isLP: false,
+        tip: i18n._(TOOLTIPS.ap),
+        tint: 0xffcc00,
+        onVal: (t) => {
+          this.apVal = t;
+        },
+      },
+      {
+        icon: "IconMP.svg",
+        label: i18n._(LABELS.mp),
+        isLP: false,
+        tip: i18n._(TOOLTIPS.mp),
+        onVal: (t) => {
+          this.mpVal = t;
+        },
+      },
+      {
+        icon: "IconInit.svg",
+        label: i18n._(LABELS.initiative),
+        isLP: false,
+        tip: i18n._(TOOLTIPS.initiative),
+        onVal: (t) => {
+          this.initVal = t;
+        },
+      },
+      {
+        icon: "IconPP.svg",
+        label: i18n._(LABELS.prospection),
+        isLP: false,
+        tip: i18n._(TOOLTIPS.prospection),
+        onVal: (t) => {
+          this.discVal = t;
+        },
+      },
     ];
     for (const cr of combatRows) {
-      y = this.addCombatRow(y, cr.icon, cr.label, cr.isLP, cr.onVal, cr.tip, cr.tint);
-      rowIdx++;
+      y = this.addCombatRow(
+        y,
+        cr.icon,
+        cr.label,
+        cr.isLP,
+        cr.onVal,
+        W,
+        ROW_H,
+        ICON_SIZE,
+        PX,
+        f,
+        cr.tip,
+        cr.tint
+      );
     }
 
     // ═══════ CARACTÉRISTIQUES HEADER ═══════
-    const caracHdr = createSectionHeader(y, W, 'Caractéristiques');
+    const caracHdr = createSectionHeader(
+      y,
+      W,
+      i18n._(LABELS.characteristics),
+      z
+    );
     this.container.addChild(caracHdr.graphics);
     this.container.addChild(caracHdr.text);
 
-    const quill = this.makeIcon('QuillIcon.svg', 12, 12);
-    quill.x = W - METRICS.PX - 14;
-    quill.y = y + (METRICS.HEADER_H - 12) / 2;
-    this.withTooltip(quill, TOOLTIPS.quill);
+    const quillSize = p(12);
+    const quill = this.makeIcon("QuillIcon.svg", quillSize, quillSize);
+    quill.x = W - PX - p(14);
+    quill.y = y + (HEADER_H - quillSize) / 2;
+    this.withTooltip(quill, i18n._(TOOLTIPS.quill));
 
     y = caracHdr.nextY;
 
     // ═══════ 6 CHARACTERISTIC ROWS (rows 7-12) ═══════
     const stats = [
-      { id: STAT_IDS.VITALITY, n: 'Vitalité', ic: 'IconVita.svg', tip: TOOLTIPS.vitality },
-      { id: STAT_IDS.WISDOM, n: 'Sagesse', ic: 'IconWisdom.svg', tip: TOOLTIPS.wisdom },
-      { id: STAT_IDS.STRENGTH, n: 'Force', ic: 'IconEarth.svg', tip: TOOLTIPS.strength },
-      { id: STAT_IDS.INTELLIGENCE, n: 'Intelligence', ic: 'IconFire.svg', tip: TOOLTIPS.intelligence },
-      { id: STAT_IDS.CHANCE, n: 'Chance', ic: 'IconWater.svg', tip: TOOLTIPS.chance },
-      { id: STAT_IDS.AGILITY, n: 'Agilité', ic: 'IconAir.svg', tip: TOOLTIPS.agility },
+      {
+        id: STAT_IDS.VITALITY,
+        n: i18n._(LABELS.vitality),
+        ic: "IconVita.svg",
+        tip: i18n._(TOOLTIPS.vitality),
+      },
+      {
+        id: STAT_IDS.WISDOM,
+        n: i18n._(LABELS.wisdom),
+        ic: "IconWisdom.svg",
+        tip: i18n._(TOOLTIPS.wisdom),
+      },
+      {
+        id: STAT_IDS.STRENGTH,
+        n: i18n._(LABELS.strength),
+        ic: "IconEarth.svg",
+        tip: i18n._(TOOLTIPS.strength),
+      },
+      {
+        id: STAT_IDS.INTELLIGENCE,
+        n: i18n._(LABELS.intelligence),
+        ic: "IconFire.svg",
+        tip: i18n._(TOOLTIPS.intelligence),
+      },
+      {
+        id: STAT_IDS.CHANCE,
+        n: i18n._(LABELS.chance),
+        ic: "IconWater.svg",
+        tip: i18n._(TOOLTIPS.chance),
+      },
+      {
+        id: STAT_IDS.AGILITY,
+        n: i18n._(LABELS.agility),
+        ic: "IconAir.svg",
+        tip: i18n._(TOOLTIPS.agility),
+      },
     ];
 
     for (const s of stats) {
-      const row = new StatRow(s.n, `${ICON}/${s.ic}`, W, s.tip);
+      const row = new StatRow(s.n, `${ICON()}/${s.ic}`, W, s.tip, z);
       row.container.y = y;
       row.setOnBoost(() => this.onBoostStat?.(s.id));
       this.statRows.set(s.id, row);
       this.container.addChild(row.container);
-      y += METRICS.ROW_H;
-      rowIdx++;
+      y += ROW_H;
     }
 
     // ═══════ CAPITAL HEADER ═══════
     const capBg = new Graphics();
-    capBg.rect(0, y, W, METRICS.HEADER_H);
+    capBg.rect(0, y, W, HEADER_H);
     capBg.fill({ color: 0x7a7a56 });
     this.container.addChild(capBg);
-    const capLabel = new Text({ text: 'Capital', style: boldText(11, COLORS.TEXT_WHITE) });
+    const capLabel = new Text({
+      text: i18n._(LABELS.capital),
+      style: boldText(f(11), COLORS.TEXT_WHITE),
+    });
     capLabel.anchor.set(0, 0.5);
-    capLabel.x = METRICS.PX;
-    capLabel.y = y + METRICS.HEADER_H / 2;
+    capLabel.x = PX;
+    capLabel.y = y + HEADER_H / 2;
     this.container.addChild(capLabel);
-    this.withTooltip(capLabel, TOOLTIPS.capital);
+    this.withTooltip(capLabel, i18n._(TOOLTIPS.capital));
 
-    this.capitalVal = new Text({ text: '0', style: boldText(12, COLORS.TEXT_WHITE) });
+    this.capitalVal = new Text({
+      text: "0",
+      style: boldText(f(12), COLORS.TEXT_WHITE),
+    });
     this.capitalVal.anchor.set(1, 0.5);
-    this.capitalVal.x = W - METRICS.PX;
-    this.capitalVal.y = y + METRICS.HEADER_H / 2;
+    this.capitalVal.x = W - PX;
+    this.capitalVal.y = y + HEADER_H / 2;
     this.container.addChild(this.capitalVal);
-    y += METRICS.HEADER_H;
+    y += HEADER_H;
 
     // ═══════ MES MÉTIERS HEADER ═══════
-    const jobHdr = createSectionHeader(y, W, 'Mes métiers');
+    const jobHdr = createSectionHeader(y, W, i18n._(LABELS.jobs), z);
     this.container.addChild(jobHdr.graphics);
     this.container.addChild(jobHdr.text);
     y = jobHdr.nextY;
 
     // ═══════ JOB & SPEC SLOTS — side by side, centered vertically ═══════
-    const panelH = 420;
     const jobAreaH = panelH - y;
-    const jobGap = 4;
-    const specGap = 3;
-    const midGap = 8;
-    const jobTotalW = 3 * METRICS.JOB_SLOT + 2 * jobGap;
-    const specTotalW = 3 * METRICS.SPEC_SLOT + 2 * specGap;
+    const jobGap = p(4);
+    const specGap = p(3);
+    const midGap = p(8);
+    const jobTotalW = 3 * JOB_SLOT + 2 * jobGap;
+    const specTotalW = 3 * SPEC_SLOT + 2 * specGap;
     const allW = jobTotalW + midGap + specTotalW;
     const startX = (W - allW) / 2;
-    const jobY = y + (jobAreaH - METRICS.JOB_SLOT) / 2;
+    const jobY = y + (jobAreaH - JOB_SLOT) / 2;
 
     for (let i = 0; i < 3; i++) {
-      const sx = startX + i * (METRICS.JOB_SLOT + jobGap);
-      const slot = createSlot(sx, jobY, METRICS.JOB_SLOT);
+      const sx = startX + i * (JOB_SLOT + jobGap);
+      const slot = createSlot(sx, jobY, JOB_SLOT);
       this.container.addChild(slot.graphics);
     }
 
     const specX = startX + jobTotalW + midGap;
-    const specBlockH = 10 + METRICS.SPEC_SLOT;
-    const specTopY = jobY + (METRICS.JOB_SLOT - specBlockH) / 2;
-    const specLabel = new Text({ text: 'Spécialisations', style: regularText(8, COLORS.TEXT_DARK) });
+    const specBlockH = p(10) + SPEC_SLOT;
+    const specTopY = jobY + (JOB_SLOT - specBlockH) / 2;
+    const specLabel = new Text({
+      text: i18n._(LABELS.specializations),
+      style: regularText(f(8), COLORS.TEXT_DARK),
+    });
     specLabel.x = specX;
     specLabel.y = specTopY;
     this.container.addChild(specLabel);
-    const specSlotY = specTopY + 12;
+    const specSlotY = specTopY + p(12);
     for (let i = 0; i < 3; i++) {
-      const sx = specX + i * (METRICS.SPEC_SLOT + specGap);
-      const slot = createSlot(sx, specSlotY, METRICS.SPEC_SLOT);
+      const sx = specX + i * (SPEC_SLOT + specGap);
+      const slot = createSlot(sx, specSlotY, SPEC_SLOT);
       this.container.addChild(slot.graphics);
     }
 
     // ═══════ FIXED HEIGHT background (at bottom of z-order) ═══════
     const bgFill = new Graphics();
-    bgFill.roundRect(0, 0, W, panelH, 3);
+    bgFill.roundRect(0, 0, W, panelH, p(3));
     bgFill.fill({ color: COLORS.BG });
-    bgFill.eventMode = 'static';
+    bgFill.eventMode = "static";
     this.container.addChildAt(bgFill, 0);
 
     // Border overlay (on top of everything)
     const borderOverlay = new Graphics();
-    borderOverlay.roundRect(0, 0, W, panelH, 3);
+    borderOverlay.roundRect(0, 0, W, panelH, p(3));
     borderOverlay.stroke({ color: COLORS.BORDER, width: 2 });
-    borderOverlay.eventMode = 'none';
+    borderOverlay.eventMode = "none";
     this.container.addChild(borderOverlay);
 
     // Alignment frame on top
@@ -277,21 +452,21 @@ export class StatsPanel {
   // ─── Helpers ───
 
   private withDynamicTooltip(target: Container, getTip: () => string): void {
-    target.eventMode = 'static';
-    target.cursor = 'default';
-    target.on('pointerover', (e) => {
+    target.eventMode = "static";
+    target.cursor = "default";
+    target.on("pointerover", (e) => {
       showTooltip(this.container, getTip(), e.global.x, e.global.y);
     });
-    target.on('pointerout', () => hideTooltip());
+    target.on("pointerout", () => hideTooltip());
   }
 
   private withTooltip(target: Container, tip: string): void {
-    target.eventMode = 'static';
-    target.cursor = 'default';
-    target.on('pointerover', (e) => {
+    target.eventMode = "static";
+    target.cursor = "default";
+    target.on("pointerover", (e) => {
       showTooltip(this.container, tip, e.global.x, e.global.y);
     });
-    target.on('pointerout', () => hideTooltip());
+    target.on("pointerout", () => hideTooltip());
   }
 
   private makeIcon(label: string, w: number, h: number): Sprite {
@@ -305,47 +480,64 @@ export class StatsPanel {
   }
 
   private addCombatRow(
-    y: number, iconFile: string, label: string, isLP: boolean,
-    onVal: (t: Text) => void, tooltip?: string, tint?: number,
+    y: number,
+    iconFile: string,
+    label: string,
+    isLP: boolean,
+    onVal: (t: Text) => void,
+    W: number,
+    ROW_H: number,
+    ICON_SIZE: number,
+    PX: number,
+    f: (n: number) => number,
+    tooltip?: string,
+    tint?: number
   ): number {
-    const midY = y + METRICS.ROW_H / 2;
+    const midY = y + ROW_H / 2;
 
-    const ico = this.makeIcon(iconFile, METRICS.ICON_SIZE, METRICS.ICON_SIZE);
-    ico.x = METRICS.PX;
-    ico.y = y + (METRICS.ROW_H - METRICS.ICON_SIZE) / 2;
+    const ico = this.makeIcon(iconFile, ICON_SIZE, ICON_SIZE);
+    ico.x = PX;
+    ico.y = y + (ROW_H - ICON_SIZE) / 2;
     if (tint != null) ico.tint = tint;
 
-    const lbl = new Text({ text: label, style: boldText(11, COLORS.TEXT_DARK) });
+    const lbl = new Text({
+      text: label,
+      style: boldText(f(11), COLORS.TEXT_DARK),
+    });
     lbl.anchor.set(0, 0.5);
-    lbl.x = METRICS.PX + 18;
+    lbl.x = PX + Math.round(18 * this.zoom);
     lbl.y = midY;
     this.container.addChild(lbl);
     if (tooltip) this.withTooltip(lbl, tooltip);
 
-    const val = new Text({ text: isLP ? '0 / 0' : '0', style: boldText(11, COLORS.TEXT_DARK) });
+    const val = new Text({
+      text: isLP ? "0 / 0" : "0",
+      style: boldText(f(11), COLORS.TEXT_DARK),
+    });
     val.anchor.set(1, 0.5);
-    val.x = W - METRICS.PX;
+    val.x = W - PX;
     val.y = midY;
     this.container.addChild(val);
     onVal(val);
-    return y + METRICS.ROW_H;
+    return y + ROW_H;
   }
 
   private async loadIcons(): Promise<void> {
-    // Batch load: collect valid paths, load all at once, then assign
+    const res = this.zoom * (window.devicePixelRatio || 1);
     const entries: Array<{ spr: Sprite; path: string }> = [];
     for (const [spr] of this.iconSizes) {
-      entries.push({ spr, path: `${ICON}/${spr.label}` });
+      entries.push({ spr, path: `${ICON()}/${spr.label}` });
     }
 
-    // Load in parallel, ignoring missing files
     const results = await Promise.allSettled(
-      entries.map(e => Assets.load(e.path))
+      entries.map((e) =>
+        Assets.load({ src: e.path, data: { resolution: res } })
+      )
     );
 
     for (let i = 0; i < entries.length; i++) {
       const result = results[i];
-      if (result.status === 'fulfilled' && result.value) {
+      if (result.status === "fulfilled" && result.value) {
         const { spr } = entries[i];
         const size = this.iconSizes.get(spr)!;
         spr.texture = result.value;
@@ -357,20 +549,32 @@ export class StatsPanel {
 
   // ─── Public API ───
 
-  setOnBoostStat(fn: (statId: number) => void): void { this.onBoostStat = fn; }
-  setOnClose(fn: () => void): void { this.onClose = fn; }
-  setClassId(classId: number): void { this.classId = classId; }
+  setOnBoostStat(fn: (statId: number) => void): void {
+    this.onBoostStat = fn;
+  }
+  setOnClose(fn: () => void): void {
+    this.onClose = fn;
+  }
+  setClassId(classId: number): void {
+    this.classId = classId;
+  }
 
-  setCharacterName(name: string): void { this.nameText.text = name; }
+  setCharacterName(name: string): void {
+    this.storedName = name;
+    this.nameText.text = name;
+  }
 
   updateStats(stats: CharacterStats): void {
-    this.levelText.text = `Niveau ${stats.level ?? 1}`;
+    this.storedStats = stats;
+
+    const level = stats.level ?? 1;
+    this.levelText.text = i18n._(LABELS.level.id, { level });
 
     const energy = stats.energy ?? 0;
     const maxEnergy = stats.maxEnergy ?? 1;
     const ePct = maxEnergy > 0 ? energy / maxEnergy : 0;
     this.energyBar.redraw(ePct);
-    this.energyTip = `Énergie : ${energy} / ${maxEnergy}`;
+    this.energyTip = i18n._(LABELS.energyTip.id, { energy, maxEnergy });
 
     const xp = stats.xp ?? 0;
     const xpLow = stats.xpLow ?? 0;
@@ -378,7 +582,11 @@ export class StatsPanel {
     const xpRange = xpHigh - xpLow;
     const xPct = xpRange > 0 ? (xp - xpLow) / xpRange : 0;
     this.xpBar.redraw(xPct);
-    this.xpTip = `Expérience : ${xp - xpLow} / ${xpRange} (niveau ${stats.level ?? 1})`;
+    this.xpTip = i18n._(LABELS.xpTip.id, {
+      current: xp - xpLow,
+      range: xpRange,
+      level,
+    });
 
     this.lpVal.text = `${stats.hp ?? 0} / ${stats.maxHp ?? 0}`;
     this.apVal.text = String(stats.ap ?? 0);
@@ -387,14 +595,19 @@ export class StatsPanel {
     this.discVal.text = String(stats.discernment ?? 0);
 
     const keys: [number, keyof CharacterStats][] = [
-      [STAT_IDS.VITALITY, 'vitality'], [STAT_IDS.WISDOM, 'wisdom'],
-      [STAT_IDS.STRENGTH, 'strength'], [STAT_IDS.INTELLIGENCE, 'intelligence'],
-      [STAT_IDS.CHANCE, 'chance'], [STAT_IDS.AGILITY, 'agility'],
+      [STAT_IDS.VITALITY, "vitality"],
+      [STAT_IDS.WISDOM, "wisdom"],
+      [STAT_IDS.STRENGTH, "strength"],
+      [STAT_IDS.INTELLIGENCE, "intelligence"],
+      [STAT_IDS.CHANCE, "chance"],
+      [STAT_IDS.AGILITY, "agility"],
     ];
     const bp = stats.bonusPoints ?? 0;
     for (const [id, key] of keys) {
       const row = this.statRows.get(id);
-      const v = stats[key] as { base: number; items: number; boost: number } | undefined;
+      const v = stats[key] as
+        | { base: number; items: number; boost: number }
+        | undefined;
       const stat = v ?? { base: 0, items: 0, boost: 0 };
       row?.update(stat);
       const cost = getBoostCost(this.classId, id, stat.base);
@@ -405,13 +618,23 @@ export class StatsPanel {
     this.capitalVal.text = String(bp);
   }
 
-  toggle(): void { this.container.visible = !this.container.visible; }
-  show(): void { this.container.visible = true; }
-  hide(): void { this.container.visible = false; }
-  isVisible(): boolean { return this.container.visible; }
+  toggle(): void {
+    this.container.visible = !this.container.visible;
+  }
+  show(): void {
+    this.container.visible = true;
+  }
+  hide(): void {
+    this.container.visible = false;
+  }
+  isVisible(): boolean {
+    return this.container.visible;
+  }
 
-  setScale(s: number): void { this.container.scale.set(s); }
-  setPosition(x: number, y: number): void { this.container.x = x; this.container.y = y; }
+  setPosition(x: number, y: number): void {
+    this.container.x = x;
+    this.container.y = y;
+  }
 
   destroy(): void {
     for (const row of this.statRows.values()) row.destroy();

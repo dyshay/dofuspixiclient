@@ -1,5 +1,5 @@
 import type { Container, Graphics, Sprite, Texture } from 'pixi.js';
-// import type { Input } from '@pixi/ui'; // TODO: Re-enable when compatible
+import { getAssetPath, getColors, getLayout } from '@/themes';
 
 export interface AssetEntry {
   file: string;
@@ -67,7 +67,20 @@ export interface FilterConfig {
   color: number;
 }
 
-export const BANNER_ASSETS_PATH = '/assets/hud/banner';
+export function getBannerAssetsPath(): string {
+  return getAssetPath('banner');
+}
+
+export const BANNER_ASSETS_PATH = '/themes/classic/assets/banner';
+
+export function getIconButtonConfigs(): IconConfig[] {
+  const buttons = getLayout().banner.iconButtons;
+  return buttons.map((b) => ({
+    key: b.key,
+    path: b.key,
+    x: b.x,
+  }));
+}
 
 export const ICON_BUTTON_CONFIGS: IconConfig[] = [
   { key: 'stats', path: 'stats', x: 476 - 415 },
@@ -80,6 +93,10 @@ export const ICON_BUTTON_CONFIGS: IconConfig[] = [
   { key: 'mount', path: 'mount', x: 680.75 - 415 },
   { key: 'pvp', path: 'pvp', x: 710 - 415 },
 ];
+
+export function getChatFilterConfigs(): FilterConfig[] {
+  return getColors().chatFilters;
+}
 
 export const CHAT_FILTER_CONFIGS: FilterConfig[] = [
   { index: 0, color: 0x009900 },

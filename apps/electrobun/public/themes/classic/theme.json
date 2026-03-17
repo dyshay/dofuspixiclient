@@ -1,0 +1,95 @@
+{
+  "name": "classic",
+  "version": "1.0.0",
+  "colors": {
+    "bg": "0xddd7b2",
+    "bgAlt": "0xc4be96",
+    "headerBg": "0x5c5040",
+    "border": "0x8a7f5f",
+    "textDark": "0x3d3529",
+    "textWhite": "0xffffff",
+    "barBg": "0x3d3529",
+    "barFill": "0xe86420",
+    "barBorder": "0x2a2218",
+    "closeBg": "0xcc4400",
+    "boost": "0xe86420",
+    "boostHover": "0xffaa44",
+    "slotBg": "0xdcd5bf",
+    "alignBorder": "0x88bbcc",
+    "banner": {
+      "background": "0xd5cfaa",
+      "whiteZone": "0xffffff"
+    },
+    "combat": {
+      "spellSlotBg": "0x222222",
+      "spellSlotActive": "0x333333",
+      "spellHighlight": "0xffff00",
+      "apCostText": "0x00aaff",
+      "actionBarBg": "0x000000",
+      "apBar": "0x00aaff",
+      "mpBar": "0x00ff00",
+      "passTurnButton": "0x4444aa",
+      "forfeitButton": "0xaa4444"
+    },
+    "chatFilters": [
+      { "index": 0, "color": "0x009900" },
+      { "index": 2, "color": "0x111111" },
+      { "index": 3, "color": "0x0066ff" },
+      { "index": 4, "color": "0x663399" },
+      { "index": 5, "color": "0xdd7700" },
+      { "index": 6, "color": "0x737373" },
+      { "index": 7, "color": "0x663300" },
+      { "index": 10, "color": "0xe4287c" }
+    ]
+  },
+  "fonts": {
+    "primary": "Arial"
+  },
+  "metrics": {
+    "rowH": 18,
+    "headerH": 17,
+    "px": 10,
+    "iconSize": 14,
+    "barH": 12,
+    "closeSize": 16,
+    "alignFrame": 50,
+    "jobSlot": 42,
+    "specSlot": 30
+  },
+  "layout": {
+    "statsPanel": { "width": 250, "height": 420, "headerH": 28 },
+    "banner": {
+      "offsetY": 125,
+      "whiteZoneTopRight": { "x": 415, "y": 0, "w": 327, "h": 40 },
+      "xpCircle": { "x": 417, "yOffset": 65.4 },
+      "heart": { "x": 395, "yOffset": -5 },
+      "bannerContainer": { "x": 464, "yOffset": 50 },
+      "shortcuts": { "startX": 518.35, "yOffset": 50, "spacingX": 28, "spacingY": 29 },
+      "iconButtons": [
+        { "key": "stats", "x": 61 },
+        { "key": "spells", "x": 90.25 },
+        { "key": "inventory", "x": 119.5 },
+        { "key": "quest", "x": 148.75 },
+        { "key": "map", "x": 178 },
+        { "key": "friends", "x": 207.25 },
+        { "key": "guild", "x": 236.5 },
+        { "key": "mount", "x": 265.75 },
+        { "key": "pvp", "x": 295 }
+      ]
+    },
+    "combat": {
+      "spellBar": { "slotSize": 36, "slotsPerRow": 10, "spacing": 2, "totalSlots": 31 },
+      "actionBar": { "width": 300, "height": 70 }
+    },
+    "display": {
+      "width": 742,
+      "height": 432,
+      "bannerHeight": 125,
+      "gameWidth": 1049,
+      "gameHeight": 786
+    }
+  },
+  "assets": {
+    "basePath": "/themes/classic/assets"
+  }
+}

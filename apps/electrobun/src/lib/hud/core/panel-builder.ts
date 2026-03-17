@@ -14,20 +14,24 @@ export function createSectionHeader(
   y: number,
   w: number,
   label: string,
+  zoom = 1,
 ): { graphics: Graphics; text: Text; nextY: number } {
+  const HEADER_H = Math.round(METRICS.HEADER_H * zoom);
+  const PX = Math.round(METRICS.PX * zoom);
+
   const graphics = new Graphics();
-  graphics.rect(0, y, w, METRICS.HEADER_H);
+  graphics.rect(0, y, w, HEADER_H);
   graphics.fill({ color: COLORS.HEADER_BG });
 
   const text = new Text({
     text: label,
-    style: boldText(11, COLORS.TEXT_WHITE),
+    style: boldText(11 * zoom, COLORS.TEXT_WHITE),
   });
   text.anchor.set(0, 0.5);
-  text.x = METRICS.PX;
-  text.y = y + METRICS.HEADER_H / 2;
+  text.x = PX;
+  text.y = y + HEADER_H / 2;
 
-  return { graphics, text, nextY: y + METRICS.HEADER_H };
+  return { graphics, text, nextY: y + HEADER_H };
 }
 
 export function createAlternatingRow(
@@ -76,20 +80,21 @@ export function createProgressBar(
   return { graphics, redraw };
 }
 
-export function createCloseButton(onClick: () => void): Container {
+export function createCloseButton(onClick: () => void, zoom = 1): Container {
+  const CLOSE_SIZE = Math.round(METRICS.CLOSE_SIZE * zoom);
   const c = new Container();
   c.eventMode = 'static';
   c.cursor = 'pointer';
 
   const bg = new Graphics();
-  bg.rect(0, 0, METRICS.CLOSE_SIZE, METRICS.CLOSE_SIZE);
+  bg.rect(0, 0, CLOSE_SIZE, CLOSE_SIZE);
   bg.fill({ color: COLORS.CLOSE_BG });
   c.addChild(bg);
 
-  const x = new Text({ text: 'x', style: boldText(11, COLORS.TEXT_WHITE) });
+  const x = new Text({ text: 'x', style: boldText(11 * zoom, COLORS.TEXT_WHITE) });
   x.anchor.set(0.5, 0.5);
-  x.x = METRICS.CLOSE_SIZE / 2;
-  x.y = METRICS.CLOSE_SIZE / 2;
+  x.x = CLOSE_SIZE / 2;
+  x.y = CLOSE_SIZE / 2;
   c.addChild(x);
 
   c.on('pointerdown', onClick);

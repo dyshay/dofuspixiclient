@@ -1,9 +1,10 @@
-import { Application, Container, Graphics, Text } from 'pixi.js';
-import { WorldMapRenderer } from '@/ank/gapi/worldmap';
-import {
-  COLORS, METRICS, boldText,
-  createCloseButton,
-} from '../core';
+import { type Application, Container, Graphics, Text } from "pixi.js";
+
+import { WorldMapRenderer } from "@/ank/gapi/worldmap";
+import { i18n } from "@/i18n";
+import { worldMapLabels } from "@/i18n/hud.messages";
+
+import { boldText, COLORS, createCloseButton, METRICS } from "../core";
 
 const HEADER_H = 24;
 const PADDING = 8;
@@ -26,18 +27,21 @@ export class WorldMapPanel {
   constructor(app: Application) {
     this.app = app;
     this.container = new Container();
-    this.container.label = 'world-map-panel';
+    this.container.label = "world-map-panel";
     this.container.visible = false;
-    this.container.eventMode = 'static';
+    this.container.eventMode = "static";
 
     this.bg = new Graphics();
-    this.bg.eventMode = 'static';
+    this.bg.eventMode = "static";
     this.container.addChild(this.bg);
 
     this.header = new Graphics();
     this.container.addChild(this.header);
 
-    const title = new Text({ text: 'Carte du monde', style: boldText(13, COLORS.TEXT_WHITE) });
+    const title = new Text({
+      text: i18n._(worldMapLabels.title),
+      style: boldText(13, COLORS.TEXT_WHITE),
+    });
     title.anchor.set(0, 0.5);
     title.x = PADDING + 4;
     title.y = HEADER_H / 2;

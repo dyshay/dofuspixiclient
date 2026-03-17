@@ -7,6 +7,8 @@ import {
   type Texture,
 } from "pixi.js";
 
+import { getColors, getFonts } from "@/themes";
+
 /**
  * Spell data for display.
  */
@@ -240,9 +242,10 @@ export class SpellBar {
     const height = rows * (this.slotSize + this.spacing) + this.spacing;
 
     this.background.clear();
+    const combat = getColors().combat;
     this.background.roundRect(0, 0, width, height, 4);
-    this.background.fill({ color: 0x000000, alpha: 0.7 });
-    this.background.stroke({ color: 0x333333, width: 1 });
+    this.background.fill({ color: combat.actionBarBg, alpha: 0.7 });
+    this.background.stroke({ color: combat.spellSlotActive, width: 1 });
   }
 
   /**
@@ -272,10 +275,11 @@ export class SpellBar {
     slot.cursor = "pointer";
 
     // Background
+    const combat = getColors().combat;
     const bg = new Graphics();
     bg.label = "bg";
     bg.roundRect(0, 0, this.slotSize, this.slotSize, 4);
-    bg.fill({ color: 0x222222 });
+    bg.fill({ color: combat.spellSlotBg });
     bg.stroke({ color: 0x444444, width: 1 });
     slot.addChild(bg);
 
@@ -292,7 +296,7 @@ export class SpellBar {
 
     // Cooldown text
     const cooldownStyle = new TextStyle({
-      fontFamily: "Arial",
+      fontFamily: getFonts().primary,
       fontSize: 14,
       fontWeight: "bold",
       fill: 0xffffff,
@@ -309,10 +313,10 @@ export class SpellBar {
 
     // AP cost
     const apStyle = new TextStyle({
-      fontFamily: "Arial",
+      fontFamily: getFonts().primary,
       fontSize: 9,
       fontWeight: "bold",
-      fill: 0x00aaff,
+      fill: combat.apCostText,
       stroke: { color: 0x000000, width: 1 },
     });
 
@@ -328,7 +332,7 @@ export class SpellBar {
     const highlight = new Graphics();
     highlight.label = "highlight";
     highlight.roundRect(-2, -2, this.slotSize + 4, this.slotSize + 4, 4);
-    highlight.stroke({ color: 0xffff00, width: 2 });
+    highlight.stroke({ color: combat.spellHighlight, width: 2 });
     highlight.visible = false;
     slot.addChild(highlight);
 
@@ -364,12 +368,13 @@ export class SpellBar {
     bg.clear();
     bg.roundRect(0, 0, this.slotSize, this.slotSize, 4);
 
+    const combat = getColors().combat;
     if (spell.canCast) {
-      bg.fill({ color: 0x333333 });
+      bg.fill({ color: combat.spellSlotActive });
       bg.stroke({ color: 0x666666, width: 1 });
     } else {
-      bg.fill({ color: 0x222222 });
-      bg.stroke({ color: 0x333333, width: 1 });
+      bg.fill({ color: combat.spellSlotBg });
+      bg.stroke({ color: combat.spellSlotActive, width: 1 });
     }
 
     // Update icon
@@ -427,9 +432,10 @@ export class SpellBar {
     const apText = slot.getChildByLabel("ap-cost") as Text;
     const highlight = slot.getChildByLabel("highlight") as Graphics;
 
+    const combat = getColors().combat;
     bg.clear();
     bg.roundRect(0, 0, this.slotSize, this.slotSize, 4);
-    bg.fill({ color: 0x222222 });
+    bg.fill({ color: combat.spellSlotBg });
     bg.stroke({ color: 0x444444, width: 1 });
 
     iconContainer.removeChildren();

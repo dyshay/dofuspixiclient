@@ -1,29 +1,35 @@
-import { Container, Graphics, Text, TextStyle, CanvasTextMetrics } from 'pixi.js';
+import {
+  CanvasTextMetrics,
+  Container,
+  Graphics,
+  Text,
+  TextStyle,
+} from "pixi.js";
 
 const ROW_HEIGHT = 30;
 const PADDING = 2;
 const BORDER_WIDTH = 2;
 const MENU_OFFSET_X = 20; // Offset to the right of cursor
 
-const COLOR_BROWN = 0x514A3C;
-const COLOR_BEIGE = 0xD5CFAA;
+const COLOR_BROWN = 0x514a3c;
+const COLOR_BEIGE = 0xd5cfaa;
 const COLOR_BROWN_TEXT = 0xada57e;
-const COLOR_BEIGE_TEXT = 0x514A3C;
-const COLOR_WHITE = 0xFFFFFF;
+const COLOR_BEIGE_TEXT = 0x514a3c;
+const COLOR_WHITE = 0xffffff;
 
 // bitMini6 bitmap font at normal size (matching Dofus PopupTextArea)
 const FONT_SCALE = 1;
 const TEXT_STYLE = new TextStyle({
-  fontFamily: 'bitMini6',
+  fontFamily: "bit-mini-6",
   fontSize: 12,
-  align: 'left',
-  fontWeight: 'normal',
+  align: "left",
+  fontWeight: "normal",
 });
 
 // Cached measurement texts for efficient sizing
 const measurementTexts = {
-  zaap: CanvasTextMetrics.measureText('Zaap', TEXT_STYLE),
-  use: CanvasTextMetrics.measureText('Use', TEXT_STYLE),
+  zaap: CanvasTextMetrics.measureText("Zaap", TEXT_STYLE),
+  use: CanvasTextMetrics.measureText("Use", TEXT_STYLE),
 };
 
 export class ZaapContextMenu {
@@ -43,7 +49,10 @@ export class ZaapContextMenu {
   }
 
   private calculateMenuWidth(): void {
-    const maxWidth = Math.max(measurementTexts.zaap.width, measurementTexts.use.width);
+    const maxWidth = Math.max(
+      measurementTexts.zaap.width,
+      measurementTexts.use.width
+    );
     // Account for the scale applied to text (6px font scaled up by FONT_SCALE)
     const scaledWidth = maxWidth * FONT_SCALE;
     this.menuWidth = scaledWidth + PADDING * 2 + 15;
@@ -61,20 +70,40 @@ export class ZaapContextMenu {
 
     // Inner brown border
     const innerBorder = new Graphics();
-    innerBorder.rect(BORDER_WIDTH, BORDER_WIDTH, this.menuWidth + BORDER_WIDTH * 2, totalHeight - BORDER_WIDTH * 2);
+    innerBorder.rect(
+      BORDER_WIDTH,
+      BORDER_WIDTH,
+      this.menuWidth + BORDER_WIDTH * 2,
+      totalHeight - BORDER_WIDTH * 2
+    );
     innerBorder.fill(COLOR_BROWN);
     this.container.addChild(innerBorder);
 
     // Row 1: "Zaap" - brown background, brown text
-    const row1 = this.createRow('Zaap', COLOR_BROWN, COLOR_BROWN_TEXT, BORDER_WIDTH * 2);
+    const row1 = this.createRow(
+      "Zaap",
+      COLOR_BROWN,
+      COLOR_BROWN_TEXT,
+      BORDER_WIDTH * 2
+    );
     this.container.addChild(row1);
 
     // Row 2: "Use" - beige background, brown text
-    const row2 = this.createRow('Use', COLOR_BEIGE, COLOR_BEIGE_TEXT, BORDER_WIDTH * 2 + ROW_HEIGHT);
+    const row2 = this.createRow(
+      "Use",
+      COLOR_BEIGE,
+      COLOR_BEIGE_TEXT,
+      BORDER_WIDTH * 2 + ROW_HEIGHT
+    );
     this.container.addChild(row2);
   }
 
-  private createRow(label: string, backgroundColor: number, textColor: number, yOffset: number): Container {
+  private createRow(
+    label: string,
+    backgroundColor: number,
+    textColor: number,
+    yOffset: number
+  ): Container {
     const row = new Container();
     row.position.set(BORDER_WIDTH * 2, yOffset);
 
@@ -86,7 +115,7 @@ export class ZaapContextMenu {
 
     // Text - use same style as measurement but with color override
     const textStyle = new TextStyle({
-      fontFamily: 'bitMini6',
+      fontFamily: "bit-mini-6",
       fontSize: 12,
       fill: textColor,
     });
@@ -99,19 +128,19 @@ export class ZaapContextMenu {
     row.addChild(text);
 
     // Interactive area
-    row.eventMode = 'static';
-    row.cursor = 'pointer';
+    row.eventMode = "static";
+    row.cursor = "pointer";
 
-    row.on('pointerdown', () => {
+    row.on("pointerdown", () => {
       this.onRowClicked(label);
     });
 
     // Hover effect
-    row.on('pointerenter', () => {
+    row.on("pointerenter", () => {
       background.alpha = 0.8;
     });
 
-    row.on('pointerleave', () => {
+    row.on("pointerleave", () => {
       background.alpha = 1;
     });
 
@@ -123,11 +152,11 @@ export class ZaapContextMenu {
     this.hide();
 
     // Handle "Use" button click
-    if (label === 'Use') {
+    if (label === "Use") {
       if (this.onUseCallback) {
         this.onUseCallback();
       }
-      this.container.emit('zaap-use');
+      this.container.emit("zaap-use");
     }
   }
 

@@ -3,8 +3,8 @@ import {
   type Application,
   Container,
   extensions,
+  type Sprite as PixiSprite,
   type Sprite,
-  Sprite as PixiSprite,
   TextureSource,
   Ticker,
 } from "pixi.js";
@@ -14,12 +14,13 @@ import { ZaapContextMenu } from "@/ank/gapi/controls";
 import { DISPLAY_HEIGHT } from "@/constants/battlefield";
 import { type GameWorld, getGameWorld } from "@/ecs/world";
 import { Banner } from "@/hud/banner";
+import { initTooltipBounds } from "@/hud/core/tooltip";
 import { StatsPanel } from "@/hud/stats";
 import { WorldMapPanel } from "@/hud/worldmap";
-import { initTooltipBounds } from "@/hud/core/tooltip";
 import { AtlasLoader } from "@/render/atlas-loader";
 import { Engine } from "@/render/engine";
 import { PickingSystem } from "@/render/picking-system";
+import { loadTheme } from "@/themes";
 
 import {
   CellHighlighter,
@@ -240,6 +241,7 @@ export class Battlefield {
   }
 
   async init(): Promise<void> {
+    await loadTheme("classic");
     await this.engine.init();
     this.app = this.engine.getApp();
 
@@ -287,7 +289,7 @@ export class Battlefield {
     this.app.stage.addChild(this.banner.getGraphics());
 
     // Stats panel — anchored above the banner, right side
-    this.statsPanel = new StatsPanel();
+    this.statsPanel = new StatsPanel(this.engine.getBaseZoom());
     this.updateStatsPanelPosition();
     this.statsPanel.setOnBoostStat((statId) => {
       this.onBoostStatCallback?.(statId);
@@ -346,6 +348,11 @@ export class Battlefield {
     };
 
     Ticker.shared.add(this.ecsTickerCallback);
+  }
+
+  /** Resolves when banner assets are fully loaded and drawn. */
+  async waitForBannerLoaded(): Promise<void> {
+    await this.banner?.whenLoaded();
   }
 
   /**
@@ -422,7 +429,12 @@ export class Battlefield {
   }
 
   async loadMapFromData(mapData: MapData): Promise<void> {
-    if (!this.mapContainer || !this.mapHandler || !this.atlasLoader || !this.app) {
+    if (
+      !this.mapContainer ||
+      !this.mapHandler ||
+      !this.atlasLoader ||
+      !this.app
+    ) {
       return;
     }
 
@@ -532,17 +544,19 @@ export class Battlefield {
       this.initWorldActorContainer();
     }
 
-    return this.worldActorRenderer?.addFighter({
-      id: data.id,
-      name: data.name,
-      team: data.isCurrentPlayer ? 1 : 0, // Blue for self, red for others
-      cellId: data.cellId,
-      direction: data.direction,
-      look: data.look,
-      hp: 100,
-      maxHp: 100,
-      isPlayer: data.isCurrentPlayer,
-    }) ?? Promise.resolve();
+    return (
+      this.worldActorRenderer?.addFighter({
+        id: data.id,
+        name: data.name,
+        team: data.isCurrentPlayer ? 1 : 0, // Blue for self, red for others
+        cellId: data.cellId,
+        direction: data.direction,
+        look: data.look,
+        hp: 100,
+        maxHp: 100,
+        isPlayer: data.isCurrentPlayer,
+      }) ?? Promise.resolve()
+    );
   }
 
   /**
@@ -776,8 +790,12 @@ export class Battlefield {
     if (this.statsPanel?.isVisible()) {
       const c = this.statsPanel.container;
       const bounds = c.getBounds();
-      if (x >= bounds.x && x <= bounds.x + bounds.width &&
-          y >= bounds.y && y <= bounds.y + bounds.height) {
+      if (
+        x >= bounds.x &&
+        x <= bounds.x + bounds.width &&
+        y >= bounds.y &&
+        y <= bounds.y + bounds.height
+      ) {
         return true;
       }
     }
@@ -793,16 +811,11 @@ export class Battlefield {
     this.worldMapPanel?.setArea(this.app.screen.width, bannerY);
 
     if (!this.statsPanel) return;
-    // Panel sticks to the top of the banner, right-aligned
-    const panelH = 420; // must match stats-panel.ts H
-    const panelW = 250; // must match stats-panel.ts W
-    const availableHeight = bannerY;
-    const fitScale = Math.min(zoom, availableHeight / panelH);
-    this.statsPanel.setScale(fitScale);
-    const scaledH = panelH * fitScale;
+    // Rebuild panel at the correct zoom so everything is pixel-crisp
+    this.statsPanel.rebuild(zoom);
     this.statsPanel.setPosition(
-      this.app.screen.width - panelW * fitScale - 4,
-      (bannerY - scaledH) / 2
+      Math.round(this.app.screen.width - this.statsPanel.panelW - 4),
+      Math.round((bannerY - this.statsPanel.panelH) / 2)
     );
   }
 
@@ -848,7 +861,7 @@ export class Battlefield {
 
     this.currentContextMenu = new ZaapContextMenu(onUse);
 
-    if (this.app && this.app.stage) {
+    if (this.app?.stage) {
       this.currentContextMenu.show(x, y, this.app.stage);
     }
   }
