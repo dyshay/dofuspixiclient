@@ -11,6 +11,7 @@ tile_classifier := root + "/tools/tile-classifier"
 sources := root + "/assets/sources"
 tiles_output := root + "/assets/rasters/tiles"
 sprites_output := root + "/assets/rasters/sprites"
+items_output := root + "/apps/electrobun/public/assets/items"
 tiles_spritesheets := root + "/assets/spritesheets/tiles"
 sprites_spritesheets := root + "/assets/spritesheets/sprites"
 tile_classifications := root + "/assets/tile-classifications.json"
@@ -94,6 +95,15 @@ clean-sprite-spritesheets:
     rm -rf "{{sprites_spritesheets}}"
     @echo "✓ Cleaned sprite spritesheets"
 
+# =============================================================================
+# UI Builder
+# =============================================================================
+
+# Launch the interactive UI panel builder (http://localhost:4200)
+ui-builder:
+    @echo "Starting UI Builder on http://localhost:4200..."
+    cd "{{root}}/tools/ui-builder" && bun run dev
+
 # Show current configuration
 info:
     @echo "Configuration:"
@@ -108,6 +118,25 @@ info:
     @echo "  Tiles Rasters:        {{tiles_rasters}}"
     @echo "  Sprites Rasters:      {{sprites_rasters}}"
     @echo "  Parallel Workers:     {{parallel}}"
+
+# =============================================================================
+# Item icons extraction
+# =============================================================================
+
+# Extract item icons from SWF sources to SVG
+extract-items:
+    @echo "Extracting item icons from SWF sources..."
+    cd "{{assets_exporter}}" && php bin/extract-items --output "{{items_output}}"
+
+# Extract item icons with clean (removes existing output first)
+extract-items-clean:
+    @echo "Extracting item icons from SWF sources (clean)..."
+    cd "{{assets_exporter}}" && php bin/extract-items --output "{{items_output}}" --clean
+
+# Extract a single item type (e.g., just extract-item-type 1)
+extract-item-type type:
+    @echo "Extracting item type {{type}}..."
+    cd "{{assets_exporter}}" && php bin/extract-items --output "{{items_output}}" --type {{type}}
 
 # =============================================================================
 # Sprites spritesheet generation
