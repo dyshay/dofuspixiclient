@@ -20,6 +20,6 @@
       "@/*": ["src/lib/*"]
     }
   },
-  "include": ["src", "lingui.config.ts"],
+  "include": ["src", "lingui.config.ts", "*.d.ts"],
   "exclude": ["node_modules", "dist", "build", "../../package/dist"]
 }
