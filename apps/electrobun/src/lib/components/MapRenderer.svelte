@@ -17,7 +17,12 @@
   // Connection state
   let connected = false;
   let loggedIn = false;
-  let characters: Array<{ id: number; name: string; class: number; level: number }> = [];
+  let characters: Array<{
+    id: number;
+    name: string;
+    class: number;
+    level: number;
+  }> = [];
 
   function handleResizeStart() {
     isResizing = true;
@@ -109,32 +114,32 @@
 
   function setupKeybindings() {
     keybindings = new Keybindings();
-    keybindings.on('toggleStats', () => {
+    keybindings.on("toggleStats", () => {
       if (battlefield) {
         battlefield.getStatsPanel()?.toggle();
       }
     });
-    keybindings.on('toggleDebug', () => {
+    keybindings.on("toggleDebug", () => {
       if (battlefield) {
         debugEnabled = battlefield.toggleDebug();
       }
     });
-    keybindings.on('toggleGrid', () => {
+    keybindings.on("toggleGrid", () => {
       if (battlefield) {
         battlefield.toggleGridOverlay();
       }
     });
-    keybindings.on('toggleStressTest', () => {
+    keybindings.on("toggleStressTest", () => {
       if (battlefield) {
         stressTestActive = battlefield.toggleStressTest();
       }
     });
-    keybindings.on('toggleWorldMap', () => {
+    keybindings.on("toggleWorldMap", () => {
       if (battlefield) {
         battlefield.getWorldMapPanel()?.toggle();
       }
     });
-    keybindings.on('escape', () => {
+    keybindings.on("escape", () => {
       if (!battlefield) return;
       // Close the topmost open panel
       if (battlefield.getWorldMapPanel()?.isVisible()) {
