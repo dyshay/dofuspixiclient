@@ -18,7 +18,6 @@ export class WorldMapPanel {
   private bg: Graphics;
   private header: Graphics;
   private closeBtn: Container;
-  private title: Text;
   private loaded = false;
   private areaW = 0;
   private areaH = 0;
@@ -38,11 +37,11 @@ export class WorldMapPanel {
     this.header = new Graphics();
     this.container.addChild(this.header);
 
-    this.title = new Text({ text: 'Carte du monde', style: boldText(13, COLORS.TEXT_WHITE) });
-    this.title.anchor.set(0, 0.5);
-    this.title.x = PADDING + 4;
-    this.title.y = HEADER_H / 2;
-    this.container.addChild(this.title);
+    const title = new Text({ text: 'Carte du monde', style: boldText(13, COLORS.TEXT_WHITE) });
+    title.anchor.set(0, 0.5);
+    title.x = PADDING + 4;
+    title.y = HEADER_H / 2;
+    this.container.addChild(title);
 
     this.closeBtn = createCloseButton(() => this.hide());
     this.closeBtn.y = (HEADER_H - METRICS.CLOSE_SIZE) / 2;

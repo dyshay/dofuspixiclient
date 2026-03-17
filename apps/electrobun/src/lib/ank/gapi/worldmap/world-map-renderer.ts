@@ -286,33 +286,40 @@ export class WorldMapRenderer {
     this.gridGraphics.clear();
     if (!this.showGrid) return;
 
-    const { DISPLAY_WIDTH, DISPLAY_HEIGHT, CHUNK_SIZE } = WORLDMAP_CONSTANTS;
-    const { bounds } = this.manifest;
+    const { bounds, grid_size, tile_size } = this.manifest;
 
-    // Cell size in world map pixels (one game map = one cell)
-    const cellW = DISPLAY_WIDTH / CHUNK_SIZE;
-    const cellH = DISPLAY_HEIGHT / CHUNK_SIZE;
+    // Total map in pixels (tile space)
+    const mapPx = grid_size * tile_size;
 
-    // Number of game-map cells across the world map
-    const xCells = (bounds.xMax - bounds.xMin) * CHUNK_SIZE;
-    const yCells = (bounds.yMax - bounds.yMin) * CHUNK_SIZE;
-    const totalW = xCells * cellW;
-    const totalH = yCells * cellH;
+    // Number of chunks
+    const chunksX = bounds.xMax - bounds.xMin;
+    const chunksY = bounds.yMax - bounds.yMin;
+
+    // Pixels per chunk in tile space
+    const chunkPxW = mapPx / chunksX;
+    const chunkPxH = mapPx / chunksY;
+
+    // Pixels per game-map cell
+    const cellW = chunkPxW / WORLDMAP_CONSTANTS.CHUNK_SIZE;
+    const cellH = chunkPxH / WORLDMAP_CONSTANTS.CHUNK_SIZE;
+
+    const totalCellsX = chunksX * WORLDMAP_CONSTANTS.CHUNK_SIZE;
+    const totalCellsY = chunksY * WORLDMAP_CONSTANTS.CHUNK_SIZE;
 
     const gridColor = 0x000000;
-    const gridAlpha = 0.15;
+    const gridAlpha = 0.12;
 
     // Vertical lines
-    for (let i = 0; i <= xCells; i++) {
+    for (let i = 0; i <= totalCellsX; i++) {
       const x = i * cellW;
-      this.gridGraphics.rect(x, 0, 1, totalH);
+      this.gridGraphics.rect(x, 0, 1, mapPx);
       this.gridGraphics.fill({ color: gridColor, alpha: gridAlpha });
     }
 
     // Horizontal lines
-    for (let j = 0; j <= yCells; j++) {
+    for (let j = 0; j <= totalCellsY; j++) {
       const y = j * cellH;
-      this.gridGraphics.rect(0, y, totalW, 1);
+      this.gridGraphics.rect(0, y, mapPx, 1);
       this.gridGraphics.fill({ color: gridColor, alpha: gridAlpha });
     }
   }
@@ -760,6 +767,36 @@ export class WorldMapRenderer {
       colorIndicator.fill({ color: HINT_COLORS[category.color] ?? 0xffffff });
       this.uiContainer.addChild(colorIndicator);
     });
+
+    // Grid toggle — below categories
+    const gridYPos = 50 + this.hintsData.categories.length * 30 + 10;
+
+    const gridCheckbox = new Graphics();
+    gridCheckbox.rect(20, gridYPos, 20, 20);
+    gridCheckbox.fill({ color: this.showGrid ? 0x44ff44 : 0x444444 });
+    gridCheckbox.stroke({ color: 0xffffff, width: 1 });
+    gridCheckbox.interactive = true;
+    gridCheckbox.cursor = 'pointer';
+    gridCheckbox.on('pointerdown', () => {
+      this.toggleGrid();
+      this.createCategoryUI();
+    });
+    this.uiContainer.addChild(gridCheckbox);
+
+    const gridLabel = new Text({
+      text: 'Grille',
+      style: categoryStyle,
+    });
+    gridLabel.x = 50;
+    gridLabel.y = gridYPos + 2;
+    this.uiContainer.addChild(gridLabel);
+
+    // Resize panel bg to fit
+    const totalH = gridYPos + 30 + 10;
+    panelBg.clear();
+    panelBg.rect(10, 10, 250, totalH - 10);
+    panelBg.fill({ color: 0x000000, alpha: 0.7 });
+    panelBg.stroke({ color: 0x666666, width: 2 });
   }
 
   private showTooltip(text: string, x: number, y: number): void {
